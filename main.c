@@ -4,6 +4,10 @@
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
+struct fecha{
+     int dia,mes,anio; //Inicializamos en 0?
+};
+
 struct tecnico{
      int id;
      long int DNI;
@@ -39,6 +43,12 @@ struct opcion{
      struct tarea *ini;
      struct materiales *ini;
      struct opcion *sgte;
+};
+
+struct pendientes{
+     struct tarea *nodo;
+     struct fecha fec_fin;
+     struct pendientes *sgte;
 };
 
 struct trabajos{
