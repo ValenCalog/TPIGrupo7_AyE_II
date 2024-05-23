@@ -1,21 +1,19 @@
-name: C/C++ CI
+name: Build and Test C/C++ Project
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set up C/C++ environment
-      uses: actions/setup-cpp@v2
-      with:
-        compiler: 'gcc'  # O 'clang' según tu preferencia
+      - name: Set up C/C++ environment
+        uses: actions/setup-cpp@v2
+        with:
+          compiler: 'gcc'  # O 'clang' según tu preferencia
 
-    - name: Build project
-      run: make  # Ejecuta el comando 'make' para compilar tu proyecto
+      - name: Build project
+        run: make  # Ejecuta el comando 'make' para compilar tu proyecto
