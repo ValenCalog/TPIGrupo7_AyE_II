@@ -150,3 +150,15 @@ void listado_finitrab (){
 
 void mopcsvends (){
 }
+
+void altamateriales(){
+    struct materiales nuevo_mat;
+    nuevo_mat->id = buscarmayorid() + 1;
+    printf("Ingrese la descripcion del material: ");
+    gets(nuevo_mat->descripcion);
+    printf(Ingrese cual sera la unidad de medida: ");
+    gets(nuevo_mat->unimed);
+    printf("Ingrese el precio unitario del nuevo material: ");
+    scanf("%f",&nuevo_mat->costo_uni);
+    insertarnuevomat();
+{
