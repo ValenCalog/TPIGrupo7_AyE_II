@@ -153,6 +153,7 @@ void mopcsvends (){
 
 void altamateriales(){
     struct materiales nuevo_mat;
+    nuevo_mat= (struct materiales *) malloc(sizeof(struct materiales))
     nuevo_mat->id = buscarmayorid() + 1;//necesitamos saber el id del ultimo material ingresado
     printf("Ingrese la descripcion del material: ");
     gets(nuevo_mat->descripcion);
