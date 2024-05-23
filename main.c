@@ -161,5 +161,9 @@ void altamateriales(){
     gets(nuevo_mat->unimed);
     printf("Ingrese el precio unitario del nuevo material: ");
     scanf("%f",&nuevo_mat->costo_uni);
-    insertarnuevomat();//insertamos el nodo con el nuevo material al arbol
-{
+    insertarnuevomat(nuevo_mat);//insertamos el nodo con el nuevo material al arbol
+}
+
+void insertarnuevomat(){
+     
+}
