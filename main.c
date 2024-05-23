@@ -41,7 +41,7 @@ struct opcion{
      char Nombre[30];
      float costo;
      struct tarea *ini;
-     struct materiales *ini;
+     struct materiales *iniMat;
      struct opcion *sgte;
 };
 
