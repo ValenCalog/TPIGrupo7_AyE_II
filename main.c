@@ -8,53 +8,59 @@ struct fecha{
      int dia,mes,anio; //Inicializamos en 0?
 };
 
-struct tecnico{
+struct tecnico{ //cola
      int id;
      long int DNI;
      char Nombre[30];
      struct tecnico *sgte;
 };
 
-struct cliente{
+struct cliente{ //cola
      int id;
      long int DNI;
      char Nombre[30];
      struct cliente *sgte;
 };
 
-struct tarea{
+struct tarea{ //lista doblemente enlazada
      int id_op,id_tarea,orden;
      float tiempo;
      char descripcion[30];
-     struct tarea *sgte;
+     struct tarea *sgte, *ant;
 };
 
-struct materiales{
+struct materiales{ //arbol de busqueda binaria
      int id;
-     char descripcion[30];
+     char descripcion[30],unimed[10];
      float costo_uni,cantidad;
-     struct materiales *sgte;
+     struct materiales *izq, *derch;
 };
 
-struct opcion{
+struct materialesop{
+	int idaux, cantidad;
+	struct materialesop *sgte;
+};
+
+struct opcion{ //lista enlazada simple
      int id;
      char Nombre[30];
-     float costo;
-     struct tarea *ini;
+     float costo, tiempo;
      struct materiales *iniMat;
      struct opcion *sgte;
 };
 
-struct pendientes{
-     struct tarea *nodo;
-     struct fecha fec_fin;
-     struct pendientes *sgte;
+struct pendientes{ //pila
+	int id_trabajo,orden;
+	float tiempo;
+    char descripcion[30];
+    struct pendientes *sgte;
 };
 
-struct trabajos{
-     int id_trabajo,id_opcion,may4;
+struct trabajos{ 
+     int id_trabajo,id_opcion,cuatromtrs;
      char direccion[30];
      int id_tecnico, id_cliente;
+	 struct fecha fc_fin;
      struct trabajos *sgte;
 };
 
@@ -69,6 +75,7 @@ void mopcsvends (); //para listar opciones mas vendidas
 int main(int argc, char *argv[]){
 	int opc=-1;
 	while(opc!=0){
+		//system("CLS");
 		opc=menu(opc);
 		switch(opc){
 			case 1:
@@ -118,9 +125,18 @@ int menu (int o){
 }
 
 void listado_opc (){
+	struct opcion{
+     int id;
+     char Nombre[30];
+     float costo;
+     struct tarea *ini;
+     struct materiales *iniMat;
+     struct opcion *sgte;
+};
 }
 
 void alta_opc (){
+	
 }
 
 void alta_trab (){
