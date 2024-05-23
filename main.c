@@ -153,12 +153,12 @@ void mopcsvends (){
 
 void altamateriales(){
     struct materiales nuevo_mat;
-    nuevo_mat->id = buscarmayorid() + 1;
+    nuevo_mat->id = buscarmayorid() + 1;//necesitamos saber el id del ultimo material ingresado
     printf("Ingrese la descripcion del material: ");
     gets(nuevo_mat->descripcion);
     printf(Ingrese cual sera la unidad de medida: ");
     gets(nuevo_mat->unimed);
     printf("Ingrese el precio unitario del nuevo material: ");
     scanf("%f",&nuevo_mat->costo_uni);
-    insertarnuevomat();
+    insertarnuevomat();//insertamos el nodo con el nuevo material al arbol
 {
