@@ -45,7 +45,6 @@ struct opcion{ //lista enlazada simple
      int id;
      char Nombre[30];
      float costo, tiempo;
-     struct materiales *iniMat;
      struct opcion *sgte;
 };
 
@@ -140,7 +139,7 @@ void listado_opc (){
      struct tarea *ini;
      struct materiales *iniMat;
      struct opcion *sgte;
-};
+	};
 }
 
 void alta_opc (){
@@ -155,6 +154,8 @@ void alta_opc (){
 		nueva_op->costo= costo_op(nueva_op->tiempo);
 		nueva_op->sgte=NULL;
 		insertarop(nueva_op);
+	}else{
+		printf("No hay espacio en memoria");
 	}
 }
 
