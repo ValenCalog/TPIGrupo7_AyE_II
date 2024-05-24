@@ -63,8 +63,10 @@ struct pendientes{ //Pila
 
 float OperacionTiempo (int id);
 float OperacionCosto (float tiempo);
+int BuscarTecnicoDisponible ();
 int Menu (int opc);
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
+void AgregarListaEspera (struct trabajos *nuevo_trab);
 void AltaDeMateriales (struct materiales *r);
 void AltaDeOpciones ();
 void AltaDeTrabajos ();
@@ -121,6 +123,9 @@ float OperacionTiempo (int id){
 float OperacionCosto (float tiempo){
 }
 
+int BuscarTecnicoDisponible (){
+}
+
 int Menu (int o){
 	int contgency=0;
 	while( (o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) ){
@@ -153,6 +158,9 @@ struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materi
 		}
 	}
 	return (raiz);
+}
+
+void AgregarListaEspera (struct trabajos *nuevo_trab){
 }
 
 void AltaDeMateriales (struct materiales *raiz){
@@ -200,40 +208,43 @@ void AltaDeOpciones (){
 }
 
 void AltaDeTrabajos (){
-	int tec,espera;
+	int tec, espera;
 	struct trabajos *nuevo_trab;
-	nuevo_trab = (struct trabajos *) malloc(sizeof(struct trabajos));
-	listadoDeOpciones();
-	printf("\nIngrese el ID de la opcion a contratar: ");
-	scanf("%i",&nuevo_trab->id_opcion);
-	printf("\nIngrese el ID de trabajo: ");
-	scanf("%i",&nuevo_trab->id_trabajo); //Despues se puede implementar el buscaridtrabajo() + 1;
-	printf("\nIngrese la direccion de la instalacion");
-	gets(nuevo_trab->direccion);
-	tec = buscartecdisponible(); //funcion que recorra la lista de tecnicos en busca de uno disponible
-	if(tec !=0){ //si el id de tecnicos es 0, es que no hay ninguno disponible
+	nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos) );
+	ListadoDeOpciones();
+	
+	printf( "\n---Ingrese el ID de la opcion a contratar: " );
+	scanf( "%i", &nuevo_trab->id_opcion );
+	
+	printf( "\n---Ingrese el ID de trabajo: " );
+	scanf( "%i", &nuevo_trab->id_trabajo ); //Despues se puede implementar el buscaridtrabajo() + 1;
+	
+	printf( "\n---Ingrese la direccion de la instalacion: " );
+	gets( nuevo_trab->direccion );
+	
+	tec = BuscarTecnicoDisponible(); //funcion que recorra la lista de tecnicos en busca de uno disponible
+	if( tec!=0 ){ //si el id de tecnicos es 0, es que no hay ninguno disponible
 		nuevo_trab->id_tecnico = tec;
 	}else{
-		printf("\nNo hay tecnicos disponibles en este momento");
-		printf("\nDesea ser agregado a la lista de espera?");
-		printf("\n1) Si");
-		printf("\n2) No");
-		printf("\n---> ");
-		scanf("%i",&espera);
-		while(espera!=0){
-			switch(espera){
+		printf( "\nNo hay tecnicos disponibles en este momento" );
+		printf( "\nDesea ser agregado a la lista de espera?" );
+		printf( "\1) Si" );
+		printf( "\2) No" );
+		printf( "\n---> " );
+		scanf( "%i", &espera );
+		while( espera!=0 ){
+			switch( espera ){
 				case 1:
-					agregar_listaespera(nuevo_trab);
+					AgregarListaEspera (nuevo_trab);
 					espera=0;
 				break;
 				case 2:
-					printf("\nDisculpe las molestias, vuelva pronto");
+					printf( "\nDisculpe las molestias, vuelva pronto" );
 					espera=0;
 				break;
 				default:
-					printf("\nIngrese una opcion valida: ");
-					printf("--> );
-					scanf(espera);
+					printf( "\nIngrese una opcion valida: " );
+					scanf( "%i", &espera );
 					break;
 			}
 		}
