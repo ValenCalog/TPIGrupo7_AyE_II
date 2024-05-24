@@ -37,7 +37,7 @@ struct materiales{ //arbol de busqueda binaria
 };
 
 struct materialesop{
-	int idaux, cantidad;
+	int idmat, cantidad,id_opcion;
 	struct materialesop *sgte;
 };
 
@@ -150,7 +150,7 @@ void alta_opc (){
 		printf("Digite el ID de la opcion: ");
 		scanf("%i",&nueva_op->id);
 		printf("Digite el nombre de la nueva opcion: ");
-		gets(Nombre);
+		gets(nueva_op->Nombre);
 		nueva_op->tiempo= tiempo_op(nueva_op->id);
 		nueva_op->costo= costo_op(nueva_op->tiempo);
 		nueva_op->sgte=NULL;
