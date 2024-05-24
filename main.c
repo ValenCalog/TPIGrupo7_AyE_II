@@ -3,7 +3,7 @@
 #include <string.h>
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
-//ahuahauhauahauahuahau
+
 struct fecha{
      int dia,mes,anio; //Inicializamos en 0?
 };
@@ -71,9 +71,13 @@ void alta_trab (); //para dar de alta trabajos
 void listado_trabytar (); //para lisar trabajos pendientes
 void listado_finitrab (); //para listar trabajos finalizados
 void mopcsvends (); //para listar opciones mas vendidas
+void altamateriales(struct materiales *r);
+struct materiales* insertarnuevomat(struct materiales *r, struct materiales *nodo);
 
 int main(int argc, char *argv[]){
+	struct materiales *r, *izq, *der;
 	int opc=-1;
+	
 	while(opc!=0){
 		//system("CLS");
 		opc=menu(opc);
@@ -100,6 +104,10 @@ int main(int argc, char *argv[]){
 				break;
 			case 6:
 				mopcsvends();
+				opc=-1; //NO BORRAR hasta que carguemos la funcion.
+				break;
+			case 7:
+				altamateriales (r);
 				opc=-1; //NO BORRAR hasta que carguemos la funcion.
 				break;
 		}
@@ -151,24 +159,38 @@ void listado_finitrab (){
 void mopcsvends (){
 }
 
-void altamateriales(){
+void altamateriales(struct materiales *raiz){
     struct materiales *nuevo_mat;
 
-    nuevo_mat= (struct materiales *) malloc(sizeof(struct materiales))
-    if (nuevo_mat == NULL) {
+    nuevo_mat= (struct materiales *) malloc(sizeof(struct materiales));
+    if (nuevo_mat == NULL){
        printf("No hay espacio en la memoria /n");
     } else {
       nuevo_mat->id = buscarmayorid() + 1;//necesitamos saber el id del ultimo material ingresado
       printf("Ingrese la descripcion del material: ");
       gets(nuevo_mat->descripcion);
-      printf(Ingrese cual sera la unidad de medida: ");
+      printf("Ingrese cual sera la unidad de medida: ");
       gets(nuevo_mat->unimed);
       printf("Ingrese el precio unitario del nuevo material: ");
       scanf("%f",&nuevo_mat->costo_uni);
-      insertarnuevomat(nuevo_mat);//insertamos el nodo con el nuevo material al arbol
+      raiz = insertarnuevomat(raiz, nuevo_mat);//insertamos el nodo con el nuevo material al arbol
     }
 }
 
-void insertarnuevomat(){
+struct materiales* insertarnuevomat(struct materiales *raiz, struct materiales *nodo){
      
+    if (raiz != NULL){
+     	if (raiz == nodo){
+     		printf("Ya está en la lista. \n");
+		} else {
+			if (nodo<raiz){
+				raiz->izq = insertarnuevomat(raiz->izq,nodo);
+			} else {
+				raiz->derch = insertarnuevomat(raiz->derch,nodo);
+			}
+		}
+	} else {
+		raiz=nodo;
+	}
+	return (raiz);
 }
