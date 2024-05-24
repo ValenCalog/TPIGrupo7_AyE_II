@@ -48,7 +48,7 @@ struct opcion{ //Lista Enlazada Simple.
 };
 
 struct tecnico{ //Lista Enlazada Simple.
-     int id;
+     int id,disponible; //1 esta disponible, 0 si no esta disponible
      long int DNI;
      char Nombre[30];
      struct tecnico *sgte;
