@@ -178,14 +178,16 @@ void altamateriales(struct materiales *raiz){
     if (nuevo_mat == NULL){
        printf("No hay espacio en la memoria /n");
     } else {
-      nuevo_mat->id = buscarmayorid() + 1;//necesitamos saber el id del ultimo material ingresado
-      printf("Ingrese la descripcion del material: ");
-      gets(nuevo_mat->descripcion);
-      printf("Ingrese cual sera la unidad de medida: ");
-      gets(nuevo_mat->unimed);
-      printf("Ingrese el precio unitario del nuevo material: ");
-      scanf("%f",&nuevo_mat->costo_uni);
-      raiz = insertarnuevomat(raiz, nuevo_mat);//insertamos el nodo con el nuevo material al arbol
+    	printf("Ingrese el ID de material: ");
+     scanf("%i",&nuevo_mat->id)
+     //nuevo_mat->id = buscarmayorid() + 1; necesitamos saber el id del ultimo material ingresado
+     printf("Ingrese la descripcion del material: ");
+     gets(nuevo_mat->descripcion);
+     printf("Ingrese cual sera la unidad de medida: ");
+     gets(nuevo_mat->unimed);
+     printf("Ingrese el precio unitario del nuevo material: ");
+     scanf("%f",&nuevo_mat->costo_uni);
+     raiz = insertarnuevomat(raiz, nuevo_mat);//insertamos el nodo con el nuevo material al arbol
     }
 }
 
