@@ -144,7 +144,18 @@ void listado_opc (){
 }
 
 void alta_opc (){
-	
+	struct opcion nueva_op;
+	nueva_op = (struct opcion *) malloc(sizeof(struct opcion));
+	if (nueva_op!=NULL){
+		printf("Digite el ID de la opcion: ");
+		scanf("%i",&nueva_op->id);
+		printf("Digite el nombre de la nueva opcion: ");
+		gets(Nombre);
+		nueva_op->tiempo= tiempo_op(nueva_op->id);
+		nueva_op->costo= costo_op(nueva_op->tiempo);
+		nueva_op->sgte=NULL;
+		insertarop(nueva_op);
+	}
 }
 
 void alta_trab (){
