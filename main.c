@@ -2,10 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct fecha{
-     int dia,mes,anio;
-};
-
 struct materiales{ //Arbol de Busqueda Binaria.
      int id;
      char descripcion[30],unimed[10];
@@ -14,16 +10,15 @@ struct materiales{ //Arbol de Busqueda Binaria.
 };
 
 struct trabajos{ //Cola.
-     int id_trabajo,id_opcion,cuatromtrs;
+     int id_trabajo, id_opcion, cuatromtrs;
      float CostoTotal;
      char direccion[30];
-     int id_tecnico, id_cliente;
-	struct fecha fc_fin;
+     int id_tecnico, id_cliente, fc_fin[3];
      struct trabajos *sgte;
 };
 
 struct tarea{ //Lista Doblemente Enlazada.
-     int id_op,id_tarea,orden;
+     int id_op, id_tarea, orden;
      float tiempo;
      char descripcion[30];
      struct tarea *sgte, *ant;
@@ -37,7 +32,7 @@ struct cliente{ //Lista Enlazada Simple.
 };
 
 struct materialesop{ //Lista Enlazada Simple.
-	int idmat, cantidad,id_opcion;
+	int idmat, cantidad, id_opcion;
 	struct materialesop *sgte;
 };
 
@@ -62,20 +57,25 @@ struct pendientes{ //Pila
     struct pendientes *sgte;
 };
 
+
 float OperacionTiempo (int id);
 float OperacionCosto (float tiempo);
+float CostoManodeObra(int cod_op);
+
 int buscartecnico();
 int buscarcliente(int codcliente);
-float CostoManodeObra(int cod_op);
-void InsertarTrabajo(struct trabajos ** nvt);
 int Menu (int opc);
+
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
+
 void AgregarListaEspera (struct trabajos *nuevo_trab);
 void AltaDeMateriales (struct materiales *r);
 void AltaDeOpciones ();
 void AltaDeTrabajos ();
 void AltaDeClientes();
+void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 void InsertarOpcion (struct opcion *nueva_op);
+void InsertarTrabajo(struct trabajos ** nvt);
 void ListadoDeOpciones ();
 void ListadoDePendientes ();
 void ListadoDeFinalizados ();
@@ -83,9 +83,18 @@ void OpcionesMasVendidas ();
 
 
 int main(int argc, char *argv[]){
-	struct materiales *r;
-
+	struct cliente *inicli;
+	struct materiales *raiz;
+	struct materialesop *inimat;
+	struct tarea *initar;
+	struct tecnico *initech;
+	struct trabajos *e,*s;
+	struct opcion *iniopc;
+	struct pendientes *tope;
 	int opc=-1;
+	FILE *p;
+	
+	CargaSupremaDeEstructuras(p, &inicli, &raiz, &inimat, &initar, &initech, &e, &s, &iniopc, &tope);
 	
 	while(opc!=0){
 		//system("CLS");
@@ -116,7 +125,7 @@ int main(int argc, char *argv[]){
 				opc=-1; //NO BORRAR hasta que carguemos la funcion.
 				break;
 			case 7:
-				AltaDeMateriales(r);
+				AltaDeMateriales(raiz);
 				opc=-1; //NO BORRAR hasta que carguemos la funcion.
 				break;
 		}
@@ -130,16 +139,20 @@ float OperacionTiempo (int id){
 float OperacionCosto (float tiempo){
 }
 
-int buscartecnico(){
-}
-
-int buscarcliente(int codcliente){
-}
 
 float CostoManodeObra(int cod_op){
 }
 
 void InsertarTrabajo(struct trabajos ** nvt){
+}
+
+void AltaDeClientes(){
+}
+
+int buscartecnico(){
+}
+
+int buscarcliente(int codcliente){
 }
 
 int Menu (int o){
@@ -176,9 +189,6 @@ struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materi
 	return (raiz);
 }
 
-void AltaDeClientes(int codcliente){
-	
-}
 
 void AltaDeMateriales (struct materiales *raiz){
     struct materiales *nuevo_mat;
@@ -259,7 +269,7 @@ void AltaDeTrabajos (){
 		while(op!=0){
 			switch(op){
 			case 1:
-				AltaDeClientes(nuevo_trab->id_cliente);
+				AltaDeClientes();
 				op=0;
 				break;
 			case 2:
@@ -280,25 +290,46 @@ void AltaDeTrabajos (){
 		InsertarTrabajo(&nuevo_trab);
 	}
 }
-/*
-struct trabajos{ //Cola.
-     int id_trabajo,id_opcion,cuatromtrs;
-     float CostoTotal;
-     char direccion[30];
-     int id_tecnico, id_cliente;
-	struct fecha fc_fin;
-     struct trabajos *sgte;
-};
 
-struct trab{ //Al archivo
-     int id_trabajo,id_opcion,cuatromtrs;
-     float CostoTotal;
-     char direccion[30];
-     int id_tecnico, id_cliente;
-	struct fecha fc_fin;
-}job;
+void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
+	struct cliente *cli, *ant;
+	struct materiales *mat;
+	struct materialesop *mato;
+	struct tarea *tar;
+	struct tecnico *tech;
+	struct trabajos *trab;
+	struct opcion *opc;
+	struct pendientes *pend;
+	int cont=0;
+	
+	if((p=fopen("clientes.bin","r+b"))==NULL){
+		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
+	}else{
+		while(!feof(p)){
+			cont++;
+			if(cont==1){
+				cli=(struct cliente *) malloc(sizeof (struct cliente) );
+				fscanf(p, "%ld" ,cli->DNI);
+				fscanf(p, "%d" ,cli->id);
+				fscanf(p, "%s" ,cli->Nombre);
+				(*inicli)=cli;
+				(*inicli)->sgte=NULL;
+			}else{
+				ant->sgte=cli;
+				cli=(struct cliente *) malloc(sizeof (struct cliente) );
+				fscanf(p, "%ld" ,cli->DNI);
+				fscanf(p, "%d" ,cli->id);
+				fscanf(p, "%s" ,cli->Nombre);
+				ant=cli;
+			}
+		}
+		fclose(p);
+	}
+}
 
-int main(){
+//------------------------------------------------------------------------------//
+
+/*int main(){
 	FILE *archtrabajo;
 }
 
@@ -320,8 +351,7 @@ void ArmarListaTrab(){
 			p->sgte=NULL;
 			encolartrab(&p,&E,&S);
 		}
-}
-*/
+}*/
 
 
 void InsertarOpcion (struct opcion *nueva_op){
