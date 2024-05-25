@@ -280,7 +280,15 @@ void AltaDeTrabajos (){
 		InsertarTrabajo(&nuevo_trab);
 	}
 }
-	
+/*
+void InsertarTrabajo(struct trabajos ** nv){
+	ArmarListaTrab();
+}
+
+void ArmarListaTrab(){
+
+}
+*/
 
 
 void InsertarOpcion (struct opcion *nueva_op){
