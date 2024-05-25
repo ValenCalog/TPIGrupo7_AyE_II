@@ -48,7 +48,7 @@ struct opcion{ //Lista Enlazada Simple.
      struct opcion *sgte;
 };
 
-struct tecnico{ //Lista Enlazada Simple.
+struct tecnico{ //Lista Enlazada Simple. La cambiamos a cola(?
      int id;
      long int DNI;
      char Nombre[30];
@@ -84,6 +84,7 @@ void OpcionesMasVendidas ();
 
 int main(int argc, char *argv[]){
 	struct materiales *r;
+
 	int opc=-1;
 	
 	while(opc!=0){
@@ -139,6 +140,9 @@ float CostoManodeObra(int cod_op){
 }
 
 void InsertarTrabajo(struct trabajos ** nvt){
+}
+
+void AltaDeClientes(){
 }
 
 int Menu (int o){
@@ -255,7 +259,7 @@ void AltaDeTrabajos (){
 		while(op!=0){
 			switch(op){
 			case 1:
-				void AltaDeClientes();
+				AltaDeClientes();
 				op=0;
 				break;
 			case 2:
