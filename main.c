@@ -142,9 +142,6 @@ float CostoManodeObra(int cod_op){
 void InsertarTrabajo(struct trabajos ** nvt){
 }
 
-void AltaDeClientes(){
-}
-
 int Menu (int o){
 	int contgency=0;
 	while( (o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) ){
@@ -179,6 +176,9 @@ struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materi
 	return (raiz);
 }
 
+void AltaDeClientes(int codcliente){
+	
+}
 
 void AltaDeMateriales (struct materiales *raiz){
     struct materiales *nuevo_mat;
@@ -259,7 +259,7 @@ void AltaDeTrabajos (){
 		while(op!=0){
 			switch(op){
 			case 1:
-				AltaDeClientes();
+				AltaDeClientes(nuevo_trab->id_cliente);
 				op=0;
 				break;
 			case 2:
