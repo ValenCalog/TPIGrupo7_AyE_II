@@ -281,12 +281,45 @@ void AltaDeTrabajos (){
 	}
 }
 /*
+struct trabajos{ //Cola.
+     int id_trabajo,id_opcion,cuatromtrs;
+     float CostoTotal;
+     char direccion[30];
+     int id_tecnico, id_cliente;
+	struct fecha fc_fin;
+     struct trabajos *sgte;
+};
+
+struct trab{ //Al archivo
+     int id_trabajo,id_opcion,cuatromtrs;
+     float CostoTotal;
+     char direccion[30];
+     int id_tecnico, id_cliente;
+	struct fecha fc_fin;
+}job;
+
+int main(){
+	FILE *archtrabajo;
+}
+
 void InsertarTrabajo(struct trabajos ** nv){
 	ArmarListaTrab();
 }
 
 void ArmarListaTrab(){
-
+	struct trabajos *p=NULL,*E=NULL,*S=NULL;
+	if((archtrabajo=fopen("TRABAJOS.bin","r+b")==NULL)){
+		printf("Error de apertura de archivo");
+	}
+		fread(&job,sizeof(job),1,archtrabajo);
+		while(!feof(archtrabajo)){
+			p=(struct trabajos *)malloc(sizeof(struct trabajos));
+			p->id_trabajo = job.id_trabajo;
+			p->id_opcion = job.id_opcion;
+			//Lo mismo para todos los campos
+			p->sgte=NULL;
+			encolartrab(&p,&E,&S);
+		}
 }
 */
 
