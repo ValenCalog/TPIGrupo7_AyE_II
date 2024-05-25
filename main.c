@@ -59,8 +59,8 @@ struct pendientes{ //Pila
 
 
 float OperacionTiempo (int id);
-float OperacionCosto (float tiempo);
-float CostoManodeObra(int cod_op);
+//float OperacionCosto (float tiempo);
+//float CostoManodeObra(int cod_op);
 
 int buscartecnico();
 int buscarcliente(int codcliente);
@@ -134,14 +134,22 @@ int main(int argc, char *argv[]){
 }
 
 float OperacionTiempo (int id){
+	float tiempo=0;
+	struct tarea *aux=NULL;
+	aux=initar; //Se puede asignar de esta forma ya que es una variable global
+	while(aux!=NULL){
+		if(aux->id==id){
+			tiempo = tiempo + aux->tiempo;
+		}
+	}
+	return tiempo;
 }
 
-float OperacionCosto (float tiempo){
+float OperacionCosto(float tiempo){
 }
 
-
-float CostoManodeObra(int cod_op){
-}
+/*float CostoManodeObra(int cod_op){
+}*/
 
 void InsertarTrabajo(struct trabajos ** nvt){
 }
@@ -228,7 +236,9 @@ void AltaDeOpciones (){
 		gets( nueva_op->Nombre );
 		
 		nueva_op->tiempo = OperacionTiempo ( nueva_op->id );
-		nueva_op->costo = OperacionCosto ( nueva_op->tiempo );
+		nueva_op->costo = OperacionTiempo ( nueva_op->id )*100;
+		//100 es el costo de cada hora de trabajo
+		//Por ahora no se tiene en cuenta el costo de los materiales
 		nueva_op->sgte = NULL;
 		InsertarOpcion (nueva_op);
 	}
@@ -253,7 +263,7 @@ void AltaDeTrabajos (){
 	scanf("%i",&nuevo_trab->cuatromtrs); //0 no requiere, 1 si requiere trabajo en altura
 	
 	nuevo_trab->id_tecnico = buscartecnico();
-	nuevo_trab->CostoTotal = CostoManodeObra(nuevo_trab->id_opcion) + (CostoManodeObra(nuevo_trab->id_opcion)*nuevo_trab->cuatromtrs*0.20);
+	nuevo_trab->CostoTotal = (OperacionTiempo(nuevo_trab->id_opcion)*100) + ((OperacionTiempo(nuevo_trab->id_opcion)*100) *nuevo_trab->cuatromtrs*0.20);
 	//Por ahora no se esta teniendo en cuenta el costo de los materiales en CostoTotal
 	//Si cuatromtrs es 0, no requiere trabajo en altura, por lo cual el resultado del producto sera 0 y no se suma el 20%
 	printf("\nIngrese su ID de cliente: ");
@@ -320,7 +330,11 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 				fscanf(p, "%ld" ,cli->DNI);
 				fscanf(p, "%d" ,cli->id);
 				fscanf(p, "%s" ,cli->Nombre);
-				ant=cli;
+				ant=inicli;
+				while(ant.sgte!=NULL){
+					ant=ant.sgte;
+				}
+				ant.sgte=cli;
 			}
 		}
 		fclose(p);
