@@ -15,9 +15,10 @@ struct materiales{ //Arbol de Busqueda Binaria.
 
 struct trabajos{ //Cola.
      int id_trabajo,id_opcion,cuatromtrs;
+     float CostoTotal;
      char direccion[30];
      int id_tecnico, id_cliente;
-	 struct fecha fc_fin;
+	struct fecha fc_fin;
      struct trabajos *sgte;
 };
 
@@ -48,7 +49,7 @@ struct opcion{ //Lista Enlazada Simple.
 };
 
 struct tecnico{ //Lista Enlazada Simple.
-     int id,disponible; //1 esta disponible, 0 si no esta disponible
+     int id;
      long int DNI;
      char Nombre[30];
      struct tecnico *sgte;
@@ -63,18 +64,23 @@ struct pendientes{ //Pila
 
 float OperacionTiempo (int id);
 float OperacionCosto (float tiempo);
-int BuscarTecnicoDisponible ();
+int buscartecnico();
+int buscarcliente(int codcliente);
+float CostoManodeObra(int cod_op);
+void InsertarTrabajo(struct trabajos ** nvt);
 int Menu (int opc);
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
 void AgregarListaEspera (struct trabajos *nuevo_trab);
 void AltaDeMateriales (struct materiales *r);
 void AltaDeOpciones ();
 void AltaDeTrabajos ();
+void AltaDeClientes();
 void InsertarOpcion (struct opcion *nueva_op);
 void ListadoDeOpciones ();
 void ListadoDePendientes ();
 void ListadoDeFinalizados ();
 void OpcionesMasVendidas ();
+
 
 int main(int argc, char *argv[]){
 	struct materiales *r;
@@ -123,7 +129,16 @@ float OperacionTiempo (int id){
 float OperacionCosto (float tiempo){
 }
 
-int BuscarTecnicoDisponible (){
+int buscartecnico(){
+}
+
+int buscarcliente(int codcliente){
+}
+
+float CostoManodeObra(int cod_op){
+}
+
+void InsertarTrabajo(struct trabajos ** nvt){
 }
 
 int Menu (int o){
@@ -160,8 +175,6 @@ struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materi
 	return (raiz);
 }
 
-void AgregarListaEspera (struct trabajos *nuevo_trab){
-}
 
 void AltaDeMateriales (struct materiales *raiz){
     struct materiales *nuevo_mat;
@@ -208,57 +221,63 @@ void AltaDeOpciones (){
 }
 
 void AltaDeTrabajos (){
-	int tec, espera;
+	int op;
 	struct trabajos *nuevo_trab;
-	nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos) );
+	nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos));
+	nuevo_trab->sgte = NULL;
 	ListadoDeOpciones();
 	
-	printf( "\n---Ingrese el ID de la opcion a contratar: " );
-	scanf( "%i", &nuevo_trab->id_opcion );
+	printf("\n---Ingrese el ID de la opcion a contratar: ");
+	scanf("%i",&nuevo_trab->id_opcion);
 	
-	printf( "\n---Ingrese el ID de trabajo: " );
-	scanf( "%i", &nuevo_trab->id_trabajo ); //Despues se puede implementar el buscaridtrabajo() + 1;
+	printf("\n---Ingrese el ID de trabajo: ");
+	scanf( "%i",&nuevo_trab->id_trabajo); //Despues se puede implementar el buscaridtrabajo() + 1;
 	
-	printf( "\n---Ingrese la direccion de la instalacion: " );
-	gets( nuevo_trab->direccion );
+	printf("\n---Ingrese la direccion de la instalacion: ");
+	gets(nuevo_trab->direccion);
+	printf("\nRequiere trabajo en altura?: ");
+	scanf("%i",&nuevo_trab->cuatromtrs); //0 no requiere, 1 si requiere trabajo en altura
 	
-	tec = BuscarTecnicoDisponible(); //funcion que recorra la lista de tecnicos en busca de uno disponible
-	if( tec!=0 ){ //si el id de tecnicos es 0, es que no hay ninguno disponible
-		nuevo_trab->id_tecnico = tec;
-	}else{
-		printf( "\nNo hay tecnicos disponibles en este momento" );
-		printf( "\nDesea ser agregado a la lista de espera?" );
-		printf( "\1) Si" );
-		printf( "\2) No" );
-		printf( "\n---> " );
-		scanf( "%i", &espera );
-		while( espera!=0 ){
-			switch( espera ){
-				case 1:
-					AgregarListaEspera (nuevo_trab);
-					espera=0;
+	nuevo_trab->id_tecnico = buscartecnico();
+	nuevo_trab->CostoTotal = CostoManodeObra(nuevo_trab->id_opcion) + (CostoManodeObra(nuevo_trab->id_opcion)*nuevo_trab->cuatromtrs*0.20);
+	//Por ahora no se esta teniendo en cuenta el costo de los materiales en CostoTotal
+	//Si cuatromtrs es 0, no requiere trabajo en altura, por lo cual el resultado del producto sera 0 y no se suma el 20%
+	printf("\nIngrese su ID de cliente: ");
+	scanf("%i",&nuevo_trab->id_cliente);
+	if(buscarcliente(nuevo_trab->id_cliente)==0){ 
+		//buscarcliente recorre la lista de clientes en busca del id ingresado, si no lo encuentra devuelve 0
+		printf("\nNo se ha encontrado un cliente asociado a la ID ingresada");
+		printf("\nDesea darse de alta como cliente?");
+		printf("\n1)Si");
+		printf("\n2)No");
+		printf("\n--> ");
+		scanf("%i",&op);
+		while(op!=0){
+			switch(op){
+			case 1:
+				void AltaDeClientes();
+				op=0;
 				break;
-				case 2:
-					printf( "\nDisculpe las molestias, vuelva pronto" );
-					espera=0;
+			case 2:
+				printf("\nDisculpe las molestias, vuelva pronto");
+				nuevo_trab->id_cliente=0;//Si no esta en la lista de clientes y no quiere estarlo, se cancela la solicitud de trabajo
+				op=0;
 				break;
-				default:
-					printf( "\nIngrese una opcion valida: " );
-					scanf( "%i", &espera );
-					break;
+			default:
+				printf("Ingrese una opcion valida: ");
+				printf("\n--> ");
+				scanf("%i",&op);
+				break;
 			}
-		}
-	//Falta agregar ID CLIENTE y Costo Total
-	//Observacion: No agregaamos el campo "Costo Total" en la estructura trabajos, se pide en la consigna
+		}	
 	}
-	/*struct trabajos{ //Cola.
-     		int id_trabajo,id_opcion,cuatromtrs;
-    		char direccion[30];
-     		int id_tecnico, id_cliente;
-		struct fecha fc_fin;
-     		struct trabajos *sgte;
-	};*/
+
+	if (nuevo_trab->id_cliente != 0){ //Si no esta en 0 significa que existe en la lista de clientes
+		InsertarTrabajo(&nuevo_trab);
+	}
 }
+	
+
 
 void InsertarOpcion (struct opcion *nueva_op){
 }
