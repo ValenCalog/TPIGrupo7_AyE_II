@@ -66,6 +66,7 @@ int buscartecnico();
 int buscarcliente(int codcliente);
 int Menu (int opc);
 
+struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz);
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
 
 void AgregarListaEspera (struct trabajos *nuevo_trab);
@@ -73,7 +74,7 @@ void AltaDeMateriales (struct materiales *r);
 void AltaDeOpciones ();
 void AltaDeTrabajos ();
 void AltaDeClientes();
-void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
+void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales *raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 void InsertarOpcion (struct opcion *nueva_op);
 void InsertarTrabajo(struct trabajos ** nvt);
 void ListadoDeOpciones ();
@@ -180,6 +181,21 @@ int Menu (int o){
 	return (o);
 }
 
+struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz){
+	if( raiz == NULL) {
+		mat->derch = NULL;
+		mat->izq = NULL;
+		raiz = mat;
+	}else{
+		if( mat->id < raiz->id ){
+			raiz->izq = InsertarMaterial(mat, raiz);
+		}else{
+			raiz->derch = InsertarMaterial(mat, raiz);
+		}
+	}
+	return(raiz);
+}
+
 struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materiales *nodo){
 	if( raiz == NULL ){
 		raiz = nodo;
@@ -196,7 +212,6 @@ struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materi
 	}
 	return (raiz);
 }
-
 
 void AltaDeMateriales (struct materiales *raiz){
     struct materiales *nuevo_mat;
@@ -301,72 +316,114 @@ void AltaDeTrabajos (){
 	}
 }
 
-void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
-	struct cliente *cli, *ant;
-	struct materiales *mat;
-	struct materialesop *mato;
-	struct tarea *tar;
-	struct tecnico *tech;
-	struct trabajos *trab;
-	struct opcion *opc;
-	struct pendientes *pend;
-	int cont=0;
+void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales *raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
+	struct cliente *cli=NULL, *antc=NULL;
+	struct materiales *mat=NULL;
+	struct materialesop *mato=NULL, *antm=NULL;
+	struct tarea *tar=NULL, *antt=NULL;
+	struct tecnico *tech=NULL;
+	struct trabajos *trab=NULL;
+	struct opcion *opc=NULL;
+	struct pendientes *pend=NULL;
 	
+	//carga lista simple clientes
 	if((p=fopen("clientes.bin","r+b"))==NULL){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
 		while(!feof(p)){
-			cont++;
-			if(cont==1){
-				cli=(struct cliente *) malloc(sizeof (struct cliente) );
-				fscanf(p, "%ld" ,cli->DNI);
-				fscanf(p, "%d" ,cli->id);
-				fscanf(p, "%s" ,cli->Nombre);
-				(*inicli)=cli;
-				(*inicli)->sgte=NULL;
+			cli=(struct cliente *) malloc(sizeof (struct cliente) );
+			if(cli==NULL){
+				printf("-------No hay espacio de memoria-------\n");
 			}else{
-				ant->sgte=cli;
-				cli=(struct cliente *) malloc(sizeof (struct cliente) );
 				fscanf(p, "%ld" ,cli->DNI);
 				fscanf(p, "%d" ,cli->id);
-				fscanf(p, "%s" ,cli->Nombre);
-				ant=inicli;
-				while(ant.sgte!=NULL){
-					ant=ant.sgte;
+				fscanf(p, "%s" ,cli->Nombre);					
+				if(inicli==NULL){
+					(*inicli)=cli;
+					(*inicli)->sgte=NULL;
+				}else{
+					antc->sgte=cli;
+					antc=cli;
 				}
-				ant.sgte=cli;
+			}
+		}
+		fclose(p);
+	}
+	
+	//carga arbol materiales
+	p=NULL;
+	if((p=fopen("materiales.bin","r+b"))==NULL){
+		printf("||||||| Error de apertura de archivo Materiales durante la carga |||||||\n");
+	}else{
+		while(!feof(p)){
+			mat=(struct materiales *) malloc(sizeof (struct materiales) );
+			if(mat==NULL){
+				printf("-------No hay espacio de memoria-------\n");
+			}else{
+				fscanf(p, "%f", mat->cantidad);
+				fscanf(p, "%f", mat->costo_uni);
+				fscanf(p, "%s", mat->descripcion);
+				fscanf(p, "%d", mat->id);
+				fscanf(p, "%s", mat->unimed);
+				raiz = InsertarMaterial(mat, raiz);
+			}
+		}
+		fclose(p);
+	}
+	
+	//carga lista simple materiales
+	p=NULL;
+	antm=NULL;
+	if((p=fopen("materialesop.bin","r+b"))==NULL){
+		printf("||||||| Error de apertura de archivo Materiales por Opcion durante la carga |||||||\n");
+	}else{
+		while(!feof(p)){
+			mato=(struct materialesop *) malloc(sizeof(struct materialesop));
+			if(mato==NULL){
+				printf("-------No hay espacio de memoria-------\n");
+			}else{
+				fscanf(p, "%d", mato->cantidad);
+				fscanf(p, "%d", mato->idmat);
+				fscanf(p, "%d", mato->id_opcion);
+				if(inicli==NULL){
+					(*inimat)=mato;
+					(*inimat)->sgte=NULL;
+				}else{
+					antm->sgte=mato;
+					antm=mato;
+				}
+			}
+		}
+		fclose(p);
+	}
+	
+	//carga lista doble tareas
+	p=NULL;
+	if((p=fopen("tareas.bin","r+b"))==NULL){
+		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
+	}else{
+		while(!feof(p)){
+			tar=(struct tarea *) malloc(sizeof (struct tarea) );
+			if(tar==NULL){
+				printf("-------No hay espacio de memoria-------\n");
+			}else{
+				fscanf(p, "%s", tar->descripcion);
+				fscanf(p, "%d", tar->id_op);
+				fscanf(p, "%d", tar->id_tarea);
+				fscanf(p, "%d", tar->orden);
+				fscanf(p, "%f", tar->tiempo);
+				if(initar==NULL){
+					(*initar)=tar;
+					(*initar)->sgte=NULL;
+					(*initar)->ant=NULL;
+				}else{
+					
+				}
 			}
 		}
 		fclose(p);
 	}
 }
-
-//------------------------------------------------------------------------------//
-
-/*int main(){
-	FILE *archtrabajo;
-}
-
-void InsertarTrabajo(struct trabajos ** nv){
-	ArmarListaTrab();
-}
-
-void ArmarListaTrab(){
-	struct trabajos *p=NULL,*E=NULL,*S=NULL;
-	if((archtrabajo=fopen("TRABAJOS.bin","r+b")==NULL)){
-		printf("Error de apertura de archivo");
-	}
-		fread(&job,sizeof(job),1,archtrabajo);
-		while(!feof(archtrabajo)){
-			p=(struct trabajos *)malloc(sizeof(struct trabajos));
-			p->id_trabajo = job.id_trabajo;
-			p->id_opcion = job.id_opcion;
-			//Lo mismo para todos los campos
-			p->sgte=NULL;
-			encolartrab(&p,&E,&S);
-		}
-}*/
-
 
 void InsertarOpcion (struct opcion *nueva_op){
 }
