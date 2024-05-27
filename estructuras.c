@@ -57,3 +57,15 @@ struct pendientes{ //Pila
     struct pendientes *sgte;
 };
 
+int main(int argc, char *argv[]){
+	struct cliente *inicli;
+	struct materiales *raiz;
+	struct materialesop *inimat;
+	struct tarea *initar;
+	struct tecnico *initech;
+	struct trabajos *e,*s;
+	struct opcion *iniopc;
+        struct pendientes *nodo, *tope, *nodoaux, *topeaux;	
+	int opc=-1;
+	FILE *p;
+}
