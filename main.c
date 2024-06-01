@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 struct materiales{ //Arbol de Busqueda Binaria.
      int id;
@@ -71,7 +72,7 @@ struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiale
 struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
 
 void AltaDeClientes (struct cliente **inicli);
-void AltaDeMateriales (struct materiales *r);
+void AltaDeMateriales (struct materiales **r);
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar);
 void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
@@ -87,6 +88,12 @@ void InsertarTrabajo (struct trabajos ** nvt);
 void ListadoDeOpciones ();
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope);
 void OpcionesMasVendidas ();
+int buscarMayorIdCliente(struct cliente *ini);
+int buscarMayorIdOpc(struct opcion *ini);
+int buscarMayorIdTrab(struct trabajos *s);
+int buscarMayorIdTarea(struct tarea *ini);
+int generarIdMaterial(struct materiales *r);
+int verificarId(struct materiales *r, int idRandom);
 
 int main(int argc, char *argv[]){
 	struct cliente *inicli;
@@ -99,7 +106,7 @@ int main(int argc, char *argv[]){
     struct pendientes *nodo, *tope;	
 	int opc=-1;
 	FILE *p;
-	
+	srand(time(NULL));
 	CargaSupremaDeEstructuras(p, &inicli, &raiz, &inimat, &initar, &et, &st, &e, &s, &iniopc, &tope);
 	
 	while(opc!=0){
@@ -127,7 +134,7 @@ int main(int argc, char *argv[]){
 				opc=-1; //NO BORRAR hasta que carguemos la funcion.
 				break;
 			case 6:
-				AltaDeMateriales(raiz);
+				AltaDeMateriales(&raiz);
 				opc=-1; //NO BORRAR hasta que carguemos la funcion.
 				break;
 			case 7:
@@ -275,9 +282,11 @@ void AltaDeClientes(struct cliente **inicli){
 		printf( "\nDigite su nombre completo: " );
 		fflush(stdin);
 		gets( nvcliente->Nombre );
-		printf( "\nDigite un ID con el que quiera identificarse en el sistema: ");
-		fflush(stdin);
-		scanf( "%i", &nvcliente->id );
+		if(*inicli == NULL){
+			nvcliente->id = 1;
+		}else{
+			nvcliente->id = buscarMayorIdCliente(*inicli) +1;
+		}
 		nvcliente->sgte=NULL;
 		//inicli no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
 		InsertarCliente ( &nvcliente, inicli );
@@ -295,17 +304,25 @@ void AltaDeClientes(struct cliente **inicli){
 
 }
 
-void AltaDeMateriales (struct materiales *raiz){
+int buscarMayorIdCliente(struct cliente *ini){
+	int maxId = ini->id;
+	while(ini!=NULL){
+		if(ini->id > maxId){
+			maxId = ini->id;
+		}
+		ini = ini->sgte;
+	}
+	return maxId;
+}
+
+void AltaDeMateriales (struct materiales **raiz){
     struct materiales *nuevo_mat;
 
     nuevo_mat = (struct materiales *) malloc (sizeof (struct materiales) );
     if( nuevo_mat == NULL ){
        printf( ":( No hay espacio en la memoria \n" );
     }else{
-    	printf( "---Ingrese el ID de material: \n" );
-	    	fflush(stdin);
-		scanf( "%i", &nuevo_mat->id );
-		
+    		nuevo_mat->id = generarIdMaterial(*raiz);
 		printf( "---Ingrese la descripcion del material: \n" );
 	    	fflush(stdin);
 		gets( nuevo_mat->descripcion );
@@ -317,10 +334,34 @@ void AltaDeMateriales (struct materiales *raiz){
 		printf( "---Ingrese el precio unitario del nuevo material: \n" );
 	    	fflush(stdin);
 		scanf( "%f", &nuevo_mat->costo_uni );
-		
-		raiz = InsertarNuevoMaterial (raiz, nuevo_mat);
+		*raiz = InsertarNuevoMaterial (*raiz, nuevo_mat);
 		//Insertamos el nodo, con el nuevo material, al arbol.
 	}
+}
+
+int generarIdMaterial(struct materiales *r){
+	int min = 10, max = 40000, idRandomizado, idEncontrado = 0;
+	do{
+		idRandomizado = rand() % (max - min + 1) + min;
+    	idEncontrado = verificarId(r, idRandomizado);		
+	}while(idEncontrado == 1);
+   return idRandomizado;
+}
+
+int verificarId(struct materiales *r, int idRandom){
+	int band = 0;
+	if(r!=NULL){
+		if(r->id == idRandom){
+			band = 1;
+		}else{
+			if(idRandom > r->id){
+				band = verificarId(r->derch, idRandom);
+			}else{
+				band = verificarId(r->izq, idRandom);
+			}
+		}
+	}
+	return band;
 }
 
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar){
@@ -330,14 +371,18 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 		printf( ":( No hay espacio en memoria \n" );
 		
 	}else{
-		printf( "---Digite el ID de la opcion: \n" );
-		fflush(stdin);
-		scanf( "%i", &nueva_op->id );
+		if(*iniop != NULL){
+			nueva_op->id = 1;
+		}else{
+			nueva_op->id = buscarMayorIdOpc(*iniop) + 1;
+		}
 		
 		printf( "---Digite el nombre de la nueva opcion: \n" );
 		fflush(stdin);
 		gets( nueva_op->Nombre );
-
+		
+		printf("---Digite el costo por hora de la mano de obra: \n");
+		scanf("%2.f", &nueva_op->cHoraMObra);
 		//lo puse como comentario apra que no de problemas en la compilacion porque ya no hay costo y tiempo en opciones.
 		//nueva_op->tiempo = OperacionTiempo ( nueva_op->id, initar );
 		//nueva_op->costo = nueva_op->tiempo*100 + OperacionCosto ( nueva_op->id, inimat );
@@ -347,6 +392,18 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 		//Por el prototipo, nueva_op debe pasar por referencia, faltaba el & y se lo puse pero no se si erra un error o a propósito.
 		InsertarOpcion (&nueva_op, iniop);
 	}
+}
+
+int buscarMayorIdOpc(struct opcion *ini){
+	int idMax = ini->id;
+	ini = ini->sgte;
+	while(ini!=NULL){
+		if(ini->id > idMax){
+			idMax = ini->id;
+		}
+		ini = ini->sgte;
+	}
+	return idMax;
 }
 
 void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar){
@@ -423,6 +480,8 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
 	if(nv!=NULL){
 		if(*e == NULL){
 			nv->id = 1;
+		}else{
+			nv->id = buscarMayorIdTecnico(*e, *s) +1;	
 		}
 		nv->id = BuscarMayorIdTecnico(*e, *s) +1;
 		printf("\nDNI: ");
