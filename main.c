@@ -483,7 +483,6 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
 		}else{
 			nv->id = buscarMayorIdTecnico(*e, *s) +1;	
 		}
-		nv->id = BuscarMayorIdTecnico(*e, *s) +1;
 		printf("\nDNI: ");
 		scanf("%d", &nv->DNI);
 		printf("\nNombre: ");
