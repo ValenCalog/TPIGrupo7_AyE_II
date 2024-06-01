@@ -558,7 +558,7 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
 			free(*nodo);
   		} else {
    			printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s aun no está terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);	
-			Apilar(nodo, topeaux);
+			Apilar(nodo, &topeaux);
    		}
    	}
 }
