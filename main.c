@@ -74,7 +74,7 @@ struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
 void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales **r);
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar);
-void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar);
+void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar, struct trabajos **sTrab, struct trabajos **eTrab);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]){
 				opc=-1; //NO BORRAR hasta que carguemos la funcion.
 				break;
 			case 3:
-				AltaDeTrabajos(&inicli,&inimat,&iniopc,&initar);
+				AltaDeTrabajos(&inicli,&inimat,&iniopc,&initar, &e, &s);
 				opc=-1; //NO BORRAR hasta que carguemos la funcion.
 				break;
 			case 4:
@@ -406,7 +406,7 @@ int buscarMayorIdOpc(struct opcion *ini){
 	return idMax;
 }
 
-void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar){
+void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar, struct trabajos **sTrab, struct trabajos **eTrab){
 	int op;
 	struct trabajos *nuevo_trab;
 	nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos));
@@ -417,9 +417,14 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	fflush(stdin);
 	scanf( "%i", &nuevo_trab->id_opcion );
 	
-	printf( "\n---Ingrese el ID de trabajo: " );
+	/*printf( "\n---Ingrese el ID de trabajo: " );
 	fflush(stdin);
-	scanf( "%i", &nuevo_trab->id_trabajo ); //Despues se puede implementar el buscaridtrabajo() + 1;
+	scanf( "%i", &nuevo_trab->id_trabajo ); //Despues se puede implementar el buscaridtrabajo() + 1;*/
+	if(*sTrab!=NULL){
+		nuevo_trab->id_trabajo = 1;
+	}else{
+		nuevo_trab->id_trabajo = buscarMayorIdTrab(*sTrab) + 1;
+	}
 	
 	printf( "\n---Ingrese la direccion de la instalacion: " );
 	fflush(stdin);
@@ -474,6 +479,17 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	}
 }
 
+int buscarMayorIdTrab(struct trabajos *s){
+	int maxId = s->id_trabajo;
+	while(s!=NULL){
+		if(s->id_trabajo > maxId){
+			maxId = s->id_trabajo;
+		}
+		s = s->sgte;
+	}
+	return maxId;
+}
+
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
 	struct tecnico *nv;
 	nv = (struct tecnico*) malloc(sizeof(struct tecnico));
@@ -481,7 +497,7 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
 		if(*e == NULL){
 			nv->id = 1;
 		}else{
-			nv->id = buscarMayorIdTecnico(*e, *s) +1;	
+			nv->id = BuscarMayorIdTecnico(*e, *s) +1;	
 		}
 		printf("\nDNI: ");
 		scanf("%d", &nv->DNI);
