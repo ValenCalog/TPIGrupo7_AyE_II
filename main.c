@@ -56,14 +56,13 @@ struct pendientes{ //Pila.
     struct pendientes *sgte;
 };
 
-//son 80mil, por dios
-
 float OperacionTiempo (int id,struct tarea ** initar);
 float OperacionCosto (int codop,struct materialesop ** inimat);
 float BuscarPrecioMaterial (int codmat);
 
-int BuscarTecnico ();
 int BuscarCliente (int codcliente);
+int buscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
+int BuscarTecnico ();
 int Menu (int opc);
 int Vacia (struct pendientes *tp);
 
@@ -79,15 +78,15 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 void Desapilar (struct pendientes **nodo, struct pendientes **tp);
+void desEncolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s);
+void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s);
+void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s);
 void InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
 void InsertarOpcion (struct opcion ** nvop,struct opcion ** iniop);
 void InsertarTrabajo (struct trabajos ** nvt);
 void ListadoDeOpciones ();
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope);
 void OpcionesMasVendidas ();
-void encolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s);
-void desencolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s);
-int buscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
 
 int main(int argc, char *argv[]){
 	struct cliente *inicli;
@@ -409,11 +408,11 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
 		printf("\nNombre: ");
 		scanf("%29s", nv->Nombre);
 		nv->sgte = NULL;
-		encolarTecnico(&nv, e, s);
+		EncolarTecnico(&nv, e, s);
 	}
 }
 
-void encolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s){
+void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s){
 	if((*e) == NULL){
 		*s = *nv;
 	}else{
@@ -423,7 +422,17 @@ void encolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s)
 	*nv = NULL;
 }
 
-void desencolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s){
+void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s){
+	if((*e) == NULL){
+		*s = *nv;
+	}else{
+		(*e)->sgte = *nv;
+	}
+	*e=*nv;
+	*nv = NULL;
+}
+
+void desEncolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s){
 	(*ds) = (*s);
 	(*s)=(*s)->sgte;
 	if (*s == NULL){
@@ -442,22 +451,17 @@ int buscarMayorIdTecnico(struct tecnico *e, struct tecnico *s){
 	return maxId;
 }
 
-
-
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
-	
-	//si se marean: es normal AJAJAJAJ
 	struct cliente *cli=NULL, *antc=NULL;
 	struct materiales *mat=NULL, *auxm=NULL;
 	struct materialesop *mato=NULL, *antm=NULL;
 	struct tarea *tar=NULL, *antt=NULL, *auxt=NULL;
 	struct tecnico *tech=NULL;
 	struct trabajos *trab=NULL;
-	struct opcion *opc=NULL;
+	struct opcion *opc=NULL, *anto=NULL;
 	struct pendientes *pend=NULL;
-	
 	//carga lista simple clientes
-	if((p=fopen("clientes.txt","r+"))==NULL){
+	if((p=fopen("clientes.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
 		while(!feof(p)){
@@ -479,10 +483,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	
 	//carga arbol materiales
 	p=NULL;
-	if((p=fopen("materiales.txt","r+"))==NULL){
+	if((p=fopen("materiales.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales durante la carga |||||||\n");
 	}else{
 		while(!feof(p)){
@@ -503,11 +506,10 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	
 	//carga lista simple materiales
 	p=NULL;
 	antm=NULL;
-	if((p=fopen("materialesop.txt","r+"))==NULL){
+	if((p=fopen("materialesop.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales por Opcion durante la carga |||||||\n");
 	}else{
 		while(!feof(p)){
@@ -530,10 +532,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	
 	//carga lista doble tareas
 	p=NULL;
-	if((p=fopen("tareas.txt", "r+"))==NULL){
+	if((p=fopen("tareas.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
 	}else{
 		while(!feof(p)){
@@ -571,10 +572,95 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	
-	//carga 
+	//carga cola tecnicos
 	p=NULL;
-	
+	if((p=fopen("tecnicos.txt", "r"))==NULL){
+		printf("||||||| Error de apertura de archivo Tecnicos durante la carga |||||||\n");
+	}else{
+		while(feof(p)){
+			tech=(struct tecnico *) malloc(sizeof (struct tecnico) );
+			if(tech==NULL){
+				printf("-------No hay espacio de memoria-------\n");
+			}else{
+				fscanf(p, "%ld", tech->DNI);
+				fscanf(p, "%d", tech->id);
+				fscanf(p, "%s", tech->Nombre);
+				EncolarTecnico(&tech, &(*et), &(*st));
+				free(tech);
+			}
+		}
+		fclose(p);
+	}
+	//carga cola trabajos
+	p=NULL;
+	if((p=fopen("trabajos.txt", "r"))==NULL){
+		printf("||||||| Error de apertura de archivo Trabajos durante la carga |||||||\n");
+	}else{
+		while(feof(p)){
+			trab=(struct trabajos *) malloc(sizeof (struct trabajos) );
+			if(trab==NULL){
+				printf("-------No hay espacio de memoria-------\n");
+			}else{
+				fscanf(p, "%d", trab->cuatromtrs);
+				fscanf(p, "%s", trab->direccion);
+				fscanf(p, "%d", trab->fc_fin);
+				fscanf(p, "%d", trab->id_cliente);
+				fscanf(p, "%d", trab->id_opcion);
+				fscanf(p, "%d", trab->id_tecnico);
+				fscanf(p, "%d", trab->id_trabajo);
+				EncolarTrabajos(&trab, &(*ent), &(*sal));
+				free(trab);
+			}
+		}
+		fclose(p);
+	}
+	//carga lista simple opciones
+	p=NULL;
+	if((p=fopen("opciones.txt", "r"))==NULL){
+		printf("||||||| Error de apertura de archivo Opciones durante la carga |||||||\n");
+	}else{
+		while(!feof(p)){
+			opc=(struct opcion *) malloc(sizeof(struct opcion));
+			if(opc==NULL){
+				printf("-------No hay espacio de memoria-------\n");
+			}else{
+				fscanf(p, "%d", opc->id);
+				fscanf(p, "%f", opc->cHoraMObra);
+				fscanf(p, "%s", opc->Nombre);
+				if(iniopc==NULL){
+					(*iniopc)=opc;
+					(*iniopc)->sgte=NULL;
+				}else{
+					anto->sgte=opc;
+					anto=opc;
+				}
+			}
+			free (opc);
+		}
+		fclose(p);
+	}
+	//carga de pila pendientes
+	p=NULL;
+	if((p=fopen("pendientes.txt", "r"))==NULL){
+		printf("||||||| Error de apertura de archivo Pendientes durante la carga |||||||\n");
+	}else{
+		while(!feof(p)){
+			pend=(struct pendientes *) malloc(sizeof(struct pendientes));
+			if(pend==NULL){
+				printf("-------No hay espacio de memoria-------\n");
+			}else{
+				fscanf(p, "%d", pend->completado);
+				fscanf(p, "%s", pend->descripcion);
+				fscanf(p, "%d", pend->id_tarea);
+				fscanf(p, "%d", pend->id_trabajo);
+				fscanf(p, "%d", pend->orden);
+				fscanf(p, "%f", pend->tiempo);
+				Apilar (&pend, tope);
+			}
+		}
+		free (pend);
+	}
+	fclose(p);
 }
 
 void Desapilar (struct pendientes **nodo, struct pendientes **tp){
