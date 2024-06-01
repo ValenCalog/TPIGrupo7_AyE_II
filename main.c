@@ -75,6 +75,7 @@ void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales *r);
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar);
 void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar);
+void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 void Desapilar (struct pendientes **nodo, struct pendientes **tp);
@@ -84,7 +85,7 @@ void InsertarTrabajo (struct trabajos ** nvt);
 void ListadoDeOpciones ();
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope);
 void OpcionesMasVendidas ();
-
+void encolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s);
 
 int main(int argc, char *argv[]){
 	struct cliente *inicli;
@@ -127,6 +128,10 @@ int main(int argc, char *argv[]){
 			case 6:
 				AltaDeMateriales(raiz);
 				opc=-1; //NO BORRAR hasta que carguemos la funcion.
+				break;
+			case 7:
+				AltaDeTecnicos(&et, &st);
+				opc=-1;
 				break;
 		}
 	}
@@ -179,7 +184,7 @@ int Menu (int o){
 			fflush(stdin);
 			scanf( "%d", &o );
 		}else{
-			printf( "-------------------Bienvenido al menu :D-------------------\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para listar los trabajos finalizados.\n---Ingrese 6 para listar las opciones mas vendidas.\n" );
+			printf( "-------------------Bienvenido al menu :D-------------------\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para listar los trabajos finalizados.\n---Ingrese 6 para listar las opciones mas vendidas.\n---Ingrese 7 para dar de alta un tecnico." );
 			fflush(stdin);
 			scanf( "%d", &o );
 			contgency++;
@@ -387,6 +392,29 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	if (nuevo_trab->id_cliente != 0){ //Si no esta en 0 significa que existe en la lista de clientes
 		InsertarTrabajo(&nuevo_trab);
 	}
+}
+
+void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
+	struct tecnico *nv;
+	nv = (struct tecnico*) malloc(sizeof(struct tecnico));
+	if(nv!=NULL){
+		printf("\nDNI: ");
+		scanf("%d", &nv->DNI);
+		printf("\nNombre: ");
+		scanf("%29s", nv->Nombre);
+		nv->sgte = NULL;
+		encolarTecnico(&nv, e, s);
+	}
+}
+
+void encolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s){
+	if((*e) == NULL){
+		*s = *nv;
+	}else{
+		(*e)->sgte = *nv;
+	}
+	*e=*nv;
+	*nv = NULL;
 }
 
 
