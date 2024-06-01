@@ -4,14 +4,13 @@
 
 struct materiales{ //Arbol de Busqueda Binaria.
      int id;
-     char descripcion[30],unimed[10];
-     float costo_uni,cantidad;
+     char descripcion[30], unimed[10];
+     float costo_uni, cantidad;
      struct materiales *izq, *derch;
 };
 
 struct trabajos{ //Cola.
      int id_trabajo, id_opcion, cuatromtrs;
-     float CostoTotal;
      char direccion[30];
      int id_tecnico, id_cliente, fc_fin[3];
      struct trabajos *sgte;
@@ -39,19 +38,19 @@ struct materialesop{ //Lista Enlazada Simple.
 struct opcion{ //Lista Enlazada Simple.
      int id;
      char Nombre[30];
-     float costo, tiempo;
+     float cHoraMObra; //cortesia de vale.
      struct opcion *sgte;
 };
 
-struct tecnico{ //Lista Enlazada Simple. La cambiamos a cola(?
+struct tecnico{ //Cola.
      int id;
      long int DNI;
      char Nombre[30];
      struct tecnico *sgte;
 };
 
-struct pendientes{ //Pila
-	int id_trabajo, orden, completado;
+struct pendientes{ //Pila.
+	int id_tarea, id_trabajo, orden, completado;
 	float tiempo;
     char descripcion[30];
     struct pendientes *sgte;
@@ -77,7 +76,7 @@ void AltaDeMateriales (struct materiales *r);
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar);
 void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar);
 void Apilar (struct pendientes **nodo, struct pendientes **tp);
-void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
+void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 void Desapilar (struct pendientes **nodo, struct pendientes **tp);
 void InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
 void InsertarOpcion (struct opcion ** nvop,struct opcion ** iniop);
@@ -92,14 +91,14 @@ int main(int argc, char *argv[]){
 	struct materiales *raiz;
 	struct materialesop *inimat;
 	struct tarea *initar;
-	struct tecnico *initech;
-	struct trabajos *e,*s;
+	struct tecnico *et, *st;
+	struct trabajos *e, *s;
 	struct opcion *iniopc;
     struct pendientes *nodo, *tope, *nodoaux, *topeaux;	
 	int opc=-1;
 	FILE *p;
 	
-	CargaSupremaDeEstructuras(p, &inicli, &raiz, &inimat, &initar, &initech, &e, &s, &iniopc, &tope);
+	CargaSupremaDeEstructuras(p, &inicli, &raiz, &inimat, &initar, &et, &st, &e, &s, &iniopc, &tope);
 	
 	while(opc!=0){
 		//system("CLS");
@@ -312,11 +311,10 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 		
 		printf( "---Digite el nombre de la nueva opcion: \n" );
 		gets( nueva_op->Nombre );
-		
-		//initar no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
-		nueva_op->tiempo = OperacionTiempo ( nueva_op->id, initar );
-		//inimat no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
-		nueva_op->costo = nueva_op->tiempo*100 + OperacionCosto ( nueva_op->id, inimat );
+
+		//lo puse como comentario apra que no de problemas en la compilacion porque ya no hay costo y tiempo en opciones.
+		//nueva_op->tiempo = OperacionTiempo ( nueva_op->id, initar );
+		//nueva_op->costo = nueva_op->tiempo*100 + OperacionCosto ( nueva_op->id, inimat );
 		//100 es el costo de cada hora de trabajo
 		nueva_op->sgte = NULL;
 		//iniop no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
@@ -345,8 +343,8 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	
 	nuevo_trab->id_tecnico = BuscarTecnico();
 	
-	//Fijate aca que onda porque mandaste inimat como segundo argumento pero en el prototipo se espera un struct tarea no materialesop.
-	nuevo_trab->CostoTotal = (OperacionTiempo(nuevo_trab->id_opcion, inimat)*100) + ((OperacionTiempo(nuevo_trab->id_opcion, inimat)*100) *nuevo_trab->cuatromtrs*0.20);
+	//lo puse como comentario apra que no de problemas en la compilacion porque ya no hay costo y tiempo en opciones.
+	//nuevo_trab->CostoTotal = (OperacionTiempo(nuevo_trab->id_opcion, inimat)*100) + ((OperacionTiempo(nuevo_trab->id_opcion, inimat)*100) *nuevo_trab->cuatromtrs*0.20);
 	
 	//Por ahora no se esta teniendo en cuenta el costo de los materiales en CostoTotal
 	//Si cuatromtrs es 0, no requiere trabajo en altura, por lo cual el resultado del producto sera 0 y no se suma el 20%
@@ -393,7 +391,7 @@ void Apilar (struct pendientes **nodo, struct pendientes **tp){
 	(*nodo) = NULL;
 }
 
-void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
+void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
 	
 	//si se marean: es normal AJAJAJAJ
 	struct cliente *cli=NULL, *antc=NULL;
@@ -521,7 +519,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		fclose(p);
 	}
 	
+	//carga 
 	p=NULL;
+	
 }
 
 void Desapilar (struct pendientes **nodo, struct pendientes **tp){
