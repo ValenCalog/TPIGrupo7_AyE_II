@@ -94,7 +94,7 @@ int main(int argc, char *argv[]){
 	struct tecnico *et, *st;
 	struct trabajos *e, *s;
 	struct opcion *iniopc;
-    struct pendientes *nodo, *tope, *nodoaux, *topeaux;	
+    struct pendientes *nodo, *tope;	
 	int opc=-1;
 	FILE *p;
 	
