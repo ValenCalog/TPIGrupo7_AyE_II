@@ -86,6 +86,8 @@ void ListadoDeOpciones ();
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope);
 void OpcionesMasVendidas ();
 void encolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s);
+void desencolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s);
+int buscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
 
 int main(int argc, char *argv[]){
 	struct cliente *inicli;
@@ -398,6 +400,10 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
 	struct tecnico *nv;
 	nv = (struct tecnico*) malloc(sizeof(struct tecnico));
 	if(nv!=NULL){
+		if(*e == NULL){
+			nv->id = 1;
+		}
+		nv->id = buscarMayorIdTecnico(*e, *s) +1;
 		printf("\nDNI: ");
 		scanf("%d", &nv->DNI);
 		printf("\nNombre: ");
@@ -416,6 +422,26 @@ void encolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s)
 	*e=*nv;
 	*nv = NULL;
 }
+
+void desencolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s){
+	(*ds) = (*s);
+	(*s)=(*s)->sgte;
+	if (*s == NULL){
+		(*e) = NULL;	
+	} 
+}
+
+int buscarMayorIdTecnico(struct tecnico *e, struct tecnico *s){
+	int maxId = s->id;
+	while(s!=NULL){
+		if(s->id > maxId){
+			maxId = s->id;
+		}
+		s = s->sgte;
+	}
+	return maxId;
+}
+
 
 
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
