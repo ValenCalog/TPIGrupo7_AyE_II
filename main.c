@@ -176,12 +176,12 @@ int Menu (int o){
 	while( (o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) ){
 		if(contgency>=1){
 			printf( "El valor que ingreso no es valido, vuelva a ingresar una opcion. \n" );
-			scanf( "%d", &o );
 			fflush(stdin);
+			scanf( "%d", &o );
 		}else{
 			printf( "-------------------Bienvenido al menu :D-------------------\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para listar los trabajos finalizados.\n---Ingrese 6 para listar las opciones mas vendidas.\n" );
-			scanf( "%d", &o );
 			fflush(stdin);
+			scanf( "%d", &o );
 			contgency++;
 		}
 	}
@@ -242,10 +242,13 @@ void AltaDeClientes(struct cliente **inicli){
 		printf( "\nBienvenido a SistemaSeguro S.A!" );
 		printf( "\nA continuacion le pediremos una serie de datos para poder registrarlo como cliente." );
 		printf( "\nDigite su DNI: " );
+		fflush(stdin);
 		scanf( "%ld", &nvcliente->DNI );
 		printf( "\nDigite su nombre completo: " );
+		fflush(stdin);
 		gets( nvcliente->Nombre );
 		printf( "\nDigite un ID con el que quiera identificarse en el sistema: ");
+		fflush(stdin);
 		scanf( "%i", &nvcliente->id );
 		nvcliente->sgte=NULL;
 		//inicli no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
@@ -272,15 +275,19 @@ void AltaDeMateriales (struct materiales *raiz){
        printf( ":( No hay espacio en la memoria \n" );
     }else{
     	printf( "---Ingrese el ID de material: \n" );
+	    	fflush(stdin);
 		scanf( "%i", &nuevo_mat->id );
 		
 		printf( "---Ingrese la descripcion del material: \n" );
+	    	fflush(stdin);
 		gets( nuevo_mat->descripcion );
 		
 		printf( "---Ingrese cual sera la unidad de medida: \n" );
+	    	fflush(stdin);
 		gets( nuevo_mat->unimed );
 		
 		printf( "---Ingrese el precio unitario del nuevo material: \n" );
+	    	fflush(stdin);
 		scanf( "%f", &nuevo_mat->costo_uni );
 		
 		raiz = InsertarNuevoMaterial (raiz, nuevo_mat);
@@ -296,9 +303,11 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 		
 	}else{
 		printf( "---Digite el ID de la opcion: \n" );
+		fflush(stdin);
 		scanf( "%i", &nueva_op->id );
 		
 		printf( "---Digite el nombre de la nueva opcion: \n" );
+		fflush(stdin);
 		gets( nueva_op->Nombre );
 
 		//lo puse como comentario apra que no de problemas en la compilacion porque ya no hay costo y tiempo en opciones.
@@ -320,14 +329,18 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	ListadoDeOpciones();
 	
 	printf( "\n---Ingrese el ID de la opcion a contratar: " );
+	fflush(stdin);
 	scanf( "%i", &nuevo_trab->id_opcion );
 	
 	printf( "\n---Ingrese el ID de trabajo: " );
+	fflush(stdin);
 	scanf( "%i", &nuevo_trab->id_trabajo ); //Despues se puede implementar el buscaridtrabajo() + 1;
 	
 	printf( "\n---Ingrese la direccion de la instalacion: " );
+	fflush(stdin);
 	gets( nuevo_trab->direccion );
 	printf( "\nRequiere trabajo en altura?: " );
+	fflush(stdin);
 	scanf( "%i", &nuevo_trab->cuatromtrs ); //0 no requiere, 1 si requiere trabajo en altura
 	
 	nuevo_trab->id_tecnico = BuscarTecnico();
@@ -339,6 +352,7 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	//Si cuatromtrs es 0, no requiere trabajo en altura, por lo cual el resultado del producto sera 0 y no se suma el 20%
 	
 	printf("\nIngrese su ID de cliente: ");
+	fflush(stdin);
 	scanf("%i",&nuevo_trab->id_cliente);
 	if(BuscarCliente(nuevo_trab->id_cliente)==0){ 
 		//BuscarCliente recorre la lista de clientes en busca del id ingresado, si no lo encuentra devuelve 0
@@ -347,6 +361,7 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 		printf("\n1)Si");
 		printf("\n2)No");
 		printf("\n--> ");
+		fflush(stdin);
 		scanf("%i",&op);
 		while(op!=0){
 			switch(op){
