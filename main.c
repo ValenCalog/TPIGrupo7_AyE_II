@@ -57,32 +57,33 @@ struct pendientes{ //Pila
     struct pendientes *sgte;
 };
 
+//son 80mil, por dios
 
 float OperacionTiempo (int id,struct tarea ** initar);
-float OperacionCosto(int codop,struct materialesop ** inimat);
-float buscarpreciomat(int codmat);
+float OperacionCosto (int codop,struct materialesop ** inimat);
+float BuscarPrecioMaterial (int codmat);
 
-int buscartecnico();
-int buscarcliente(int codcliente);
+int BuscarTecnico ();
+int BuscarCliente (int codcliente);
 int Menu (int opc);
-int vacia(struct pendientes *tp);
+int Vacia (struct pendientes *tp);
 
 struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz);
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
 struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
 
-void InsertarCliente(struct cliente ** nv,struct cliente ** inicli);
+void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales *r);
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar);
 void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar);
-void AltaDeClientes(struct cliente **inicli);
-void apilar(struct pendientes **nodo, struct pendientes **tp);
+void Apilar (struct pendientes **nodo, struct pendientes **tp);
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
-void desapilar(struct pendientes **nodo, struct pendientes **tp);
+void Desapilar (struct pendientes **nodo, struct pendientes **tp);
+void InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
 void InsertarOpcion (struct opcion ** nvop,struct opcion ** iniop);
-void InsertarTrabajo(struct trabajos ** nvt);
+void InsertarTrabajo (struct trabajos ** nvt);
 void ListadoDeOpciones ();
-void ListadoDePendientes(struct pendientes **nodo, struct pendientes **tope);
+void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope);
 void OpcionesMasVendidas ();
 
 
@@ -133,6 +134,7 @@ int main(int argc, char *argv[]){
 	return (0);
 }
 
+//Floats
 float OperacionTiempo (int id, struct tarea **initar){
 	float tiempo=0;
 	struct tarea *aux=NULL;
@@ -146,84 +148,28 @@ float OperacionTiempo (int id, struct tarea **initar){
 	return (tiempo);
 }
 
-/*struct tarea{ //Lista Doblemente Enlazada.
-     int id_op, id_tarea, orden;
-     float tiempo;
-     char descripcion[30];
-     struct tarea *sgte, *ant;
-};*/
-
-float OperacionCosto(int codop,struct materialesop **inimat){
+float OperacionCosto (int codop,struct materialesop **inimat){
 	float costomat=0;
 	struct materialesop *aux=NULL;
 	aux = (*inimat);
 	while(aux!=NULL){
 		if(aux->id_opcion=codop){
 			//Ira al arbol a buscar el material
-			costomat = costomat + (aux->cantidad*buscarpreciomat(aux->idmat));
+			costomat = costomat + (aux->cantidad*BuscarPrecioMaterial(aux->idmat));
 		}
 		aux=aux->sgte;
 	}
 	return (costomat);
 }
 
-void InsertarOpcion (struct opcion **nvop,struct opcion **iniop){
-	struct opcion *aux=NULL;
-	aux = (*iniop);
-	while(aux->sgte!=NULL){
-		aux=aux->sgte;
-	}
-	aux->sgte = (*nvop);
+float BuscarPrecioMaterial (int codmat){
 }
 
-float buscarpreciomat(int codmat){
+//Ints
+int BuscarTecnico(){
 }
 
-void InsertarTrabajo(struct trabajos ** nvt){
-}
-
-void AltaDeClientes(struct cliente **inicli){
-	struct cliente *nvcliente=NULL;
-	nvcliente = (struct cliente *) malloc(sizeof(struct cliente));
-	if( nvcliente != NULL ){
-		printf( "\nBienvenido a SistemaSeguro S.A!" );
-		printf( "\nA continuacion le pediremos una serie de datos para poder registrarlo como cliente." );
-		printf( "\nDigite su DNI: " );
-		scanf( "%ld", &nvcliente->DNI );
-		printf( "\nDigite su nombre completo: " );
-		gets( nvcliente->Nombre );
-		printf( "\nDigite un ID con el que quiera identificarse en el sistema: ");
-		scanf( "%i", &nvcliente->id );
-		nvcliente->sgte=NULL;
-		//inicli no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
-		InsertarCliente ( &nvcliente, inicli );
-	}else{
-		printf("\nError de asignacion de espacio de Memoria");
-	}
-	
-	/*
-	struct cliente{ //Lista Enlazada Simple.
-     int id;
-     long int DNI;
-     char Nombre[30];
-     struct cliente *sgte;
-	};*/
-
-}
-
-void InsertarCliente(struct cliente ** nv,struct cliente ** inicli){
-	struct cliente *aux=NULL;
-	aux = (*inicli);
-	while( aux->sgte != NULL ){
-		aux = aux->sgte;
-	}
-	aux->sgte = (*nv);
-}
-
-int buscartecnico(){
-}
-
-int buscarcliente(int codcliente){
+int BuscarCliente(int codcliente){
 }
 
 int Menu (int o){
@@ -243,6 +189,18 @@ int Menu (int o){
 	return (o);
 }
 
+int Vacia (struct pendientes *tp){
+	int v;
+	
+	if (tp == NULL){
+		v = 1;
+	}else {
+		v = 0;
+	}
+	return (v);
+}
+
+//Structs
 struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz){
 	if( raiz == NULL) {
 		mat->derch = NULL;
@@ -286,6 +244,36 @@ struct tarea* BuscarAnterior (int dato, struct tarea *rc){
 		}
 	}
 	return (ant);
+}
+
+//Voids
+void AltaDeClientes(struct cliente **inicli){
+	struct cliente *nvcliente=NULL;
+	nvcliente = (struct cliente *) malloc(sizeof(struct cliente));
+	if( nvcliente != NULL ){
+		printf( "\nBienvenido a SistemaSeguro S.A!" );
+		printf( "\nA continuacion le pediremos una serie de datos para poder registrarlo como cliente." );
+		printf( "\nDigite su DNI: " );
+		scanf( "%ld", &nvcliente->DNI );
+		printf( "\nDigite su nombre completo: " );
+		gets( nvcliente->Nombre );
+		printf( "\nDigite un ID con el que quiera identificarse en el sistema: ");
+		scanf( "%i", &nvcliente->id );
+		nvcliente->sgte=NULL;
+		//inicli no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
+		InsertarCliente ( &nvcliente, inicli );
+	}else{
+		printf("\nError de asignacion de espacio de Memoria");
+	}
+	
+	/*
+	struct cliente{ //Lista Enlazada Simple.
+     int id;
+     long int DNI;
+     char Nombre[30];
+     struct cliente *sgte;
+	};*/
+
 }
 
 void AltaDeMateriales (struct materiales *raiz){
@@ -355,7 +343,7 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	printf( "\nRequiere trabajo en altura?: " );
 	scanf( "%i", &nuevo_trab->cuatromtrs ); //0 no requiere, 1 si requiere trabajo en altura
 	
-	nuevo_trab->id_tecnico = buscartecnico();
+	nuevo_trab->id_tecnico = BuscarTecnico();
 	
 	//Fijate aca que onda porque mandaste inimat como segundo argumento pero en el prototipo se espera un struct tarea no materialesop.
 	nuevo_trab->CostoTotal = (OperacionTiempo(nuevo_trab->id_opcion, inimat)*100) + ((OperacionTiempo(nuevo_trab->id_opcion, inimat)*100) *nuevo_trab->cuatromtrs*0.20);
@@ -365,8 +353,8 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	
 	printf("\nIngrese su ID de cliente: ");
 	scanf("%i",&nuevo_trab->id_cliente);
-	if(buscarcliente(nuevo_trab->id_cliente)==0){ 
-		//buscarcliente recorre la lista de clientes en busca del id ingresado, si no lo encuentra devuelve 0
+	if(BuscarCliente(nuevo_trab->id_cliente)==0){ 
+		//BuscarCliente recorre la lista de clientes en busca del id ingresado, si no lo encuentra devuelve 0
 		printf("\nNo se ha encontrado un cliente asociado a la ID ingresada");
 		printf("\nDesea darse de alta como cliente?");
 		printf("\n1)Si");
@@ -397,6 +385,12 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	if (nuevo_trab->id_cliente != 0){ //Si no esta en 0 significa que existe en la lista de clientes
 		InsertarTrabajo(&nuevo_trab);
 	}
+}
+
+void Apilar (struct pendientes **nodo, struct pendientes **tp){
+	(*nodo)->sgte = (*tp);
+	(*tp) = (*nodo);
+	(*nodo) = NULL;
 }
 
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **initech, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
@@ -530,48 +524,52 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	p=NULL;
 }
 
+void Desapilar (struct pendientes **nodo, struct pendientes **tp){
+	(*nodo) = (*tp);
+	(*tp) = (*tp)->sgte;
+	(*nodo)->sgte = NULL;
+}
+
+void InsertarCliente(struct cliente ** nv,struct cliente ** inicli){
+	struct cliente *aux=NULL;
+	aux = (*inicli);
+	while( aux->sgte != NULL ){
+		aux = aux->sgte;
+	}
+	aux->sgte = (*nv);
+}
+
+void InsertarOpcion (struct opcion **nvop,struct opcion **iniop){
+	struct opcion *aux=NULL;
+	aux = (*iniop);
+	while(aux->sgte!=NULL){
+		aux=aux->sgte;
+	}
+	aux->sgte = (*nvop);
+}
+
+void InsertarTrabajo(struct trabajos ** nvt){
+}
+
 void ListadoDeOpciones (){
 }
 
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
 	int pila;
 
-	pila = vacia(*tope);
+	pila = Vacia(*tope);
   	if (pila == 1) {
-        printf("La pila está vacia\n");
+        printf("La pila está Vacia\n");
    	} else {
-      		desapilar(nodo, tope);
-        	if ((*nodo)->completado == 1) {
-           		printf("La tarea con la descripción %s, ID de trabajo %d, orden %d y con un tiempo de realizacion de %f ya está finalizada.\n",(*nodo)->descripcion, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->tiempo);
-           		free(*nodo);
-      		} else {
-       			printf("La tarea con la descripción %s, ID de trabajo %d, orden %d y con un tiempo de realizacion de %f sigue pendiente.\n", (*nodo)->descripcion, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->tiempo);
-           		apilar(nodo, tope);
-       		}
+  		Desapilar(nodo, tope);
+    	if ((*nodo)->completado == 1) {
+       		printf("La tarea con la descripción %s, ID de trabajo %d, orden %d y con un tiempo de realizacion de %f ya está finalizada.\n",(*nodo)->descripcion, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->tiempo);
+       		free(*nodo);
+  		} else {
+   			printf("La tarea con la descripción %s, ID de trabajo %d, orden %d y con un tiempo de realizacion de %f sigue pendiente.\n", (*nodo)->descripcion, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->tiempo);
+       		Apilar(nodo, tope);
+   		}
    	}
-}
-
-int vacia (struct pendientes *tp){
-	int v;
-	
-	if (tp == NULL){
-		v = 1;
-	}else {
-		v = 0;
-	}
-	return (v);
-}
-
-void desapilar (struct pendientes **nodo, struct pendientes **tp){
-	(*nodo) = (*tp);
-	(*tp) = (*tp)->sgte;
-	(*nodo)->sgte = NULL;
-}
-
-void apilar (struct pendientes **nodo, struct pendientes **tp){
-	(*nodo)->sgte = (*tp);
-	(*tp) = (*nodo);
-	(*nodo) = NULL;
 }
 
 void OpcionesMasVendidas (){
