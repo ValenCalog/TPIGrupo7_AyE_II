@@ -56,12 +56,12 @@ struct pendientes{ //Pila.
     struct pendientes *sgte;
 };
 
+float BuscarPrecioMaterial (int codmat);
 float OperacionTiempo (int id,struct tarea ** initar);
 float OperacionCosto (int codop,struct materialesop ** inimat);
-float BuscarPrecioMaterial (int codmat);
 
 int BuscarCliente (int codcliente);
-int buscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
+int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
 int BuscarTecnico ();
 int Menu (int opc);
 int Vacia (struct pendientes *tp);
@@ -78,7 +78,7 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 void Desapilar (struct pendientes **nodo, struct pendientes **tp);
-void desEncolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s);
+void DesencolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s);
 void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s);
 void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s);
 void InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
@@ -171,10 +171,21 @@ float BuscarPrecioMaterial (int codmat){
 }
 
 //Ints
+int BuscarCliente(int codcliente){
+}
+
 int BuscarTecnico(){
 }
 
-int BuscarCliente(int codcliente){
+int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s){
+	int maxId = s->id;
+	while(s!=NULL){
+		if(s->id > maxId){
+			maxId = s->id;
+		}
+		s = s->sgte;
+	}
+	return maxId;
 }
 
 int Menu (int o){
@@ -192,6 +203,17 @@ int Menu (int o){
 		}
 	}
 	return (o);
+}
+
+int Vacia (struct pendientes *tp){
+	int v;
+	
+	if (tp == NULL){
+		v = 1;
+	}else {
+		v = 0;
+	}
+	return (v);
 }
 
 //Structs
@@ -402,7 +424,7 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
 		if(*e == NULL){
 			nv->id = 1;
 		}
-		nv->id = buscarMayorIdTecnico(*e, *s) +1;
+		nv->id = BuscarMayorIdTecnico(*e, *s) +1;
 		printf("\nDNI: ");
 		scanf("%d", &nv->DNI);
 		printf("\nNombre: ");
@@ -410,6 +432,12 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
 		nv->sgte = NULL;
 		EncolarTecnico(&nv, e, s);
 	}
+}
+
+void Apilar (struct pendientes **nodo, struct pendientes **tpaux){
+	(*nodo)->sgte = (*tpaux);
+	(*tpaux) = (*nodo);
+	(*nodo) = NULL;
 }
 
 void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s){
@@ -432,23 +460,12 @@ void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos 
 	*nv = NULL;
 }
 
-void desEncolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s){
+void DesencolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s){
 	(*ds) = (*s);
 	(*s)=(*s)->sgte;
 	if (*s == NULL){
 		(*e) = NULL;	
 	} 
-}
-
-int buscarMayorIdTecnico(struct tecnico *e, struct tecnico *s){
-	int maxId = s->id;
-	while(s!=NULL){
-		if(s->id > maxId){
-			maxId = s->id;
-		}
-		s = s->sgte;
-	}
-	return maxId;
 }
 
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
@@ -716,23 +733,6 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
 			Apilar(nodo, &topeaux);
    		}
    	}
-}
-
-int Vacia (struct pendientes *tp){
-	int v;
-	
-	if (tp == NULL){
-		v = 1;
-	}else {
-		v = 0;
-	}
-	return (v);
-}
-
-void Apilar (struct pendientes **nodo, struct pendientes **tpaux){
-	(*nodo)->sgte = (*tpaux);
-	(*tpaux) = (*nodo);
-	(*nodo) = NULL;
 }
 
 void OpcionesMasVendidas (){
