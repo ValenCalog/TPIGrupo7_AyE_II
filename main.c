@@ -75,7 +75,7 @@ void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales *r);
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar);
 void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar);
-void Apilar (struct pendientes **nodo, struct pendientes **tp);
+void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 void Desapilar (struct pendientes **nodo, struct pendientes **tp);
 void InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
@@ -186,17 +186,6 @@ int Menu (int o){
 		}
 	}
 	return (o);
-}
-
-int Vacia (struct pendientes *tp){
-	int v;
-	
-	if (tp == NULL){
-		v = 1;
-	}else {
-		v = 0;
-	}
-	return (v);
 }
 
 //Structs
@@ -385,11 +374,6 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	}
 }
 
-void Apilar (struct pendientes **nodo, struct pendientes **tp){
-	(*nodo)->sgte = (*tp);
-	(*tp) = (*nodo);
-	(*nodo) = NULL;
-}
 
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
 	
@@ -556,6 +540,13 @@ void ListadoDeOpciones (){
 
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
 	int pila;
+	struct pendientes *topeaux=NULL;
+	/*struct pendientes{ //Pila.
+	int id_tarea, id_trabajo, orden, completado;
+	float tiempo;
+    char descripcion[30];
+    struct pendientes *sgte;
+};*/
 
 	pila = Vacia(*tope);
   	if (pila == 1) {
@@ -563,13 +554,30 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
    	} else {
   		Desapilar(nodo, tope);
     	if ((*nodo)->completado == 1) {
-       		printf("La tarea con la descripción %s, ID de trabajo %d, orden %d y con un tiempo de realizacion de %f ya está finalizada.\n",(*nodo)->descripcion, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->tiempo);
-       		free(*nodo);
+    		printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s ya está terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);
+			free(*nodo);
   		} else {
-   			printf("La tarea con la descripción %s, ID de trabajo %d, orden %d y con un tiempo de realizacion de %f sigue pendiente.\n", (*nodo)->descripcion, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->tiempo);
-       		Apilar(nodo, tope);
+   			printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s aun no está terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);	
+			Apilar(nodo, topeaux);
    		}
    	}
+}
+
+int Vacia (struct pendientes *tp){
+	int v;
+	
+	if (tp == NULL){
+		v = 1;
+	}else {
+		v = 0;
+	}
+	return (v);
+}
+
+void Apilar (struct pendientes **nodo, struct pendientes **tpaux){
+	(*nodo)->sgte = (*tpaux);
+	(*tpaux) = (*nodo);
+	(*nodo) = NULL;
 }
 
 void OpcionesMasVendidas (){
