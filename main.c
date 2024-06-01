@@ -275,8 +275,17 @@ struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materi
 	return (raiz);
 }
 
-struct tarea* BuscarAnterior (int id_op, struct tarea *initar){
-	
+struct tarea* BuscarAnterior (int dato, struct tarea *rc){
+	struct tarea *ant=NULL;
+	while( rc != NULL){
+		if( rc->id_op > dato){
+			rc = NULL;
+		}else{
+			ant = rc;
+			rc = rc->sgte;
+		}
+	}
+	return (ant);
 }
 
 void AltaDeMateriales (struct materiales *raiz){
@@ -403,7 +412,7 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	struct pendientes *pend=NULL;
 	
 	//carga lista simple clientes
-	if((p=fopen("clientes.bin","r+b"))==NULL){
+	if((p=fopen("clientes.txt","r+"))==NULL){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
 		while(!feof(p)){
@@ -428,7 +437,7 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	
 	//carga arbol materiales
 	p=NULL;
-	if((p=fopen("materiales.bin","r+b"))==NULL){
+	if((p=fopen("materiales.txt","r+"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales durante la carga |||||||\n");
 	}else{
 		while(!feof(p)){
@@ -453,7 +462,7 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	//carga lista simple materiales
 	p=NULL;
 	antm=NULL;
-	if((p=fopen("materialesop.bin","r+b"))==NULL){
+	if((p=fopen("materialesop.txt","r+"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales por Opcion durante la carga |||||||\n");
 	}else{
 		while(!feof(p)){
@@ -479,7 +488,7 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	
 	//carga lista doble tareas
 	p=NULL;
-	if((p=fopen("tareas.bin","r+b"))==NULL){
+	if((p=fopen("tareas.txt", "r+"))==NULL){
 		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
 	}else{
 		while(!feof(p)){
@@ -517,6 +526,8 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
+	
+	p=NULL;
 }
 
 void ListadoDeOpciones (){
