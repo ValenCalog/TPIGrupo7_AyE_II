@@ -11,10 +11,10 @@ struct materiales{ //Arbol de Busqueda Binaria.
 };
 
 struct trabajos{ //Cola.
-     int id_trabajo, id_opcion, cuatromtrs;
-     char direccion[30];
-     int id_tecnico, id_cliente, fc_fin[3];
-     struct trabajos *sgte;
+    int id_trabajo, id_opcion, opcion, cuatromtrs;
+    char direccion[30];
+    int id_tecnico, id_cliente, fc_fin[3];
+    struct trabajos *sgte;
 };
 
 struct tarea{ //Lista Doblemente Enlazada.
@@ -39,7 +39,7 @@ struct materialesop{ //Lista Enlazada Simple.
 struct opcion{ //Lista Enlazada Simple.
      int id;
      char Nombre[30];
-     float cHoraMObra; //cortesia de vale.
+     float cHoraMObra; //cortesia de vale. (vale me arruinaste la vida con ese nombre)
      struct opcion *sgte;
 };
 
@@ -68,7 +68,8 @@ int BuscarMayorIdTarea(struct tarea *ini);
 int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
 int BuscarMayorIdTrab(struct trabajos *s);
 int BuscarMayorIdOpc(struct opcion *ini);
-int BuscarTecnico ();
+int BuscarTecnico (struct tecnico **nodo, struct tecnico **et, struct tecnico **st);
+int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniop); //este muestra las opciones y retorna un valor para el alta de trabajo
 
 int GenerarIdMaterial(struct materiales *r);
 
@@ -87,7 +88,7 @@ struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
 void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales **r);
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar);
-void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar, struct trabajos **sTrab, struct trabajos **eTrab);
+void AltaDeTrabajos (struct cliente ** inicli,struct opcion ** iniop, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
 
@@ -103,10 +104,9 @@ void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos 
 
 void InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
 void InsertarOpcion (struct opcion ** nvop,struct opcion ** iniop);
-void InsertarTrabajo (struct trabajos ** nvt);
 
-void ListadoDeOpciones ();
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope);
+void ListadoDeOpciones (struct opcion **iniop); //este solo muestra las opciones que hay
 
 void OpcionesMasVendidas ();
 
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]){
 		opc = Menu(opc);
 		switch(opc){
 			case 1:
-				ListadoDeOpciones();
+				ListadoDeOpciones(&iniopc);
 				opc=-1;
 				break;
 			case 2:
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 3:
-				AltaDeTrabajos(&inicli,&inimat,&iniopc,&initar, &e, &s);
+				AltaDeTrabajos(&inicli, &iniopc, &et, &st, &e, &s); //et y st para técnico, e y s para trabajo
 				opc=-1;
 				break;
 			case 4:
@@ -232,7 +232,22 @@ int BuscarMayorIdTrab(struct trabajos *s){
 	return maxId;
 }
 
-int BuscarTecnico(){
+int BuscarTecnico(struct tecnico **nodo, struct tecnico **e, struct tecnico **s){
+	/*struct tecnico{ //Cola.
+     int id;
+     long int DNI;
+     char Nombre[30];
+     struct tecnico *sgte;
+	};*/
+	int cont=0; //el cont es para que cuando encuentre un tecnico disponible, deje de buscar
+	
+	while (cont == 0){
+		DesencolarTecnico(nodo, e, s);
+		cont = cont + 1;
+		printf("Su tecnico sera: %s.\n", (*nodo)->Nombre);
+		EncolarTecnico(nodo, e, s);
+	}
+	return((*nodo)->id);
 }
 
 int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s){
@@ -429,7 +444,7 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 		printf( ":( No hay espacio en memoria \n" );
 		
 	}else{
-		if(*iniop == NULL){
+		if(*iniop != NULL){
 			nueva_op->id = 1;
 		}else{
 			nueva_op->id = BuscarMayorIdOpc(*iniop) + 1;
@@ -440,88 +455,83 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 		
 		printf("---Digite el costo por hora de la mano de obra: \n");
 		scanf("%2.f", &nueva_op->cHoraMObra);
-		//lo puse como comentario apra que no de problemas en la compilacion porque ya no hay costo y tiempo en opciones.
-		//nueva_op->tiempo = OperacionTiempo ( nueva_op->id, initar );
-		//nueva_op->costo = nueva_op->tiempo*100 + OperacionCosto ( nueva_op->id, inimat );
-		//100 es el costo de cada hora de trabajo
 		nueva_op->sgte = NULL;
-		//iniop no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
-		//Por el prototipo, nueva_op debe pasar por referencia, faltaba el & y se lo puse pero no se si erra un error o a propósito.
 		InsertarOpcion (&nueva_op, iniop);
 	}
 }
 
-void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea ** initar, struct trabajos **sTrab, struct trabajos **eTrab){
-	int op;
-	struct trabajos *nuevo_trab;
-	nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos));
-	nuevo_trab->sgte = NULL;
-	ListadoDeOpciones();
-	
-	printf( "\n---Ingrese el ID de la opcion a contratar: " );
-	fflush(stdin);
-	scanf( "%i", &nuevo_trab->id_opcion );
-	
-	/*printf( "\n---Ingrese el ID de trabajo: " );
-	fflush(stdin);
-	scanf( "%i", &nuevo_trab->id_trabajo ); //Despues se puede implementar el buscaridtrabajo() + 1;*/
-	if(*sTrab==NULL){
-		nuevo_trab->id_trabajo = 1;
-	}else{
-		nuevo_trab->id_trabajo = BuscarMayorIdTrab(*sTrab) + 1;
-	}
-	
-	printf( "\n---Ingrese la direccion de la instalacion: " );
-	fflush(stdin);
-	gets( nuevo_trab->direccion );
-	printf( "\nRequiere trabajo en altura?: " );
-	fflush(stdin);
-	scanf( "%i", &nuevo_trab->cuatromtrs ); //0 no requiere, 1 si requiere trabajo en altura
-	
-	nuevo_trab->id_tecnico = BuscarTecnico();
-	
-	//lo puse como comentario apra que no de problemas en la compilacion porque ya no hay costo y tiempo en opciones.
-	//nuevo_trab->CostoTotal = (OperacionTiempo(nuevo_trab->id_opcion, inimat)*100) + ((OperacionTiempo(nuevo_trab->id_opcion, inimat)*100) *nuevo_trab->cuatromtrs*0.20);
-	
-	//Por ahora no se esta teniendo en cuenta el costo de los materiales en CostoTotal
-	//Si cuatromtrs es 0, no requiere trabajo en altura, por lo cual el resultado del producto sera 0 y no se suma el 20%
-	
-	printf("\nIngrese su ID de cliente: ");
-	fflush(stdin);
-	scanf("%i",&nuevo_trab->id_cliente);
-	if(BuscarCliente(nuevo_trab->id_cliente)==0){ 
-		//BuscarCliente recorre la lista de clientes en busca del id ingresado, si no lo encuentra devuelve 0
-		printf("\nNo se ha encontrado un cliente asociado a la ID ingresada");
-		printf("\nDesea darse de alta como cliente?");
-		printf("\n1)Si");
-		printf("\n2)No");
-		printf("\n--> ");
-		fflush(stdin);
-		scanf("%i",&op);
-		while(op!=0){
-			switch(op){
-			case 1:
-				//inicli no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
-				AltaDeClientes(inicli);
-				op=0;
-				break;
-			case 2:
-				printf("\nDisculpe las molestias, vuelva pronto");
-				nuevo_trab->id_cliente=0;//Si no esta en la lista de clientes y no quiere estarlo, se cancela la solicitud de trabajo
-				op=0;
-				break;
-			default:
-				printf("Ingrese una opcion valida: ");
-				printf("\n--> ");
-				scanf("%i",&op);
-				break;
+void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra){
+        /* struct trabajos{ //Cola.
+            int id_trabajo, id_opcion, opcion, cuatromtrs;
+            char direccion[30];
+            int id_tecnico, id_cliente, fc_fin[3];
+            struct trabajos *sgte;
+         }
+         */
+        struct tecnico *nodoaux = NULL; 
+        int op;
+        struct trabajos *nuevo_trab;
+        
+        nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos));
+        if (nuevo_trab == NULL){
+        	printf("No hay memoria.\n");
+		} else{
+			nuevo_trab->sgte = NULL;
+        	op = ListadoDeOpcionesParaAltaDeTrabajo(_iniop); 
+        	nuevo_trab->opcion = op;
+        	printf( "\n---Ingrese el ID de la opcion a contratar: " );
+        	fflush(stdin);
+        	scanf( "%i", &nuevo_trab->id_opcion );
+        	nuevo_trab->id_trabajo = BuscarMayorIdTrab((*sTra)) + 1;
+        	printf( "\n---Ingrese la direccion de la instalacion: " );
+        	fflush(stdin);
+        	gets(nuevo_trab->direccion);
+        	printf( "\nPonga 1 si el trabajo debe realizarse a una altura mayor a 4 metros, de lo contrario ponga 0: " );
+        	fflush(stdin);
+        	scanf( "%i", &nuevo_trab->cuatromtrs); 
+        	while ((nuevo_trab->cuatromtrs != 1) || (nuevo_trab->cuatromtrs != 0)){
+        		printf("Opción inválida. Ponga 1 si el trabajo debe realizarse a una altura mayor a 4 metros, de lo contrario ponga 0. \n");
+        		fflush(stdin);
+        		scanf( "%i", &nuevo_trab->cuatromtrs);
 			}
-		}	
+        	nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec); 
+       		printf("\nIngrese su ID de cliente: ");
+        	fflush(stdin);
+        	scanf("%i",&nuevo_trab->id_cliente);
+        	if(BuscarCliente(nuevo_trab->id_cliente)==0){ 
+                //BuscarCliente recorre la lista de clientes en busca del id ingresado, si no lo encuentra devuelve 0
+                printf("\nNo se ha encontrado un cliente asociado a la ID ingresada");
+                printf("\nDesea darse de alta como cliente?");
+                printf("\n1)Si");
+                printf("\n2)No");
+                printf("\n--> ");
+                fflush(stdin);
+                scanf("%i",&op);
+                while(op!=0){
+                        switch(op){
+                        case 1:
+                                //inicli no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
+                                AltaDeClientes(_inicli);
+                                op=0;
+                                break;
+                        case 2:
+                                printf("\nDisculpe las molestias, vuelva pronto");
+                                nuevo_trab->id_cliente=0;//Si no esta en la lista de clientes y no quiere estarlo, se cancela la solicitud de trabajo
+                                op=0;
+                                break;
+                        default:
+                                printf("Ingrese una opcion valida: ");
+                                printf("\n--> ");
+                                scanf("%i",&op);
+                                break;
+                        }
+                }        
+        }
+        if (nuevo_trab->id_cliente != 0){ //Si no esta en 0 significa que existe en la lista de clientes
+            EncolarTrabajos(&nuevo_trab, eTra, sTra);
+        }
 	}
-
-	if (nuevo_trab->id_cliente != 0){ //Si no esta en 0 significa que existe en la lista de clientes
-		InsertarTrabajo(&nuevo_trab);
-	}
+        
 }
 
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
@@ -536,7 +546,7 @@ void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
 		printf("\nDNI: ");
 		scanf("%d", &nv->DNI);
 		printf("\nNombre: ");
-		scanf("%29s", nv->Nombre);
+		scanf("%s", &nv->Nombre);
 		nv->sgte = NULL;
 		EncolarTecnico(&nv, e, s);
 	}
@@ -932,10 +942,42 @@ void InsertarOpcion (struct opcion **nvop,struct opcion **iniop){
 	aux->sgte = (*nvop);
 }
 
-void InsertarTrabajo(struct trabajos ** nvt){
+void ListadoDeOpciones (struct opcion **iniopcion){
+	int o, cont=0;
+	
+	while ((*iniopcion) != NULL){
+		cont = cont + 1;
+		printf("Las opciones disponibles son: ");
+		printf("--------------------------");
+		printf("Nombre de la opción %d: %s. \n", cont, (*iniopcion)->Nombre);
+		printf("Precio de mano de obra por hora: %2.f. \n", (*iniopcion)->cHoraMObra);
+		printf("ID de la opcion: %d. \n", (*iniopcion)->id);
+		printf("--------------------------");
+	}
 }
 
-void ListadoDeOpciones (){
+int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion){
+	int o, cont=0;
+	
+	while ((*iniopcion) != NULL){
+		cont = cont + 1;
+		printf("Las opciones disponibles son: ");
+		printf("--------------------------");
+		printf("Nombre de la opción %d: %s. \n", cont, (*iniopcion)->Nombre);
+		printf("Precio de mano de obra por hora: %2.f. \n", (*iniopcion)->cHoraMObra);
+		printf("ID de la opcion: %d. \n", (*iniopcion)->id);
+		printf("--------------------------");
+	}
+	printf("Elija la opcion que desee: \n");
+	fflush(stdin);
+	scanf("%d", &o);
+	while ((o < 0) || (o > cont)){
+		printf("Opcion invalida. Elija una opcion correcta: \n");
+		fflush(stdin);
+		scanf("%d", &o);
+	}
+	return(o);
+	
 }
 
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
@@ -947,7 +989,6 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
     char descripcion[30];
     struct pendientes *sgte;
 };*/
-
 	pila = Vacia(*tope);
   	if (pila == 1) {
         printf("La pila está Vacia\n");
