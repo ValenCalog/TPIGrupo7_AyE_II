@@ -57,9 +57,8 @@ struct pendientes{ //Pila.
     struct pendientes *sgte;
 };
 
-float BuscarPrecioMaterial (int codmat);
 float OperacionTiempo (int id,struct tarea ** initar);
-float OperacionCosto (int codop,struct materialesop ** inimat);
+float OperacionCosto (struct materiales *raiz, int codop,struct materialesop ** inimat);
 
 
 int BuscarCliente (int codcliente);
@@ -91,6 +90,8 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 void AltaDeTrabajos (struct cliente ** inicli,struct opcion ** iniop, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
+
+void BuscarPrecioMaterial (float *unitario, struct materiales *r, int codmat);
 
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 
@@ -177,21 +178,40 @@ float OperacionTiempo (int id, struct tarea **initar){
 	return (tiempo);
 }
 
-float OperacionCosto (int codop,struct materialesop **inimat){
-	float costomat=0;
+float OperacionCosto (struct materiales *raiz, int codop, struct materialesop **inimat){
+	float costomat=0, auxc=0;
 	struct materialesop *aux=NULL;
 	aux = (*inimat);
 	while(aux!=NULL){
 		if(aux->id_opcion=codop){
-			//Ira al arbol a buscar el material
-			costomat = costomat + (aux->cantidad*BuscarPrecioMaterial(aux->idmat));
+			BuscarPrecioMaterial(&auxc, raiz, aux->idmat);
+			if(auxc==0){
+				printf("--- El material no se encontro en en arbol ---\n");
+			}else{
+				costomat = costomat + (aux->cantidad * auxc);			
+			}
 		}
 		aux=aux->sgte;
 	}
 	return (costomat);
 }
 
-float BuscarPrecioMaterial (int codmat){
+void BuscarPrecioMaterial (float *unit, struct materiales *raiz, int codmat){
+	if(raiz==NULL){
+		*unit = 0;
+	}else{
+		if(*unit == 0){
+			if(codmat == raiz->id){
+				*unit = raiz->costo_uni;
+			}else{
+				if(codmat < raiz->id){
+					BuscarPrecioMaterial (&(*unit), raiz->izq, codmat);
+				}else{
+					BuscarPrecioMaterial (&(*unit), raiz->derch, codmat);
+				}
+			}
+		}
+	}
 }
 
 //Ints
@@ -442,19 +462,18 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 	nueva_op = (struct opcion *) malloc (sizeof (struct opcion) );
 	if(nueva_op == NULL){
 		printf( ":( No hay espacio en memoria \n" );
-		
 	}else{
-		if(*iniop != NULL){
+		if(*iniop == NULL){
 			nueva_op->id = 1;
 		}else{
 			nueva_op->id = BuscarMayorIdOpc(*iniop) + 1;
 		}
 		printf( "---Digite el nombre de la nueva opcion: \n" );
-		fflush(stdin);
 		gets( nueva_op->Nombre );
-		
+		fflush(stdin);
 		printf("---Digite el costo por hora de la mano de obra: \n");
 		scanf("%2.f", &nueva_op->cHoraMObra);
+		fflush(stdin);
 		nueva_op->sgte = NULL;
 		InsertarOpcion (&nueva_op, iniop);
 	}
