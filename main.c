@@ -788,13 +788,13 @@ void Desapilar (struct pendientes **nodo, struct pendientes **tp){
 
 void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes *tope){
 	struct cliente *cli=NULL;
-	struct materiales *mat=NULL, *auxm=NULL;
 	struct materialesop *mato=NULL;
-	struct tarea *tar=NULL, *antt=NULL, *auxt=NULL;
+	struct tarea *tar=NULL, *auxt=NULL;
 	struct tecnico *tech=NULL;
 	struct trabajos *trab=NULL;
 	struct opcion *opc=NULL;
 	struct pendientes *pend=NULL, *tpaux=NULL;
+	
 	if((p=fopen("clientes.txt", "w"))==NULL){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
@@ -819,10 +819,25 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 		}
 		fclose(p);
 	}
-	//struct tarea *tar=NULL, *antt=NULL, *auxt=NULL;
-	//Descarga de lista doble, tarea.
 	p=NULL;
-	
+	if((p=fopen("tareas.txt","w"))==NULL){
+		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
+	}else{
+		tar=initar->ant;
+		auxt=initar;
+		while(initar != tar){
+			fprintf(p, "%s", tar->descripcion);
+			fprintf(p, "%d", tar->id_op);
+			fprintf(p, "%d", tar->id_tarea);
+			fprintf(p, "%d", tar->orden);
+			fprintf(p, "%f", tar->tiempo);
+			if(tar!=auxt){
+				tar=auxt;
+			}
+			initar=initar->sgte;
+		}
+		fclose(p);
+	}
 	p=NULL;
 	if((p=fopen("tecnicos.txt","w"))==NULL){
 		printf("||||||| Error de apertura de archivo Tecnicos durante la carga |||||||\n");
