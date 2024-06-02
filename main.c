@@ -196,27 +196,8 @@ float OperacionCosto (struct materiales *raiz, int codop, struct materialesop **
 	return (costomat);
 }
 
-void BuscarPrecioMaterial (float *unit, struct materiales *raiz, int codmat){
-	if(raiz==NULL){
-		*unit = 0;
-	}else{
-		if(*unit == 0){
-			if(codmat == raiz->id){
-				*unit = raiz->costo_uni;
-			}else{
-				if(codmat < raiz->id){
-					BuscarPrecioMaterial (&(*unit), raiz->izq, codmat);
-				}else{
-					BuscarPrecioMaterial (&(*unit), raiz->derch, codmat);
-				}
-			}
-		}
-	}
-}
-
-
-//Ints
-int BuscarCliente(int id, struct cliente *ini){
+//ints
+int BuscarCliente (int id, struct cliente *ini){
 	int encontroid=0;
 	
 	while (ini != NULL){
@@ -229,7 +210,7 @@ int BuscarCliente(int id, struct cliente *ini){
 	return (encontroid);	
 }
 
-int BuscarMayorIdCliente(struct cliente *ini){
+int BuscarMayorIdCliente (struct cliente *ini){
 	int maxId = ini->id;
 	while(ini!=NULL){
 		if(ini->id > maxId){
@@ -240,7 +221,7 @@ int BuscarMayorIdCliente(struct cliente *ini){
 	return maxId;
 }
 
-int BuscarMayorIdOpc(struct opcion *ini){
+int BuscarMayorIdOpc (struct opcion *ini){
 	int idMax = ini->id;
 	ini = ini->sgte;
 	while(ini!=NULL){
@@ -252,7 +233,7 @@ int BuscarMayorIdOpc(struct opcion *ini){
 	return idMax;
 }
 
-int BuscarMayorIdTrab(struct trabajos *s){
+int BuscarMayorIdTrab (struct trabajos *s){
 	int maxId = s->id_trabajo;
 	while(s!=NULL){
 		if(s->id_trabajo > maxId){
@@ -263,55 +244,49 @@ int BuscarMayorIdTrab(struct trabajos *s){
 	return maxId;
 }
 
-int BuscarTecnico(struct tecnico **nodo, struct tecnico **e, struct tecnico **s){
-	/*struct tecnico{ //Cola.
-     int id;
-     long int DNI;
-     char Nombre[30];
-     struct tecnico *sgte;
-	};*/
-	int cont=0; //el cont es para que cuando encuentre un tecnico disponible, deje de buscar
-	
+int BuscarTecnico (struct tecnico **nodo, struct tecnico **e, struct tecnico **s){
+	int cont = 0;
 	while (cont == 0){
-		DesencolarTecnico(nodo, e, s);
+		DesencolarTecnico (nodo, e, s);
 		cont = cont + 1;
-		printf("Su tecnico sera: %s.\n", (*nodo)->Nombre);
-		EncolarTecnico(nodo, e, s);
+		printf ("Su tecnico sera: %s.\n", (*nodo)->Nombre);
+		EncolarTecnico (nodo, e, s);
 	}
-	return((*nodo)->id);
+	return ((*nodo)->id);
 }
 
-int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s){
+int BuscarMayorIdTecnico (struct tecnico *e, struct tecnico *s){
 	int maxId = s->id;
-	while(s!=NULL){
-		if(s->id > maxId){
+	while (s != NULL){
+		if (s->id > maxId){
 			maxId = s->id;
 		}
 		s = s->sgte;
 	}
-	return maxId;
+	return (maxId);
 }
 
-int GenerarIdMaterial(struct materiales *r){
+int GenerarIdMaterial (struct materiales *r){
 	int min = 10, max = 40000, idRandomizado, idEncontrado = 0;
 	do{
 		idRandomizado = rand() % (max - min + 1) + min;
-    	idEncontrado = VerificarId(r, idRandomizado);		
-	}while(idEncontrado == 1);
-   return idRandomizado;
+		idEncontrado = VerificarId (r, idRandomizado);		
+	}while (idEncontrado == 1);
+	
+	return (idRandomizado);
 }
 
 int Menu (int o){
-	int contgency=0;
-	while( (o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) ){
-		if(contgency>=1){
-			printf( "El valor que ingreso no es valido, vuelva a ingresar una opcion. \n" );
-			fflush(stdin);
-			scanf( "%d", &o );
+	int contgency = 0;
+	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6)){
+		if (contgency >= 1){
+			printf ("El valor que ingreso no es valido, vuelva a ingresar una opcion. \n" );
+			fflush (stdin);
+			scanf ("%d", &o );
 		}else{
-			printf( "-------------------Bienvenido al menu :D-------------------\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para listar los trabajos finalizados.\n---Ingrese 6 para listar las opciones mas vendidas.\n---Ingrese 7 para dar de alta un tecnico." );
-			fflush(stdin);
-			scanf( "%d", &o );
+			printf ("-------------------Bienvenido al menu :D-------------------\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para listar los trabajos finalizados.\n---Ingrese 6 para listar las opciones mas vendidas.\n---Ingrese 7 para dar de alta un tecnico." );
+			fflush (stdin);
+			scanf ("%d", &o);
 			contgency++;
 		}
 	}
@@ -321,28 +296,28 @@ int Menu (int o){
 int Vacia (struct pendientes *tp){
 	int v;
 	
-	if (tp == NULL){
+	if ( tp == NULL ){
 		v = 1;
 	}else {
 		v = 0;
 	}
-	return (v);
+	return ( v );
 }
 
-int VerificarId(struct materiales *r, int idRandom){
+int VerificarId (struct materiales *r, int idRandom){
 	int band = 0;
-	if(r!=NULL){
-		if(r->id == idRandom){
+	if( r != NULL ){
+		if( r->id == idRandom ){
 			band = 1;
 		}else{
-			if(idRandom > r->id){
-				band = VerificarId(r->derch, idRandom);
+			if( idRandom > r->id ){
+				band = VerificarId( r->derch, idRandom );
 			}else{
-				band = VerificarId(r->izq, idRandom);
+				band = VerificarId( r->izq, idRandom );
 			}
 		}
 	}
-	return band;
+	return ( band );
 }
 
 //Structs
@@ -365,28 +340,27 @@ struct materiales* DescargarArbol (struct materiales *raiz, FILE *p){
 }
 
 struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz){
-	if( raiz == NULL) {
-		mat->derch = NULL;
-		mat->izq = NULL;
+	if (raiz == NULL) {
 		raiz = mat;
 	}else{
-		if( mat->id < raiz->id ){
-			raiz->izq = InsertarMaterial(mat, raiz);
+		if (mat->id < raiz->id){
+			raiz->izq = InsertarMaterial (mat, raiz->izq);
 		}else{
-			raiz->derch = InsertarMaterial(mat, raiz);
+			raiz->derch = InsertarMaterial (mat, raiz->derch);
 		}
 	}
-	return(raiz);
+	return (raiz);
 }
 
 struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materiales *nodo){
-	if( raiz == NULL ){
+	if (raiz == NULL){
 		raiz = nodo;
 	}else{
-		if( raiz == nodo ){
-			printf( "Ya esta en la lista. \n" );
+		if (raiz->id == nodo->id){
+			printf ("\n --- Ya esta en la lista, se sumara el nuevo stock al deposito --- \n");
+			raiz->cantidad = raiz->cantidad + nodo->cantidad;
 		}else{
-			if( nodo < raiz ){
+			if (nodo->id < raiz->id){
 				raiz->izq = InsertarNuevoMaterial (raiz->izq, nodo);
 			}else{
 				raiz->derch = InsertarNuevoMaterial (raiz->derch, nodo);
@@ -398,189 +372,183 @@ struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materi
 
 struct tarea* BuscarAnterior (int dato, struct tarea *rc){
 	struct tarea *ant=NULL;
-	while( rc != NULL){
-		if( rc->id_op > dato){
-			rc = NULL;
+	while (rc!=NULL){
+		if (rc->id_op > dato){
+			rc=NULL;
 		}else{
-			ant = rc;
-			rc = rc->sgte;
+			ant=rc;
+			rc=rc->sgte;
 		}
 	}
 	return (ant);
 }
 
 //Voids
-void AltaDeClientes(struct cliente **inicli){
-	struct cliente *nvcliente=NULL;
-	nvcliente = (struct cliente *) malloc(sizeof(struct cliente));
+void AltaDeClientes (struct cliente **inicli){
+	struct cliente *nvcliente = NULL;
+	
+	nvcliente = ( struct cliente * ) malloc( sizeof( struct cliente ) );
+	
 	if( nvcliente != NULL ){
-		printf( "\nBienvenido a SistemaSeguro S.A!" );
+		printf( "\n¡Bienvenido a SistemaSeguro S.A!" );
 		printf( "\nA continuacion le pediremos una serie de datos para poder registrarlo como cliente." );
-		printf( "\nDigite su DNI: " );
-		fflush(stdin);
+		printf( "\n---Digite su DNI: " );
 		scanf( "%ld", &nvcliente->DNI );
-		printf( "\nDigite su nombre completo: " );
 		fflush(stdin);
+		printf( "\n---Digite su nombre completo: " );
 		gets( nvcliente->Nombre );
-		if(*inicli == NULL){
+		fflush(stdin);
+		
+		if( *inicli == NULL ){
 			nvcliente->id = 1;
 		}else{
-			nvcliente->id = BuscarMayorIdCliente(*inicli) +1;
+			nvcliente->id = BuscarMayorIdCliente( *inicli ) +1;
 		}
-		nvcliente->sgte=NULL;
-		//inicli no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
-		InsertarCliente ( &nvcliente, inicli );
+		nvcliente->sgte = NULL;
+		InsertarCliente( &nvcliente, inicli );
 	}else{
-		printf("\nError de asignacion de espacio de Memoria");
+		printf( "\n|||||| Error de asignacion de espacio de Memoria ||||||" );
 	}
-	
-	/*
-	struct cliente{ //Lista Enlazada Simple.
-     int id;
-     long int DNI;
-     char Nombre[30];
-     struct cliente *sgte;
-	};*/
-
 }
 
 void AltaDeMateriales (struct materiales **raiz){
     struct materiales *nuevo_mat;
 
     nuevo_mat = (struct materiales *) malloc (sizeof (struct materiales) );
+    
     if( nuevo_mat == NULL ){
        printf( ":( No hay espacio en la memoria \n" );
     }else{
-    		nuevo_mat->id = GenerarIdMaterial(*raiz);
-		printf( "---Ingrese la descripcion del material: \n" );
-	    	fflush(stdin);
+    	nuevo_mat->id = GenerarIdMaterial( (*raiz) );
+    	
+		printf( "\n---Ingrese la descripcion del material: " );
 		gets( nuevo_mat->descripcion );
+	    fflush(stdin);
 		
-		printf( "---Ingrese cual sera la unidad de medida: \n" );
-	    	fflush(stdin);
+		printf( "\n---Ingrese cual sera la unidad de medida: " );
 		gets( nuevo_mat->unimed );
+		fflush(stdin);
 		
-		printf( "---Ingrese el precio unitario del nuevo material: \n" );
-	    	fflush(stdin);
+		printf( "\n---Ingrese el precio unitario del nuevo material: " );
 		scanf( "%f", &nuevo_mat->costo_uni );
-		*raiz = InsertarNuevoMaterial (*raiz, nuevo_mat);
-		//Insertamos el nodo, con el nuevo material, al arbol.
+		fflush(stdin);
+		
+		printf( "\n---Ingrese la cantidad a almacenar del nuevo material: ");
+		scanf( "%f", &nuevo_mat->cantidad );
+		fflush(stdin);
+		
+		(*raiz) = InsertarNuevoMaterial ( (*raiz), nuevo_mat );
 	}
 }
 
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar){
 	struct opcion *nueva_op;
+	
 	nueva_op = (struct opcion *) malloc (sizeof (struct opcion) );
-	if(nueva_op == NULL){
+	
+	if (nueva_op == NULL){
 		printf( ":( No hay espacio en memoria \n" );
-		
 	}else{
-		if(*iniop != NULL){
+		if (*iniop != NULL){
 			nueva_op->id = 1;
 		}else{
 			nueva_op->id = BuscarMayorIdOpc(*iniop) + 1;
 		}
+		
 		printf( "---Digite el nombre de la nueva opcion: \n" );
-		fflush(stdin);
 		gets( nueva_op->Nombre );
+		fflush(stdin);
 		
 		printf("---Digite el costo  de la mano de obra: \n");
-		fflush(stdin);
 		scanf("%2.f", &nueva_op->cHoraMObra);
+		fflush(stdin);
+		
 		nueva_op->sgte = NULL;
 		InsertarOpcion (&nueva_op, iniop);
 	}
 }
 
 void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra, struct materiales **_inimat, struct materiales **raiz){
-        /* struct trabajos{ //Cola.
-            int id_trabajo, id_opcion, opcion, cuatromtrs;
-            char direccion[30];
-            int id_tecnico, id_cliente, fc_fin[3];
-            struct trabajos *sgte;
-         }
-         */
-        struct tecnico *nodoaux = NULL; 
-        int op;
-        struct trabajos *nuevo_trab;
-        
-        nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos));
-        if (nuevo_trab == NULL){
-        	printf("No hay memoria.\n");
-		} else{
-			nuevo_trab->sgte = NULL;
-			printf( "\nPonga 1 si el trabajo debe realizarse a una altura mayor a 4 metros, de lo contrario ponga 0: " );
-        	fflush(stdin);
-        	scanf( "%i", &nuevo_trab->cuatromtrs); 
-        	while ((nuevo_trab->cuatromtrs != 1) || (nuevo_trab->cuatromtrs != 0)){
-        		printf("Opción inválida. Ponga 1 si el trabajo debe realizarse a una altura mayor a 4 metros, de lo contrario ponga 0. \n");
-        		fflush(stdin);
-        		scanf( "%i", &nuevo_trab->cuatromtrs);
-			}
-        	op = ListadoDeOpcionesParaAltaDeTrabajo(_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
-        	nuevo_trab->opcion = op;
-        	printf( "\n---Ingrese el ID de la opcion a contratar: " );
-        	fflush(stdin);
-        	scanf( "%i", &nuevo_trab->id_opcion );
-        	nuevo_trab->id_trabajo = BuscarMayorIdTrab((*sTra)) + 1;
-        	printf( "\n---Ingrese la direccion de la instalacion: " );
-        	fflush(stdin);
-        	gets(nuevo_trab->direccion);
-        	nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec); 
-       		printf("\nIngrese su ID de cliente: ");
-        	fflush(stdin);
-        	scanf("%i",&nuevo_trab->id_cliente);
-        	if(BuscarCliente(nuevo_trab->id_cliente, _inicli)==0){ 
-                //BuscarCliente recorre la lista de clientes en busca del id ingresado, si no lo encuentra devuelve 0
-                printf("\nNo se ha encontrado un cliente asociado a la ID ingresada");
-                printf("\nDesea darse de alta como cliente?");
-                printf("\n1)Si");
-                printf("\n2)No");
-                printf("\n--> ");
-                fflush(stdin);
-                scanf("%i",&op);
-                while(op!=0){
-                        switch(op){
-                        case 1:
-                                //inicli no hace falta que pases por referencia porque ya llego a la funcion de esa manera.
-                                AltaDeClientes(_inicli);
-                                op=0;
-                                break;
-                        case 2:
-                                printf("\nDisculpe las molestias, vuelva pronto");
-                                nuevo_trab->id_cliente=0;//Si no esta en la lista de clientes y no quiere estarlo, se cancela la solicitud de trabajo
-                                op=0;
-                                break;
-                        default:
-                                printf("Ingrese una opcion valida: ");
-                                printf("\n--> ");
-                                scanf("%i",&op);
-                                break;
-                        }
-                }        
+    struct tecnico *nodoaux = NULL; 
+    struct trabajos *nuevo_trab;
+    int op;
+    
+    nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos));
+    if (nuevo_trab == NULL){
+    	printf ("No hay memoria.\n");
+	}else{
+		nuevo_trab->sgte = NULL;
+		printf ("\n--- Ponga 1 si el trabajo debe realizarse a una altura mayor a 4 metros, de lo contrario 0: " );
+    	scanf ("%i", &nuevo_trab->cuatromtrs); 
+    	fflush (stdin);
+    	
+    	while ((nuevo_trab->cuatromtrs != 1) || (nuevo_trab->cuatromtrs != 0)){
+    		printf ("\n |||| Opción inválida |||| \n--- Ponga 1 o 0: ");
+    		scanf ("%i", &nuevo_trab->cuatromtrs);
+    		fflush (stdin);
+		}
+		
+    	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
+    	nuevo_trab->opcion = op;
+    	printf ( "\n---Ingrese el ID de la opcion a contratar: " );
+    	scanf ("%i", &nuevo_trab->id_opcion );
+    	fflush (stdin);
+		nuevo_trab->id_trabajo = BuscarMayorIdTrab((*sTra)) + 1;
+    	printf ("\n---Ingrese la direccion de la instalacion: " );
+    	gets (nuevo_trab->direccion);
+    	fflush (stdin);
+		nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec); 
+   		printf ("\nIngrese su ID de cliente: ");
+    	scanf ("%i",&nuevo_trab->id_cliente);
+    	fflush (stdin);
+		if (BuscarCliente (nuevo_trab->id_cliente, _inicli)==0){
+            printf ("\n--- No se ha encontrado un cliente asociado a la ID ingresada---");
+            printf ("\n ¿Desea darse de alta como cliente? ");
+            printf ("\n 1)Si");
+            printf ("\n 2)No");
+            printf ("\n --> ");
+            scanf ("%i",&op);
+            fflush (stdin);
+			while (op!=0){
+                switch (op){
+	                case 1:
+	            	    AltaDeClientes(_inicli);
+	                    op=0;
+	                    break;
+	                case 2:
+	                    printf("\nDisculpe las molestias, vuelva pronto");
+	                    nuevo_trab->id_cliente=0;
+						op=0;
+	                    break;
+	                default:
+	                    printf("Ingrese una opcion valida: ");
+	                    printf("\n--> ");
+	                    scanf("%i",&op);
+	                    break;
+				}
+            }        
         }
-        if (nuevo_trab->id_cliente != 0){ //Si no esta en 0 significa que existe en la lista de clientes
+        if (nuevo_trab->id_cliente != 0){
             EncolarTrabajos(&nuevo_trab, eTra, sTra);
         }
-	}
-        
+	}    
 }
 
-void AltaDeTecnicos(struct tecnico **e, struct tecnico **s){
+void AltaDeTecnicos (struct tecnico **e, struct tecnico **s){
 	struct tecnico *nv;
-	nv = (struct tecnico*) malloc(sizeof(struct tecnico));
-	if(nv!=NULL){
-		if(*e == NULL){
+	nv = (struct tecnico*) malloc (sizeof (struct tecnico));
+	if (nv!=NULL){
+		if (*e == NULL){
 			nv->id = 1;
 		}else{
 			nv->id = BuscarMayorIdTecnico(*e, *s) +1;	
 		}
-		printf("\nDNI: ");
-		scanf("%d", &nv->DNI);
-		printf("\nNombre: ");
-		scanf("%s", &nv->Nombre);
+		printf ("\nDNI: ");
+		scanf ("%d", &nv->DNI);
+		printf ("\nNombre: ");
+		scanf ("%s", &nv->Nombre);
 		nv->sgte = NULL;
-		EncolarTecnico(&nv, e, s);
+		EncolarTecnico (&nv, e, s);
 	}
 }
 
@@ -590,24 +558,22 @@ void Apilar (struct pendientes **nodo, struct pendientes **tpaux){
 	(*nodo) = NULL;
 }
 
-void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s){
-	if((*e) == NULL){
-		*s = *nv;
+void BuscarPrecioMaterial (float *unit, struct materiales *raiz, int codmat){
+	if(raiz==NULL){
+		*unit = 0;
 	}else{
-		(*e)->sgte = *nv;
+		if(*unit == 0){
+			if(codmat == raiz->id){
+				*unit = raiz->costo_uni;
+			}else{
+				if(codmat < raiz->id){
+					BuscarPrecioMaterial (&(*unit), raiz->izq, codmat);
+				}else{
+					BuscarPrecioMaterial (&(*unit), raiz->derch, codmat);
+				}
+			}
+		}
 	}
-	*e=*nv;
-	*nv = NULL;
-}
-
-void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s){
-	if((*e) == NULL){
-		*s = *nv;
-	}else{
-		(*e)->sgte = *nv;
-	}
-	*e=*nv;
-	*nv = NULL;
 }
 
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
@@ -954,6 +920,26 @@ void DesencolarTrabajos (struct trabajos **ds, struct trabajos **e, struct traba
 	if (*s == NULL){
 		(*e) = NULL;	
 	} 
+}
+
+void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s){
+	if((*e) == NULL){
+		*s = *nv;
+	}else{
+		(*e)->sgte = *nv;
+	}
+	*e=*nv;
+	*nv = NULL;
+}
+
+void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s){
+	if((*e) == NULL){
+		*s = *nv;
+	}else{
+		(*e)->sgte = *nv;
+	}
+	*e=*nv;
+	*nv = NULL;
 }
 
 void InsertarCliente(struct cliente ** nv,struct cliente ** inicli){
