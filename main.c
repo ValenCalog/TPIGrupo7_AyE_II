@@ -482,7 +482,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
     	scanf ("%i", &nuevo_trab->cuatromtrs); 
     	fflush (stdin);
     	
-    	while ((nuevo_trab->cuatromtrs != 1) || (nuevo_trab->cuatromtrs != 0)){
+    	while ((nuevo_trab->cuatromtrs > 1) || (nuevo_trab->cuatromtrs < 0)){
     		printf ("\n |||| Opción inválida |||| \n--- Ponga 1 o 0: ");
     		scanf ("%i", &nuevo_trab->cuatromtrs);
     		fflush (stdin);
