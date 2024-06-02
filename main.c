@@ -68,7 +68,7 @@ int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
 int BuscarMayorIdTrab(struct trabajos *s);
 int BuscarMayorIdOpc(struct opcion *ini);
 int BuscarTecnico (struct tecnico **nodo, struct tecnico **et, struct tecnico **st);
-int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniop, struct materiales **raiz, struct materiales **inimat, int cuatrometros); //este muestra las opciones y retorna un valor para el alta de trabajo
+int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniop, struct materiales **raiz, struct materialesop **inimat, int cuatrometros); //este muestra las opciones y retorna un valor para el alta de trabajo
 
 int GenerarIdMaterial(struct materiales *r);
 
@@ -87,7 +87,7 @@ struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
 void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales **r);
 void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar);
-void AltaDeTrabajos (struct cliente ** inicli,struct opcion ** iniop, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct materiales **inimat, struct materiales **r);
+void AltaDeTrabajos (struct cliente ** inicli,struct opcion ** iniop, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct materialesop **inimat, struct materiales **r);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
 
@@ -468,7 +468,7 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 	}
 }
 
-void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra, struct materiales **_inimat, struct materiales **raiz){
+void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra, struct materialesop **_inimat, struct materiales **raiz){
     struct tecnico *nodoaux = NULL; 
     struct trabajos *nuevo_trab;
     int op;
@@ -501,7 +501,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
    		printf ("\nIngrese su ID de cliente: ");
     	scanf ("%i",&nuevo_trab->id_cliente);
     	fflush (stdin);
-		if (BuscarCliente (nuevo_trab->id_cliente, _inicli)==0){
+		if (BuscarCliente (nuevo_trab->id_cliente, (*_inicli))==0){
             printf ("\n--- No se ha encontrado un cliente asociado a la ID ingresada---");
             printf ("\n ¿Desea darse de alta como cliente? ");
             printf ("\n 1)Si");
@@ -975,9 +975,9 @@ void ListadoDeOpciones (struct opcion **iniopcion){
 	}
 }
 
-int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materiales **raiz, struct materiales **inimat, int _cuatrometros){
+int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materiales **raiz, struct materialesop **inimat, int _cuatrometros){
 	int o, cont=0;
-	float total=0;
+	float total=0, auxc=0;
 	
 	while ((*iniopcion) != NULL){
 		cont = cont + 1;
@@ -985,7 +985,8 @@ int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materi
 		printf("--------------------------");
 		printf("Opción %d: %s. \n", cont, (*iniopcion)->Nombre);
 		printf("ID de la opcion: %d. \n", (*iniopcion)->id);
-		total = (*iniopcion)->cHoraMObra + OperacionCosto (raiz, (*iniopcion)->id, &inimat);
+		auxc=OperacionCosto ((*raiz), (*iniopcion)->id, inimat);
+		total = ((*iniopcion)->cHoraMObra + auxc);
 		if (_cuatrometros == 1){
 			printf("El precio de mano de obra es: %2.f, pero con el costo de los materiales y del trabajo en altura queda en: %2.f \n", (*iniopcion)->cHoraMObra, ((20 * total)/100) + total);
 		} else {
