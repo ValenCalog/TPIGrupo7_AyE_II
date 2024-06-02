@@ -196,24 +196,6 @@ float OperacionCosto (struct materiales *raiz, int codop, struct materialesop **
 	return (costomat);
 }
 
-void BuscarPrecioMaterial (float *unit, struct materiales *raiz, int codmat){
-	if(raiz==NULL){
-		*unit = 0;
-	}else{
-		if(*unit == 0){
-			if(codmat == raiz->id){
-				*unit = raiz->costo_uni;
-			}else{
-				if(codmat < raiz->id){
-					BuscarPrecioMaterial (&(*unit), raiz->izq, codmat);
-				}else{
-					BuscarPrecioMaterial (&(*unit), raiz->derch, codmat);
-				}
-			}
-		}
-	}
-}
-
 //Ints
 int BuscarCliente(int codcliente){
 }
@@ -577,24 +559,22 @@ void Apilar (struct pendientes **nodo, struct pendientes **tpaux){
 	(*nodo) = NULL;
 }
 
-void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s){
-	if((*e) == NULL){
-		*s = *nv;
+void BuscarPrecioMaterial (float *unit, struct materiales *raiz, int codmat){
+	if(raiz==NULL){
+		*unit = 0;
 	}else{
-		(*e)->sgte = *nv;
+		if(*unit == 0){
+			if(codmat == raiz->id){
+				*unit = raiz->costo_uni;
+			}else{
+				if(codmat < raiz->id){
+					BuscarPrecioMaterial (&(*unit), raiz->izq, codmat);
+				}else{
+					BuscarPrecioMaterial (&(*unit), raiz->derch, codmat);
+				}
+			}
+		}
 	}
-	*e=*nv;
-	*nv = NULL;
-}
-
-void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s){
-	if((*e) == NULL){
-		*s = *nv;
-	}else{
-		(*e)->sgte = *nv;
-	}
-	*e=*nv;
-	*nv = NULL;
 }
 
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
@@ -941,6 +921,26 @@ void DesencolarTrabajos (struct trabajos **ds, struct trabajos **e, struct traba
 	if (*s == NULL){
 		(*e) = NULL;	
 	} 
+}
+
+void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s){
+	if((*e) == NULL){
+		*s = *nv;
+	}else{
+		(*e)->sgte = *nv;
+	}
+	*e=*nv;
+	*nv = NULL;
+}
+
+void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s){
+	if((*e) == NULL){
+		*s = *nv;
+	}else{
+		(*e)->sgte = *nv;
+	}
+	*e=*nv;
+	*nv = NULL;
 }
 
 void InsertarCliente(struct cliente ** nv,struct cliente ** inicli){
