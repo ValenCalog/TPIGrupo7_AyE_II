@@ -429,7 +429,7 @@ void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,stru
 		printf( ":( No hay espacio en memoria \n" );
 		
 	}else{
-		if(*iniop != NULL){
+		if(*iniop == NULL){
 			nueva_op->id = 1;
 		}else{
 			nueva_op->id = BuscarMayorIdOpc(*iniop) + 1;
@@ -465,7 +465,7 @@ void AltaDeTrabajos (struct cliente ** inicli,struct materialesop ** inimat,stru
 	/*printf( "\n---Ingrese el ID de trabajo: " );
 	fflush(stdin);
 	scanf( "%i", &nuevo_trab->id_trabajo ); //Despues se puede implementar el buscaridtrabajo() + 1;*/
-	if(*sTrab!=NULL){
+	if(*sTrab==NULL){
 		nuevo_trab->id_trabajo = 1;
 	}else{
 		nuevo_trab->id_trabajo = BuscarMayorIdTrab(*sTrab) + 1;
