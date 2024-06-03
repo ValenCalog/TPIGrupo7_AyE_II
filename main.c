@@ -221,17 +221,13 @@ int BuscarMayorIdCliente (struct cliente *ini){
 }
 
 int BuscarMayorIdOpc (struct opcion *ini){
-	printf("Entro a buscar mayor \n");
 	int idMax = ini->id;
 	ini = ini->sgte;
 	while(ini!=NULL){
-		printf("Entro a while \n");
 		if(ini->id > idMax){
-			printf("Entro al if \n");
 			idMax = ini->id;
 		}
 		ini = ini->sgte;
-		printf("avanzo \n");
 	}
 	return (idMax);
 }
@@ -253,9 +249,9 @@ int BuscarTecnico (struct tecnico **nodo, struct tecnico **e, struct tecnico **s
 		DesencolarTecnico (nodo, e, s);
 		cont = cont + 1;
 		printf ("Su tecnico sera: %s.\n", (*nodo)->Nombre);
+		return ((*nodo)->id);
 		EncolarTecnico (nodo, e, s);
 	}
-	return ((*nodo)->id);
 }
 
 int BuscarMayorIdTecnico (struct tecnico *e, struct tecnico *s){
@@ -399,8 +395,8 @@ void AltaDeClientes (struct cliente **inicli){
 		scanf( "%ld", &nvcliente->DNI );
 		fflush(stdin);
 		printf( "\n---Digite su nombre completo: " );
-		gets( nvcliente->Nombre );
 		fflush(stdin);
+		gets( nvcliente->Nombre );
 		
 		if( *inicli == NULL ){
 			nvcliente->id = 1;
@@ -493,15 +489,14 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
     	nuevo_trab->opcion = op;
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
-    	fflush (stdin);
-		nuevo_trab->id_trabajo = BuscarMayorIdTrab((*sTra)) + 1;
     	printf ("\n---Ingrese la direccion de la instalacion: " );
+    	fflush(stdin);
     	gets (nuevo_trab->direccion);
-    	fflush (stdin);
-		nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec); 
+		nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec);
+		fflush(stdin);
    		printf ("\nIngrese su ID de cliente: ");
-    	scanf ("%i",&nuevo_trab->id_cliente);
-    	fflush (stdin);
+   		fflush (stdin);
+   		scanf ("%i",&nuevo_trab->id_cliente); 
 		if (BuscarCliente (nuevo_trab->id_cliente, (*_inicli))==0){
             printf ("\n--- No se ha encontrado un cliente asociado a la ID ingresada---");
             printf ("\n ¿Desea darse de alta como cliente? ");
@@ -514,6 +509,11 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
                 switch (op){
 	                case 1:
 	            	    AltaDeClientes(_inicli);
+	            	    if (nuevo_trab->id_cliente != 0){
+        					nuevo_trab->id_trabajo = BuscarMayorIdTrab((*sTra)) + 1;
+           					 EncolarTrabajos(&nuevo_trab, eTra, sTra);
+           					 printf("Trabajo agregado exitosamente.\n");
+        				}
 	                    op=0;
 	                    break;
 	                case 2:
@@ -528,9 +528,6 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 	                    break;
 				}
             }        
-        }
-        if (nuevo_trab->id_cliente != 0){
-            EncolarTrabajos(&nuevo_trab, eTra, sTra);
         }
 	}    
 }
@@ -995,9 +992,9 @@ int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materi
 		total = aux->cHoraMObra + auxc;
 		
 		if (_cuatrometros == 1){
-			printf("El precio de mano de obra es: %0.f, pero con el costo de los materiales y del trabajo en altura queda en: %0.f \n", aux->cHoraMObra, ((20 * total)/100) + total);
+			printf("El precio de mano de obra es: %.2f, pero con el costo de los materiales y del trabajo en altura queda en: %.2f \n", aux->cHoraMObra, ((20 * total)/100) + total);
 		} else {
-			printf("El precio de mano de obra es: %0.f, pero con el costo de materiales queda en: %0.f.\n", aux->cHoraMObra, total);
+			printf("El precio de mano de obra es: %.2f, pero con el costo de materiales queda en: %.2f .\n", aux->cHoraMObra, total);
 		}
 		printf("--------------------------\n");
 		total = 0; //se reincia el total para que no vaya acumulando a lo largo del recorrido
