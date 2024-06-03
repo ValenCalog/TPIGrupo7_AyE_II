@@ -71,8 +71,6 @@ int BuscarTecnico (struct tecnico **nodo, struct tecnico **et, struct tecnico **
 int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniop, struct materiales **raiz, struct materialesop **inimat, int cuatrometros); //este muestra las opciones y retorna un valor para el alta de trabajo
 
 int GenerarIdMaterial(struct materiales *r);
-int InsertarOpcion (struct opcion * nvop,struct opcion * iniop);
-int InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
 
 int Menu (int opc);
 
@@ -81,9 +79,12 @@ int VerificarId(struct materiales *r, int idRandom);
 
 
 struct materiales* DescargarArbol (struct materiales *raiz, FILE *p);
+struct cliente* InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
 struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz);
+struct materialesop* InsertarMaterialesOp(struct materialesop **nv,struct materialesop **inimat);
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
 struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
+struct opcion* InsertarOpcion (struct opcion * nvop,struct opcion *iniop);
 
 
 void AltaDeClientes (struct cliente **inicli);
@@ -144,6 +145,10 @@ int main(int argc, char *argv[]){
 		//system("CLS");
 		opc = Menu(opc);
 		switch(opc){
+			case 0:
+				printf("---Saliendo de Programa---\n Adios!\n");
+				opc=0;
+				break;
 			case 1:
 				ListadoDeOpciones(&iniopc);
 				opc=-1;
@@ -419,7 +424,7 @@ void AltaDeClientes (struct cliente **inicli){
 			nvcliente->id = BuscarMayorIdCliente( *inicli ) +1;
 		}
 		nvcliente->sgte = NULL;
-		inicli = InsertarCliente( &nvcliente, inicli );
+		(*inicli) = InsertarCliente( &nvcliente,&(*inicli) );
 	}else{
 		printf( "\n|||||| Error de asignacion de espacio de Memoria ||||||" );
 	}
@@ -601,13 +606,7 @@ void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct c
 				fscanf(p, "%ld" ,cli->DNI);
 				fscanf(p, "%d" ,cli->id);
 				fscanf(p, "%s" ,cli->Nombre);					
-				if(inicli==NULL){
-					(*inicli) = cli;
-					(*inicli)->sgte=NULL;
-				}else{
-					antc->sgte=cli;
-					antc=cli;
-				}
+				(*inicli) = InsertarCliente (&cli, &(*inicli));
 			}
 		}
 		fclose(p);
@@ -653,13 +652,7 @@ void CargaMaterialesOpcion (FILE *p, struct materialesop *mato, struct materiale
 				fscanf(p, "%d", mato->cantidad);
 				fscanf(p, "%d", mato->idmat);
 				fscanf(p, "%d", mato->id_opcion);
-				if(inimat==NULL){
-					(*inimat)=mato;
-					(*inimat)->sgte=NULL;
-				}else{
-					antm->sgte=mato;
-					antm=mato;
-				}
+				(*inimat) = InsertarMaterialesOp (&mato, &(*inimat));
 			}
 			free (mato);
 		}
@@ -689,8 +682,6 @@ void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *
 					(*initar)->ant = NULL;
 				}else{
 					if( antt == NULL ){
-						tar->sgte = (*initar);
-						(*initar)->ant = tar;
 						(*initar) = tar;
 					}else{
 						auxt = antt->sgte;
@@ -760,26 +751,30 @@ void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opc
 	if((p=fopen("opciones.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Opciones durante la carga |||||||\n");
 	}else{
+		printf("Entro OPCIONES ELSE\n");
 		while(!feof(p)){
+			printf("Entro OPCIONES WHILE\n");
 			opc=(struct opcion *) malloc(sizeof(struct opcion));
 			if(opc==NULL){
 				printf("-------No hay espacio de memoria-------\n");
 			}else{
+				printf("Entro OPCIONES ELSE CARGA\n");
 				fscanf(p, "%d", opc->id);
-				fscanf(p, "%f", opc->cHoraMObra);
+				printf("opc->id=%d\n",opc->id);
 				fscanf(p, "%s", opc->Nombre);
-				if(iniopc==NULL){
-					(*iniopc)=opc;
-					(*iniopc)->sgte=NULL;
-				}else{
-					anto->sgte=opc;
-					anto=opc;
-				}
+				printf("opc->nombre=%s\n",opc->Nombre);
+				fscanf(p, "%f", opc->cHoraMObra);
+				printf("opc->coso de vale=%f\n",opc->cHoraMObra);
+				printf("CARGO\n");
+				(*iniopc) = InsertarOpcion (opc, (*iniopc));
+				printf("INSERTO\n");
 			}
 			free (opc);
 		}
+		printf("Salio OPCIONES WHILE\n");
 		fclose(p);
 	}
+	printf("Salio OPCIONES\n");
 }
 
 void CargaPendientes (FILE *p, struct pendientes *pend, struct pendientes **tope){
@@ -815,14 +810,21 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	struct trabajos *trab=NULL;
 	struct opcion *opc=NULL, *anto=NULL;
 	struct pendientes *pend=NULL;
-	
+	printf("Entro CARGA CLIENTES\n");
 	CargaClientes (p, cli, antc, inicli);
+	printf("Entro CARGA MATERIALES\n");
 	CargaMateriales (p, mat, auxm, raiz);
+	printf("Entro CARGA MATERIALESOP\n");
 	CargaMaterialesOpcion (p, mato, antm, inimat);
+	printf("Entro CARGA TAREAS\n");
 	CargaTareas (p, tar, antt, auxt, initar);
+	printf("Entro CARGA TECNICOS\n");
 	CargaTecnicos (p, tech, et, st);
+	printf("Entro CARGA TRABAJOS\n");
 	CargaTrabajos (p, trab, ent, sal);
+	printf("Entro CARGA OPCIONES\n");
 	CargaOpciones (p, opc, anto, iniopc);
+	printf("Entro CARGA PENDIENTES\n");
 	CargaPendientes (p, pend, tope);
 }
 
@@ -837,9 +839,9 @@ void DescargaClientes( FILE *p, struct cliente *cli, struct cliente *inicli){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
 		while(inicli != NULL){
-			fscanf(p, "%ld" ,cli->DNI);
-			fscanf(p, "%d" ,cli->id);
-			fscanf(p, "%s" ,cli->Nombre);
+			fprintf(p, "%ld" , inicli->DNI);
+			fprintf(p, "%d" , inicli->id);
+			fprintf(p, "%s" , inicli->Nombre);
 			inicli = inicli->sgte;
 		}
 		fclose(p);
@@ -852,9 +854,9 @@ void DescargaMaterialesOpcion(FILE *p, struct materialesop *mato, struct materia
 		printf("||||||| Error de apertura de archivo Materiales por Opcion durante la carga |||||||\n");
 	}else{
 		while(inimat != NULL){
-			fprintf(p, "%d", mato->cantidad);
-			fprintf(p, "%d", mato->idmat);
-			fprintf(p, "%d", mato->id_opcion);
+			fprintf(p, "%d", inimat->cantidad);
+			fprintf(p, "%d", inimat->idmat);
+			fprintf(p, "%d", inimat->id_opcion);
 			inimat = inimat->sgte;
 		}
 		fclose(p);
@@ -866,14 +868,15 @@ void DescargaTareas (FILE *p, struct tarea *tar, struct tarea *auxt, struct tare
 	if((p=fopen("tareas.txt","w"))==NULL){
 		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
 	}else{
-		tar=initar->ant;
-		auxt=initar;
+		tar = NULL;
+		auxt = initar;
 		while(initar != tar){
-			fprintf(p, "%s", tar->descripcion);
-			fprintf(p, "%d", tar->id_op);
-			fprintf(p, "%d", tar->id_tarea);
-			fprintf(p, "%d", tar->orden);
-			fprintf(p, "%f", tar->tiempo);
+			fprintf(p, "%s", initar->descripcion);
+			fprintf(p, "%d", initar->id_op);
+			fprintf(p, "%d", initar->id_tarea);
+			fprintf(p, "%d", initar->orden);
+			fprintf(p, "%f", initar->tiempo);
+			printf("CARGO\n");
 			if(tar!=auxt){
 				tar=auxt;
 			}
@@ -890,9 +893,9 @@ void DescargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico *et, struct
 	}else{
 		while(st!=NULL){
 			DesencolarTecnico (&tech, &et, &st);
-			fprintf(p, "%ld\n", tech->DNI);
-			fprintf(p, "%d\n", tech->id);
-			fprintf(p, "%s\n", tech->Nombre);
+			fprintf(p, "%ld", tech->DNI);
+			fprintf(p, "%d", tech->id);
+			fprintf(p, "%s", tech->Nombre);
 			EncolarTecnico (&tech, &et, &st);
 		}
 		fclose(p);
@@ -906,13 +909,13 @@ void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, str
 	}else{
 		while(sal!=NULL){
 			DesencolarTrabajos (&trab, &ent, &sal);
-			fscanf(p, "%d\n", trab->cuatromtrs);
-			fprintf(p, "%s\n", trab->direccion);
-			fprintf(p, "%d\n", trab->fc_fin);
-			fprintf(p, "%d\n", trab->id_cliente);
-			fprintf(p, "%d\n", trab->id_opcion);
-			fprintf(p, "%d\n", trab->id_tecnico);
-			fprintf(p, "%d\n", trab->id_trabajo);
+			fscanf(p, "%d", trab->cuatromtrs);
+			fprintf(p, "%s", trab->direccion);
+			fprintf(p, "%d", trab->fc_fin);
+			fprintf(p, "%d", trab->id_cliente);
+			fprintf(p, "%d", trab->id_opcion);
+			fprintf(p, "%d", trab->id_tecnico);
+			fprintf(p, "%d", trab->id_trabajo);
 			EncolarTrabajos (&trab, &ent, &sal);
 		}
 		fclose(p);
@@ -920,18 +923,25 @@ void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, str
 }
 
 void DescargaOpciones (FILE *p, struct opcion *opc, struct opcion *iniopc){
+	printf("Entro OPCIONES \n");
 	p=NULL;
 	if((p=fopen("opciones.txt", "w"))==NULL){
 		printf("||||||| Error de apertura de archivo Opciones durante la carga |||||||\n");
 	}else{
+		printf("Entro OPCIONES ELSE \n");
 		while(iniopc != NULL){
-			fprintf(p, "%d\n", opc->id);
-			fprintf(p, "%f\n", opc->cHoraMObra);
-			fprintf(p, "%s\n", opc->Nombre);
+			printf("Entro OPCIONES  WHILE \n");
+			fprintf(p, "%d", iniopc->id);
+			fprintf(p, "%s", iniopc->Nombre);
+			fprintf(p, "%f", iniopc->cHoraMObra);
+			printf("CARGO \n");
 			iniopc = iniopc->sgte;
+			printf("RECORRIO \n");
 		}
+		printf("Salio OPCIONES WHILE \n");
 		fclose(p);
 	}
+	printf("Salio OPCIONES \n");
 }
 
 void DescargaPendientes (FILE *p, struct pendientes *pend, struct pendientes *tope, struct pendientes *tpaux){
@@ -941,12 +951,12 @@ void DescargaPendientes (FILE *p, struct pendientes *pend, struct pendientes *to
 	}else{
 		while(tope != NULL){
 			Desapilar (&pend, &tope);
-			fprintf(p, "%d\n", pend->completado);
-			fprintf(p, "%s\n", pend->descripcion);
-			fprintf(p, "%d\n", pend->id_tarea);
-			fprintf(p, "%d\n", pend->id_trabajo);
-			fprintf(p, "%d\n", pend->orden);
-			fprintf(p, "%f\n", pend->tiempo);
+			fprintf(p, "%d", pend->completado);
+			fprintf(p, "%s", pend->descripcion);
+			fprintf(p, "%d", pend->id_tarea);
+			fprintf(p, "%d", pend->id_trabajo);
+			fprintf(p, "%d", pend->orden);
+			fprintf(p, "%f", pend->tiempo);
 			Apilar (&pend, &tpaux);	
 		}
 		fclose(p);
@@ -954,6 +964,7 @@ void DescargaPendientes (FILE *p, struct pendientes *pend, struct pendientes *to
 }
 
 void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes *tope){
+	printf("Entro DESCARGAS \n");
 	struct cliente *cli=NULL;
 	struct materialesop *mato=NULL;
 	struct tarea *tar=NULL, *auxt=NULL;
@@ -961,14 +972,21 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 	struct trabajos *trab=NULL;
 	struct opcion *opc=NULL;
 	struct pendientes *pend=NULL, *tpaux=NULL;
-	
+	printf("Entro DESCARGAS CLIENTES\n");
 	DescargaClientes (p, cli, inicli);
+	printf("Entro DESCARGAS ARBOL\n");
 	raiz = DescargarArbol (raiz, p);
+	printf("Entro DESCARGAS MATERIALESOP\n");
 	DescargaMaterialesOpcion(p, mato, inimat);
+	printf("Entro DESCARGAS TAREAS\n");
 	DescargaTareas (p, tar, auxt, initar);
+	printf("Entro DESCARGAS TECNICOS\n");
 	DescargaTecnicos (p, tech, et, st);
+	printf("Entro DESCARGAS TRABAJOS\n");
 	DescargaTrabajos (p, trab, ent, sal);
+	printf("Entro DESCARGAS OPCIONES\n");
 	DescargaOpciones (p, opc, iniopc);
+	printf("Entro DESCARGAS PENDIENTES\n");
 	DescargaPendientes (p, pend, tope, tpaux);
 }
 
@@ -1008,25 +1026,39 @@ void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos 
 	*nv = NULL;
 }
 
-int InsertarCliente(struct cliente ** nv,struct cliente ** inicli){
+struct cliente * InsertarCliente(struct cliente **nv,struct cliente **inicli){
 	struct cliente *aux=NULL;
 	aux = (*inicli);
 	if (aux != NULL) {
-		aux->sgte = InsertarCliente (nv, aux->sgte);
+		aux->sgte = InsertarCliente (&(*nv), &aux->sgte);
 	} else {
-		aux = nv;
+		aux = (*nv);
 	}
 	return (aux);
 }
 
-int InsertarOpcion (struct opcion *nvop, struct opcion *iniop){
-	
+struct materialesop * InsertarMaterialesOp(struct materialesop **nv,struct materialesop **inimat){
+	struct materialesop *aux=NULL;
+	aux = (*inimat);
+	if (aux != NULL) {
+		aux->sgte = InsertarMaterialesOp (&(*nv), &aux->sgte);
+	} else {
+		aux = (*nv);
+	}
+	return (aux);
+}
+
+struct opcion * InsertarOpcion (struct opcion *nvop, struct opcion *iniop){
+	printf("Entro FC\n");
 	if (iniop != NULL){
+		printf("Entro FC DISTINTO NULL\n");
 		iniop->sgte = InsertarOpcion(nvop, iniop->sgte);
 	} else{
+		printf("Entro FC IGUAL A NULL\n");
 		iniop = nvop;
 		printf("Opcion agregada correctamente.\n");
 	}
+	printf("Salio FC\n");
 	return (iniop);
 }
 
@@ -1045,6 +1077,7 @@ void ListadoDeOpciones (struct opcion **iniopcion) {
         aux = aux->sgte; 
     }
 }
+
 int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materiales **raiz, struct materialesop **inimat, int _cuatrometros){
 	int o, cont=0;
 	float total=0, auxc=0;
