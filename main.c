@@ -86,7 +86,7 @@ struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
 
 void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales **r);
-void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar);
+void AltaDeOpciones (struct opcion ** iniop);
 void AltaDeTrabajos (struct cliente ** inicli,struct opcion ** iniop, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct materialesop **inimat, struct materiales **r);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
@@ -112,16 +112,16 @@ void ListadoDeOpciones (struct opcion **iniop); //este solo muestra las opciones
 void OpcionesMasVendidas ();
 
 int main(int argc, char *argv[]){
-	struct cliente *inicli;
-	struct materiales *raiz;
-	struct materialesop *inimat;
-	struct tarea *initar;
-	struct tecnico *et, *st;
-	struct trabajos *e, *s;
-	struct opcion *iniopc;
-    struct pendientes *nodo, *tope;	
+	struct cliente *inicli=NULL;
+	struct materiales *raiz=NULL;
+	struct materialesop *inimat=NULL;
+	struct tarea *initar=NULL;
+	struct tecnico *et=NULL, *st=NULL;
+	struct trabajos *e=NULL, *s=NULL;
+	struct opcion *iniopc=NULL;
+    struct pendientes *nodo=NULL, *tope=NULL;	
 	int opc=-1;
-	FILE *p;
+	FILE *p=NULL;
 	
 	srand(time(NULL));
 	CargaSupremaDeEstructuras(p, &inicli, &raiz, &inimat, &initar, &et, &st, &e, &s, &iniopc, &tope);
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 2:
-				AltaDeOpciones(&inicli,&inimat,&iniopc,&initar);
+				AltaDeOpciones(&iniopc);
 				opc=-1;
 				break;
 			case 3:
@@ -222,15 +222,19 @@ int BuscarMayorIdCliente (struct cliente *ini){
 }
 
 int BuscarMayorIdOpc (struct opcion *ini){
+	printf("Entro a buscar mayor \n");
 	int idMax = ini->id;
 	ini = ini->sgte;
 	while(ini!=NULL){
+		printf("Entro a while \n");
 		if(ini->id > idMax){
+			printf("Entro al if \n");
 			idMax = ini->id;
 		}
 		ini = ini->sgte;
+		printf("avanzo \n");
 	}
-	return idMax;
+	return (idMax);
 }
 
 int BuscarMayorIdTrab (struct trabajos *s){
@@ -441,30 +445,28 @@ void AltaDeMateriales (struct materiales **raiz){
 	}
 }
 
-void AltaDeOpciones (struct cliente ** inicli,struct materialesop ** inimat,struct opcion ** iniop,struct tarea **initar){
+void AltaDeOpciones (struct opcion ** iniop){
 	struct opcion *nueva_op;
-	
 	nueva_op = (struct opcion *) malloc (sizeof (struct opcion) );
 	
 	if (nueva_op == NULL){
 		printf( ":( No hay espacio en memoria \n" );
 	}else{
-		if (*iniop != NULL){
+		if ((*iniop) == NULL){
 			nueva_op->id = 1;
 		}else{
-			nueva_op->id = BuscarMayorIdOpc(*iniop) + 1;
+			nueva_op->id = BuscarMayorIdOpc((*iniop)) + 1;
 		}
+		fflush(stdin);
 		
 		printf( "---Digite el nombre de la nueva opcion: \n" );
 		gets( nueva_op->Nombre );
 		fflush(stdin);
-		
 		printf("---Digite el costo  de la mano de obra: \n");
 		scanf("%2.f", &nueva_op->cHoraMObra);
 		fflush(stdin);
-		
 		nueva_op->sgte = NULL;
-		InsertarOpcion (&nueva_op, iniop);
+		InsertarOpcion (&nueva_op, &(*iniop));
 	}
 }
 
@@ -954,12 +956,16 @@ void InsertarCliente(struct cliente ** nv,struct cliente ** inicli){
 void InsertarOpcion (struct opcion **nvop,struct opcion **iniop){
 	struct opcion *aux=NULL;
 	aux = (*iniop);
-	while(aux->sgte!=NULL){
-		aux=aux->sgte;
+	
+	if((*iniop)==NULL){
+		iniop=nvop;
+	}else{
+		while(aux->sgte!=NULL){
+			aux=aux->sgte;
+		}
+		aux->sgte = (*nvop);
 	}
-	aux->sgte = (*nvop);
 }
-
 void ListadoDeOpciones (struct opcion **iniopcion){
 	int o, cont=0;
 	
