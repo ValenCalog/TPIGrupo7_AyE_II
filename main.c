@@ -600,105 +600,183 @@ void BuscarPrecioMaterial (double *unit, struct materiales *raiz, int codmat){
 }
 
 void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct cliente **inicli){
+	int cont=0;
 	if((p=fopen("clientes.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
-		while(!feof(p)){
+		char d[]=" ", cadaux[sizeof(p)], *a=strtok(cadaux,d);
+		fscanf(p, "%s", cadaux);
+		printf("COMPROBACION ARCH= %s \n", cadaux);
+		while(a!=NULL){
 			cli=(struct cliente *) malloc(sizeof (struct cliente) );
 			if(cli==NULL){
 				printf("-------No hay espacio de memoria-------\n");
 			}else{
-				fscanf(p, "%ld" ,cli->DNI);
-				fscanf(p, "%d" ,cli->id);
-				fscanf(p, "%s" ,cli->Nombre);					
-				(*inicli) = InsertarCliente (&cli, &(*inicli));
+				switch(cont) {
+					case 0:
+						cli->DNI=atol(a);
+						cont++;
+						break;
+					case 1:
+						cli->id=atoi(a);
+						cont++;
+						break;
+					case 2:
+						strcpy(cli->Nombre,a);
+						cont=0;
+						(*inicli) = InsertarCliente (&cli, &(*inicli));
+						break;
+				}
 			}
+			free(cli);
+			a=strtok(NULL, d);
 		}
 		fclose(p);
 	}
 }
 
 void CargaMateriales (FILE *p, struct materiales *mat, struct materiales *auxm, struct materiales **raiz){
+	int cont=0;
 	p=NULL;
 	if((p=fopen("materiales.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales durante la carga |||||||\n");
 	}else{
-		while(!feof(p)){
+		char d[]=" ", cadaux[sizeof(p)], *a=strtok(cadaux,d);
+		fscanf(p, "%s", cadaux);
+		printf("COMPROBACION ARCH= %s \n", cadaux);
+		while(a!=NULL){
 			mat=(struct materiales *) malloc(sizeof (struct materiales) );
 			if(mat==NULL){
 				printf("-------No hay espacio de memoria-------\n");
 			}else{
-				fscanf(p, "%f", mat->cantidad);
-				fscanf(p, "%f", mat->costo_uni);
-				fscanf(p, "%s", mat->descripcion);
-				fscanf(p, "%d", mat->id);
-				fscanf(p, "%s", mat->unimed);
-				auxm = (*raiz);
-				auxm = InsertarMaterial(mat, auxm);
-				(*raiz) = auxm;
+				switch(cont) {
+					case 0:
+						mat->cantidad=atof(a);
+						cont++;
+						break;
+					case 1:
+						mat->costo_uni=atof(a);
+						cont++;
+						break;
+					case 2:
+						strcpy(mat->descripcion,a);
+						cont++;
+						break;
+					case 3:
+						mat->id=atoi(a);
+						cont++;
+						break;
+					case 4:
+						strcpy(mat->unimed,a);
+						cont=0;
+						auxm = (*raiz);
+						auxm = InsertarMaterial(mat, auxm);
+						(*raiz) = auxm;
+						break;
+				}
 			}
 			free (mat);
+			a=strtok(NULL, d);
 		}
 		fclose(p);
 	}
 }
 
 void CargaMaterialesOpcion (FILE *p, struct materialesop *mato, struct materialesop *antm, struct materialesop **inimat){
+	int cont=0;
 	p=NULL;
 	antm=NULL;
 	if((p=fopen("materialesop.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales por Opcion durante la carga |||||||\n");
 	}else{
-		while(!feof(p)){
+		char d[]=" ", cadaux[sizeof(p)], *a=strtok(cadaux,d);
+		fscanf(p, "%s", cadaux);
+		printf("COMPROBACION ARCH= %s \n", cadaux);
+		while(a!=NULL){
+			
 			mato=(struct materialesop *) malloc(sizeof(struct materialesop));
 			if(mato==NULL){
 				printf("-------No hay espacio de memoria-------\n");
 			}else{
-				fscanf(p, "%d", mato->cantidad);
-				fscanf(p, "%d", mato->idmat);
-				fscanf(p, "%d", mato->id_opcion);
-				(*inimat) = InsertarMaterialesOp (&mato, &(*inimat));
+				switch(cont) {
+					case 0:
+						mato->cantidad=atoi(a);
+						cont++;
+						break;
+					case 1:
+						mato->idmat=atoi(a);
+						cont++;
+						break;
+					case 2:
+						mato->id_opcion=atoi(a);
+						cont=0;
+						(*inimat) = InsertarMaterialesOp (&mato, &(*inimat));
+						break;
+				}
 			}
 			free (mato);
+			a=strtok(NULL, d);
 		}
 		fclose(p);
 	}
 }
 
 void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *auxt, struct tarea **initar){
+	int cont=0;
 	p=NULL;
 	if((p=fopen("tareas.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
 	}else{
-		while(!feof(p)){
+		char d[]=" ", cadaux[sizeof(p)], *a=strtok(cadaux,d);
+		fscanf(p, "%s", cadaux);
+		printf("COMPROBACION ARCH= %s \n", cadaux);
+		while(a!=NULL){
 			tar=(struct tarea *) malloc(sizeof (struct tarea) );
 			if(tar==NULL){
 				printf("-------No hay espacio de memoria-------\n");
 			}else{
-				fscanf(p, "%s", tar->descripcion);
-				fscanf(p, "%d", tar->id_op);
-				fscanf(p, "%d", tar->id_tarea);
-				fscanf(p, "%d", tar->orden);
-				fscanf(p, "%lf", tar->tiempo);
-				antt = BuscarAnterior (tar->id_op, (*initar));
-				if( initar == NULL ){
-					(*initar) = tar;
-					(*initar)->sgte = NULL;
-					(*initar)->ant = NULL;
-				}else{
-					if( antt == NULL ){
-						(*initar) = tar;
-					}else{
-						auxt = antt->sgte;
-						tar->ant = antt;
-						antt->sgte = tar;
-						if( auxt != NULL ){
-							tar->sgte = auxt;
-							auxt->ant = tar;
+				switch(cont) {
+					case 0:
+						strcpy(tar->descripcion,a);
+						cont++;
+						break;
+					case 1:
+						tar->id_op=atoi(a);
+						cont++;
+						break;
+					case 2:
+						tar->id_tarea=atoi(a);
+						cont++;
+						break;
+					case 3:
+						tar->orden=atoi(a);
+						cont++;
+						break;
+					case 4:
+						tar->tiempo=atof(a);
+						cont=0;
+						antt = BuscarAnterior (tar->id_op, (*initar));
+						if( initar == NULL ){
+							(*initar) = tar;
+							(*initar)->sgte = NULL;
+							(*initar)->ant = NULL;
+						}else{
+							if( antt == NULL ){
+								(*initar) = tar;
+							}else{
+								auxt = antt->sgte;
+								tar->ant = antt;
+								antt->sgte = tar;
+								if( auxt != NULL ){
+									tar->sgte = auxt;
+									auxt->ant = tar;
+								}
+							}
 						}
-					}
+						break;
 				}
 				free (tar);
+				a=strtok(NULL, d);
 			}
 		}
 		fclose(p);
@@ -706,20 +784,36 @@ void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *
 }
 
 void CargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico **et, struct tecnico **st){
+	int cont=0;
 	p=NULL;
 	if((p=fopen("tecnicos.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Tecnicos durante la carga |||||||\n");
 	}else{
-		while(feof(p)){
+		char d[]=" ", cadaux[sizeof(p)], *a=strtok(cadaux,d);
+		fscanf(p, "%s", cadaux);
+		printf("COMPROBACION ARCH= %s \n", cadaux);
+		while(a!=NULL){
 			tech=(struct tecnico *) malloc(sizeof (struct tecnico) );
 			if(tech==NULL){
 				printf("-------No hay espacio de memoria-------\n");
 			}else{
-				fscanf(p, "%ld", tech->DNI);
-				fscanf(p, "%d", tech->id);
-				fscanf(p, "%s", tech->Nombre);
-				EncolarTecnico(&tech, &(*et), &(*st));
+				switch(cont) {
+					case 0:
+						tech->DNI=atol(a);
+						cont++;
+						break;
+					case 1:
+						tech->id=atoi(a);
+						cont++;
+						break;
+					case 2:
+						strcpy(tech->Nombre,a);
+						cont=0;
+						EncolarTecnico(&tech, &(*et), &(*st));
+						break;
+				}
 				free(tech);
+				a=strtok(NULL, d);
 			}
 		}
 		fclose(p);
@@ -727,24 +821,58 @@ void CargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico **et, struct t
 }
 
 void CargaTrabajos (FILE  *p, struct trabajos *trab, struct trabajos **ent, struct trabajos **sal){
+	int cont=0;
+	int fecha=0;
 	p=NULL;
 	if((p=fopen("trabajos.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Trabajos durante la carga |||||||\n");
 	}else{
-		while(feof(p)){
+		char d[]=" ", cadaux[sizeof(p)], *a=strtok(cadaux,d);
+		fscanf(p, "%s", cadaux);
+		printf("COMPROBACION ARCH= %s \n", cadaux);
+		while(a!=NULL){
 			trab=(struct trabajos *) malloc(sizeof (struct trabajos) );
 			if(trab==NULL){
 				printf("-------No hay espacio de memoria-------\n");
 			}else{
-				fscanf(p, "%d", trab->cuatromtrs);
-				fscanf(p, "%s", trab->direccion);
-				fscanf(p, "%d", trab->fc_fin);
-				fscanf(p, "%d", trab->id_cliente);
-				fscanf(p, "%d", trab->id_opcion);
-				fscanf(p, "%d", trab->id_tecnico);
-				fscanf(p, "%d", trab->id_trabajo);
-				EncolarTrabajos(&trab, &(*ent), &(*sal));
+				switch(cont) {
+					case 0:
+						trab->cuatromtrs=atoi(a);
+						cont++;
+						break;
+					case 1:
+						strcpy(trab->direccion,a);
+						cont++;
+						break;
+					case 2:
+						fecha=atoi(a);
+						trab->fc_fin = fecha;
+						cont++;
+						break;
+					case 3:
+						trab->id_cliente=atoi(a);
+						cont++;
+						break;
+					case 4:
+						trab->id_opcion=atoi(a);
+						cont++;
+						break;
+					case 5:
+						trab->id_tecnico=atoi(a);
+						cont++;
+						break;
+					case 6:
+						trab->id_trabajo=atoi(a);
+						cont++;
+						break;
+					case 7:
+						trab->opcion=atoi(a);
+						cont=0;
+						EncolarTrabajos(&trab, &(*ent), &(*sal));
+						break;
+				}
 				free(trab);
+				a=strtok(NULL, d);
 			}
 		}
 		fclose(p);
@@ -752,56 +880,87 @@ void CargaTrabajos (FILE  *p, struct trabajos *trab, struct trabajos **ent, stru
 }
 
 void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opcion **iniopc){
+	int cont=0;
 	p=NULL;
 	if((p=fopen("opciones.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Opciones durante la carga |||||||\n");
 	}else{
-		printf("Entro OPCIONES ELSE\n");
-		while(!feof(p)){
-			printf("Entro OPCIONES WHILE\n");
+		char d[]=" ", cadaux[sizeof(p)], *a=strtok(cadaux,d);
+		fscanf(p, "%s", cadaux);
+		printf("COMPROBACION ARCH= %s \n", cadaux);
+		while(a!=NULL){
 			opc=(struct opcion *) malloc(sizeof(struct opcion));
 			if(opc==NULL){
 				printf("-------No hay espacio de memoria-------\n");
 			}else{
-				printf("Entro OPCIONES ELSE CARGA\n");
-				fscanf(p, "%d", opc->id);
-				printf("opc->id=%d\n",opc->id);
-				fscanf(p, "%s", opc->Nombre);
-				printf("opc->nombre=%s\n",opc->Nombre);
-				fscanf(p, "%lf", opc->cHoraMObra);
-				printf("opc->coso de vale=%f\n",opc->cHoraMObra);
-				printf("CARGO\n");
-				(*iniopc) = InsertarOpcion (opc, (*iniopc));
-				printf("INSERTO\n");
+				switch(cont) {
+					case 0:
+						opc->id=atoi(a);
+						cont++;
+						break;
+					case 1:
+						strcpy(opc->Nombre,a);
+						cont++;
+						break;
+					case 2:
+						opc->cHoraMObra=atof(a);
+						(*iniopc) = InsertarOpcion (opc, (*iniopc));
+						cont=0;
+						break;
+				}
 			}
+			a=strtok(NULL, d);
 			free (opc);
 		}
-		printf("Salio OPCIONES WHILE\n");
 		fclose(p);
 	}
-	printf("Salio OPCIONES\n");
 }
 
 void CargaPendientes (FILE *p, struct pendientes *pend, struct pendientes **tope){
+	int cont=0;
 	p=NULL;
 	if((p=fopen("pendientes.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Pendientes durante la carga |||||||\n");
 	}else{
-		while(!feof(p)){
+		char d[]=" ", cadaux[sizeof(p)], *a=strtok(cadaux,d);
+		fscanf(p, "%s", cadaux);
+		printf("COMPROBACION ARCH= %s \n", cadaux);
+		while(a!=NULL){
 			pend=(struct pendientes *) malloc(sizeof(struct pendientes));
 			if(pend==NULL){
 				printf("-------No hay espacio de memoria-------\n");
 			}else{
-				fscanf(p, "%d", pend->completado);
-				fscanf(p, "%s", pend->descripcion);
-				fscanf(p, "%d", pend->id_tarea);
-				fscanf(p, "%d", pend->id_trabajo);
-				fscanf(p, "%d", pend->orden);
-				fscanf(p, "%lf", pend->tiempo);
-				Apilar (&pend, tope);
+				switch(cont) {
+					case 0:
+						pend->completado=atoi(a);
+						cont++;
+						break;
+					case 1:
+						strcpy(pend->descripcion,a);
+						cont++;
+						break;
+					case 2:
+						pend->id_tarea=atoi(a);
+						cont++;
+						break;
+					case 3:
+						pend->id_trabajo=atoi(a);
+						cont++;
+						break;
+					case 4:
+						pend->orden=atoi(a);
+						cont++;
+						break;
+					case 5:
+						pend->tiempo=atof(a);
+						cont=0;
+						Apilar (&pend, tope);
+						break;
+				}
 			}
+			a=strtok(NULL, d);
+			free (pend);
 		}
-		free (pend);
 		fclose(p);
 	}
 }
@@ -844,9 +1003,9 @@ void DescargaClientes( FILE *p, struct cliente *cli, struct cliente *inicli){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
 		while(inicli != NULL){
-			fprintf(p, "%ld" , inicli->DNI);
-			fprintf(p, "%d" , inicli->id);
-			fprintf(p, "%s" , inicli->Nombre);
+			fprintf(p, "%ld " , inicli->DNI);
+			fprintf(p, "%d " , inicli->id);
+			fprintf(p, "%s " , inicli->Nombre);
 			inicli = inicli->sgte;
 		}
 		fclose(p);
@@ -859,9 +1018,9 @@ void DescargaMaterialesOpcion(FILE *p, struct materialesop *mato, struct materia
 		printf("||||||| Error de apertura de archivo Materiales por Opcion durante la carga |||||||\n");
 	}else{
 		while(inimat != NULL){
-			fprintf(p, "%d", inimat->cantidad);
-			fprintf(p, "%d", inimat->idmat);
-			fprintf(p, "%d", inimat->id_opcion);
+			fprintf(p, "%d ", inimat->cantidad);
+			fprintf(p, "%d ", inimat->idmat);
+			fprintf(p, "%d ", inimat->id_opcion);
 			inimat = inimat->sgte;
 		}
 		fclose(p);
@@ -876,11 +1035,11 @@ void DescargaTareas (FILE *p, struct tarea *tar, struct tarea *auxt, struct tare
 		tar = NULL;
 		auxt = initar;
 		while(initar != tar){
-			fprintf(p, "%s", initar->descripcion);
-			fprintf(p, "%d", initar->id_op);
-			fprintf(p, "%d", initar->id_tarea);
-			fprintf(p, "%d", initar->orden);
-			fprintf(p, "%lf", initar->tiempo);
+			fprintf(p, "%s ", initar->descripcion);
+			fprintf(p, "%d ", initar->id_op);
+			fprintf(p, "%d ", initar->id_tarea);
+			fprintf(p, "%d ", initar->orden);
+			fprintf(p, "%f ", initar->tiempo);
 			printf("CARGO\n");
 			if(tar!=auxt){
 				tar=auxt;
@@ -898,9 +1057,9 @@ void DescargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico *et, struct
 	}else{
 		while(st!=NULL){
 			DesencolarTecnico (&tech, &et, &st);
-			fprintf(p, "%ld", tech->DNI);
-			fprintf(p, "%d", tech->id);
-			fprintf(p, "%s", tech->Nombre);
+			fprintf(p, "%ld ", tech->DNI);
+			fprintf(p, "%d ", tech->id);
+			fprintf(p, "%s ", tech->Nombre);
 			EncolarTecnico (&tech, &et, &st);
 		}
 		fclose(p);
@@ -914,13 +1073,13 @@ void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, str
 	}else{
 		while(sal!=NULL){
 			DesencolarTrabajos (&trab, &ent, &sal);
-			fscanf(p, "%d", trab->cuatromtrs);
-			fprintf(p, "%s", trab->direccion);
-			fprintf(p, "%d", trab->fc_fin);
-			fprintf(p, "%d", trab->id_cliente);
-			fprintf(p, "%d", trab->id_opcion);
-			fprintf(p, "%d", trab->id_tecnico);
-			fprintf(p, "%d", trab->id_trabajo);
+			fscanf(p, "%d ", trab->cuatromtrs);
+			fprintf(p, "%s ", trab->direccion);
+			fprintf(p, "%d ", trab->fc_fin);
+			fprintf(p, "%d ", trab->id_cliente);
+			fprintf(p, "%d ", trab->id_opcion);
+			fprintf(p, "%d ", trab->id_tecnico);
+			fprintf(p, "%d ", trab->id_trabajo);
 			EncolarTrabajos (&trab, &ent, &sal);
 		}
 		fclose(p);
@@ -936,9 +1095,9 @@ void DescargaOpciones (FILE *p, struct opcion *opc, struct opcion *iniopc){
 		printf("Entro OPCIONES ELSE \n");
 		while(iniopc != NULL){
 			printf("Entro OPCIONES  WHILE \n");
-			fprintf(p, "%d", iniopc->id);
-			fprintf(p, "%s", iniopc->Nombre);
-			fprintf(p, "%lf", iniopc->cHoraMObra);
+			fprintf(p, "%d ", iniopc->id);
+			fprintf(p, "%s ", iniopc->Nombre);
+			fprintf(p, "%f ", iniopc->cHoraMObra);
 			printf("CARGO \n");
 			iniopc = iniopc->sgte;
 			printf("RECORRIO \n");
@@ -956,12 +1115,12 @@ void DescargaPendientes (FILE *p, struct pendientes *pend, struct pendientes *to
 	}else{
 		while(tope != NULL){
 			Desapilar (&pend, &tope);
-			fprintf(p, "%d", pend->completado);
-			fprintf(p, "%s", pend->descripcion);
-			fprintf(p, "%d", pend->id_tarea);
-			fprintf(p, "%d", pend->id_trabajo);
-			fprintf(p, "%d", pend->orden);
-			fprintf(p, "%lf", pend->tiempo);
+			fprintf(p, "%d ", pend->completado);
+			fprintf(p, "%s ", pend->descripcion);
+			fprintf(p, "%d ", pend->id_tarea);
+			fprintf(p, "%d ", pend->id_trabajo);
+			fprintf(p, "%d ", pend->orden);
+			fprintf(p, "%f ", pend->tiempo);
 			Apilar (&pend, &tpaux);	
 		}
 		fclose(p);
