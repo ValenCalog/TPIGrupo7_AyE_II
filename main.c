@@ -463,7 +463,7 @@ void AltaDeOpciones (struct opcion ** iniop){
 		gets( nueva_op->Nombre );
 		fflush(stdin);
 		printf("---Digite el costo  de la mano de obra: \n");
-		scanf("%2.f", &nueva_op->cHoraMObra);
+		scanf("%f", &nueva_op->cHoraMObra);
 		fflush(stdin);
 		nueva_op->sgte = NULL;
 		(*iniop) = InsertarOpcion (nueva_op, (*iniop));
@@ -973,7 +973,7 @@ void ListadoDeOpciones (struct opcion **iniopcion) {
         cont = cont + 1;
         printf("--------------------------\n");
         printf("Opción %d: %s. \n", cont, aux->Nombre);
-        printf("Precio de mano de obra: %0.f. \n", aux->cHoraMObra);  
+        printf("Precio de mano de obra: %.2f . \n", aux->cHoraMObra);  
         printf("ID de la opcion: %d. \n", aux->id);
         printf("--------------------------\n");
         aux = aux->sgte; 
