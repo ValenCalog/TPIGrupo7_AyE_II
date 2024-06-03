@@ -95,9 +95,24 @@ void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
 
 void BuscarPrecioMaterial (float *unitario, struct materiales *r, int codmat);
 
+void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct cliente **inicli);
+void CargaMateriales (FILE *p, struct materiales *mat, struct materiales *auxm, struct materiales **raiz);
+void CargaMaterialesOpcion (FILE *p, struct materialesop *mato, struct materialesop *antm, struct materialesop **inimat);
+void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *auxt, struct tarea **initar);
+void CargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico **et, struct tecnico **st);
+void CargaTrabajos (FILE  *p, struct trabajos *trab, struct trabajos **ent, struct trabajos **sal);
+void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opcion **iniopc);
+void CargaPendientes (FILE *p, struct pendientes *pend, struct pendientes **tope);
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 
 void Desapilar (struct pendientes **nodo, struct pendientes **tp);
+void DescargaClientes ( FILE *p, struct cliente *cli, struct cliente *inicli);
+void DescargaMaterialesOpcion(FILE *p, struct materialesop *mato, struct materialesop *inimat);
+void DescargaTareas (FILE *p, struct tarea *tar, struct tarea *auxt, struct tarea *initar);
+void DescargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico *et, struct tecnico *st);
+void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, struct trabajos *sal);
+void DescargaOpciones (FILE *p, struct opcion *opc, struct opcion *iniopc);
+void DescargaPendientes (FILE *P, struct pendientes *pen, struct pendientes *tope, struct pendientes *tpaux);
 void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *e, struct trabajos *s, struct opcion *iniopc, struct pendientes *tope);
 void DesencolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s);
 void DesencolarTrabajos(struct trabajos **ds, struct trabajos **e, struct trabajos **s);
@@ -574,16 +589,7 @@ void BuscarPrecioMaterial (float *unit, struct materiales *raiz, int codmat){
 	}
 }
 
-void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
-	struct cliente *cli=NULL, *antc=NULL;
-	struct materiales *mat=NULL, *auxm=NULL;
-	struct materialesop *mato=NULL, *antm=NULL;
-	struct tarea *tar=NULL, *antt=NULL, *auxt=NULL;
-	struct tecnico *tech=NULL;
-	struct trabajos *trab=NULL;
-	struct opcion *opc=NULL, *anto=NULL;
-	struct pendientes *pend=NULL;
-	//carga lista simple clientes
+void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct cliente **inicli){
 	if((p=fopen("clientes.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
@@ -596,7 +602,7 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 				fscanf(p, "%d" ,cli->id);
 				fscanf(p, "%s" ,cli->Nombre);					
 				if(inicli==NULL){
-					(*inicli)=cli;
+					(*inicli) = cli;
 					(*inicli)->sgte=NULL;
 				}else{
 					antc->sgte=cli;
@@ -606,7 +612,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	//carga arbol materiales
+}
+
+void CargaMateriales (FILE *p, struct materiales *mat, struct materiales *auxm, struct materiales **raiz){
 	p=NULL;
 	if((p=fopen("materiales.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales durante la carga |||||||\n");
@@ -629,7 +637,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	//carga lista simple materiales
+}
+
+void CargaMaterialesOpcion (FILE *p, struct materialesop *mato, struct materialesop *antm, struct materialesop **inimat){
 	p=NULL;
 	antm=NULL;
 	if((p=fopen("materialesop.txt","r"))==NULL){
@@ -643,7 +653,7 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 				fscanf(p, "%d", mato->cantidad);
 				fscanf(p, "%d", mato->idmat);
 				fscanf(p, "%d", mato->id_opcion);
-				if(inicli==NULL){
+				if(inimat==NULL){
 					(*inimat)=mato;
 					(*inimat)->sgte=NULL;
 				}else{
@@ -655,7 +665,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	//carga lista doble tareas
+}
+
+void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *auxt, struct tarea **initar){
 	p=NULL;
 	if((p=fopen("tareas.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
@@ -695,7 +707,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	//carga cola tecnicos
+}
+
+void CargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico **et, struct tecnico **st){
 	p=NULL;
 	if((p=fopen("tecnicos.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Tecnicos durante la carga |||||||\n");
@@ -714,7 +728,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	//carga cola trabajos
+}
+
+void CargaTrabajos (FILE  *p, struct trabajos *trab, struct trabajos **ent, struct trabajos **sal){
 	p=NULL;
 	if((p=fopen("trabajos.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Trabajos durante la carga |||||||\n");
@@ -737,7 +753,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	//carga lista simple opciones
+}
+
+void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opcion **iniopc){
 	p=NULL;
 	if((p=fopen("opciones.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Opciones durante la carga |||||||\n");
@@ -762,7 +780,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 		}
 		fclose(p);
 	}
-	//carga de pila pendientes
+}
+
+void CargaPendientes (FILE *p, struct pendientes *pend, struct pendientes **tope){
 	p=NULL;
 	if((p=fopen("pendientes.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Pendientes durante la carga |||||||\n");
@@ -782,8 +802,28 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 			}
 		}
 		free (pend);
+		fclose(p);
 	}
-	fclose(p);
+}
+
+void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
+	struct cliente *cli=NULL, *antc=NULL;
+	struct materiales *mat=NULL, *auxm=NULL;
+	struct materialesop *mato=NULL, *antm=NULL;
+	struct tarea *tar=NULL, *antt=NULL, *auxt=NULL;
+	struct tecnico *tech=NULL;
+	struct trabajos *trab=NULL;
+	struct opcion *opc=NULL, *anto=NULL;
+	struct pendientes *pend=NULL;
+	
+	CargaClientes (p, cli, antc, inicli);
+	CargaMateriales (p, mat, auxm, raiz);
+	CargaMaterialesOpcion (p, mato, antm, inimat);
+	CargaTareas (p, tar, antt, auxt, initar);
+	CargaTecnicos (p, tech, et, st);
+	CargaTrabajos (p, trab, ent, sal);
+	CargaOpciones (p, opc, anto, iniopc);
+	CargaPendientes (p, pend, tope);
 }
 
 void Desapilar (struct pendientes **nodo, struct pendientes **tp){
@@ -792,15 +832,7 @@ void Desapilar (struct pendientes **nodo, struct pendientes **tp){
 	(*nodo)->sgte = NULL;
 }
 
-void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes *tope){
-	struct cliente *cli=NULL;
-	struct materialesop *mato=NULL;
-	struct tarea *tar=NULL, *auxt=NULL;
-	struct tecnico *tech=NULL;
-	struct trabajos *trab=NULL;
-	struct opcion *opc=NULL;
-	struct pendientes *pend=NULL, *tpaux=NULL;
-	
+void DescargaClientes( FILE *p, struct cliente *cli, struct cliente *inicli){
 	if((p=fopen("clientes.txt", "w"))==NULL){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
@@ -812,7 +844,9 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 		}
 		fclose(p);
 	}
-	raiz = DescargarArbol (raiz, p);
+}
+
+void DescargaMaterialesOpcion(FILE *p, struct materialesop *mato, struct materialesop *inimat){
 	p=NULL;
 	if((p=fopen("materialesop.txt", "w"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales por Opcion durante la carga |||||||\n");
@@ -825,6 +859,9 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 		}
 		fclose(p);
 	}
+}
+
+void DescargaTareas (FILE *p, struct tarea *tar, struct tarea *auxt, struct tarea *initar){
 	p=NULL;
 	if((p=fopen("tareas.txt","w"))==NULL){
 		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
@@ -844,6 +881,9 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 		}
 		fclose(p);
 	}
+}
+
+void DescargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico *et, struct tecnico *st){
 	p=NULL;
 	if((p=fopen("tecnicos.txt","w"))==NULL){
 		printf("||||||| Error de apertura de archivo Tecnicos durante la carga |||||||\n");
@@ -857,6 +897,9 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 		}
 		fclose(p);
 	}
+}
+
+void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, struct trabajos *sal){
 	p=NULL;
 	if((p=fopen("trabajos.txt","w"))==NULL){
 		printf("||||||| Error de apertura de archivo Trabajos durante la carga |||||||\n");
@@ -874,6 +917,9 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 		}
 		fclose(p);
 	}
+}
+
+void DescargaOpciones (FILE *p, struct opcion *opc, struct opcion *iniopc){
 	p=NULL;
 	if((p=fopen("opciones.txt", "w"))==NULL){
 		printf("||||||| Error de apertura de archivo Opciones durante la carga |||||||\n");
@@ -886,6 +932,9 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 		}
 		fclose(p);
 	}
+}
+
+void DescargaPendientes (FILE *p, struct pendientes *pend, struct pendientes *tope, struct pendientes *tpaux){
 	p=NULL;
 	if((p=fopen("pendientes.txt", "w"))==NULL){
 		printf("||||||| Error de apertura de archivo Pendientes durante la carga |||||||\n");
@@ -902,6 +951,25 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 		}
 		fclose(p);
 	}
+}
+
+void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes *tope){
+	struct cliente *cli=NULL;
+	struct materialesop *mato=NULL;
+	struct tarea *tar=NULL, *auxt=NULL;
+	struct tecnico *tech=NULL;
+	struct trabajos *trab=NULL;
+	struct opcion *opc=NULL;
+	struct pendientes *pend=NULL, *tpaux=NULL;
+	
+	DescargaClientes (p, cli, inicli);
+	raiz = DescargarArbol (raiz, p);
+	DescargaMaterialesOpcion(p, mato, inimat);
+	DescargaTareas (p, tar, auxt, initar);
+	DescargaTecnicos (p, tech, et, st);
+	DescargaTrabajos (p, trab, ent, sal);
+	DescargaOpciones (p, opc, iniopc);
+	DescargaPendientes (p, pend, tope, tpaux);
 }
 
 void DesencolarTecnico (struct tecnico **ds, struct tecnico **e, struct tecnico **s){
