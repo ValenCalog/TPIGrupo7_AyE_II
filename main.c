@@ -419,12 +419,15 @@ void AltaDeClientes (struct cliente **inicli){
 		gets( nvcliente->Nombre );
 		
 		if( *inicli == NULL ){
+			printf("Entra al if\n");
 			nvcliente->id = 1;
 		}else{
+			printf("Entra al else \n");
 			nvcliente->id = BuscarMayorIdCliente( *inicli ) +1;
 		}
 		nvcliente->sgte = NULL;
 		(*inicli) = InsertarCliente( &nvcliente,&(*inicli) );
+		printf("Cliente agregado exitosamente. \n");
 	}else{
 		printf( "\n|||||| Error de asignacion de espacio de Memoria ||||||" );
 	}
@@ -457,6 +460,7 @@ void AltaDeMateriales (struct materiales **raiz){
 		scanf( "%f", &nuevo_mat->cantidad );
 		
 		(*raiz) = InsertarNuevoMaterial ( (*raiz), nuevo_mat );
+		printf("Material agregado exitosamente.\n");
 	}
 }
 
@@ -482,6 +486,7 @@ void AltaDeOpciones (struct opcion ** iniop){
 		fflush(stdin);
 		nueva_op->sgte = NULL;
 		(*iniop) = InsertarOpcion (nueva_op, (*iniop));
+		printf("Opcion agregada exitosamente.\n");
 	}
 }
 
@@ -525,14 +530,13 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
             printf ("\n --> ");
             scanf ("%i",&op);
             fflush (stdin);
-			while (op!=0){
+			while (nuevo_trab->opcion !=0){
                 switch (op){
 	                case 1:
 	            	    AltaDeClientes(_inicli);
 	            	    if (nuevo_trab->id_cliente != 0){
-        					nuevo_trab->id_trabajo = BuscarMayorIdTrab((*sTra)) + 1;
-           					 EncolarTrabajos(&nuevo_trab, eTra, sTra);
-           					 printf("Trabajo agregado exitosamente.\n");
+           					EncolarTrabajos(&nuevo_trab, eTra, sTra);
+           				    printf("Trabajo agregado exitosamente.\n");
         				}
 	                    op=0;
 	                    break;
@@ -567,6 +571,7 @@ void AltaDeTecnicos (struct tecnico **e, struct tecnico **s){
 		scanf ("%s", &nv->Nombre);
 		nv->sgte = NULL;
 		EncolarTecnico (&nv, e, s);
+		printf("Tecnico agregado exitosamente.\n");
 	}
 }
 
@@ -1089,13 +1094,13 @@ int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materi
 		printf("--------------------------\n");
 		printf("Opción %d: %s. \n", cont, aux->Nombre);
 		printf("ID de la opcion: %d. \n", aux->id);
-		auxc=OperacionCosto ((*raiz), aux->id, inimat);
+		auxc = OperacionCosto ((*raiz), aux->id, inimat);
 		total = aux->cHoraMObra + auxc;
 		
-		if (_cuatrometros == 1){
-			printf("El precio de mano de obra es: %.2f, pero con el costo de los materiales y del trabajo en altura queda en: %.2f \n", aux->cHoraMObra, ((20 * total)/100) + total);
+		if (_cuatrometros == 0){
+			printf("El precio de mano de obra es: %.2f, pero con el costo de materiales queda en: %.2f .\n", aux->cHoraMObra, total + (aux->cHoraMObra));
 		} else {
-			printf("El precio de mano de obra es: %.2f, pero con el costo de materiales queda en: %.2f .\n", aux->cHoraMObra, total);
+			printf("El precio de mano de obra es: %.2f, pero con el costo de los materiales y del trabajo en altura queda en: %.2f \n", aux->cHoraMObra, ((((total+ aux->cHoraMObra) * 20)/100) + (total + aux->cHoraMObra)));
 		}
 		printf("--------------------------\n");
 		total = 0; //se reincia el total para que no vaya acumulando a lo largo del recorrido
