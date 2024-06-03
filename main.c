@@ -158,7 +158,7 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 3:
-				AltaDeTrabajos(&inicli, &iniopc, &et, &st, &e, &s, &inimat, &raiz); //et y st para técnico, e y s para trabajo
+				AltaDeTrabajos(&inicli, &iniopc, &et, &st, &e, &s, &inimat, &raiz); //et y st para tÃ©cnico, e y s para trabajo
 				opc=-1;
 				break;
 			case 4:
@@ -184,8 +184,8 @@ int main(int argc, char *argv[]){
 }
 
 //Floats
-float OperacionTiempo (int id, struct tarea **initar){
-	float tiempo=0;
+double OperacionTiempo (int id, struct tarea **initar){
+	double tiempo=0;
 	struct tarea *aux=NULL;
 	aux = (*initar);
 	while(aux!=NULL){
@@ -197,8 +197,8 @@ float OperacionTiempo (int id, struct tarea **initar){
 	return (tiempo);
 }
 
-float OperacionCosto (struct materiales *raiz, int codop, struct materialesop **inimat){
-	float costomat=0, auxc=0;
+double OperacionCosto (struct materiales *raiz, int codop, struct materialesop **inimat){
+	double costomat=0, auxc=0;
 	struct materialesop *aux=NULL;
 	aux = (*inimat);
 	while(aux!=NULL){
@@ -409,7 +409,7 @@ void AltaDeClientes (struct cliente **inicli){
 	nvcliente = ( struct cliente * ) malloc( sizeof( struct cliente ) );
 	
 	if( nvcliente != NULL ){
-		printf( "\n¡Bienvenido a SistemaSeguro S.A!" );
+		printf( "\nÂ¡Bienvenido a SistemaSeguro S.A!" );
 		printf( "\nA continuacion le pediremos una serie de datos para poder registrarlo como cliente." );
 		printf( "\n---Digite su DNI: " );
 		scanf( "%ld", &nvcliente->DNI );
@@ -506,7 +506,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
     	fflush (stdin);
     	
     	while ((nuevo_trab->cuatromtrs > 1) || (nuevo_trab->cuatromtrs < 0)){
-    		printf ("\n |||| Opción inválida |||| \n--- Ponga 1 o 0: ");
+    		printf ("\n |||| OpciÃ³n invÃ¡lida |||| \n--- Ponga 1 o 0: ");
     		scanf ("%i", &nuevo_trab->cuatromtrs);
     		fflush (stdin);
 		}
@@ -524,7 +524,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
    		scanf ("%i",&nuevo_trab->id_cliente); 
 		if (BuscarCliente (nuevo_trab->id_cliente, (*_inicli))==0){
             printf ("\n--- No se ha encontrado un cliente asociado a la ID ingresada---");
-            printf ("\n ¿Desea darse de alta como cliente? ");
+            printf ("\n Â¿Desea darse de alta como cliente? ");
             printf ("\n 1)Si");
             printf ("\n 2)No");
             printf ("\n --> ");
@@ -581,7 +581,7 @@ void Apilar (struct pendientes **nodo, struct pendientes **tpaux){
 	(*nodo) = NULL;
 }
 
-void BuscarPrecioMaterial (float *unit, struct materiales *raiz, int codmat){
+void BuscarPrecioMaterial (double *unit, struct materiales *raiz, int codmat){
 	if(raiz==NULL){
 		*unit = 0;
 	}else{
@@ -679,7 +679,7 @@ void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *
 				fscanf(p, "%d", tar->id_op);
 				fscanf(p, "%d", tar->id_tarea);
 				fscanf(p, "%d", tar->orden);
-				fscanf(p, "%f", tar->tiempo);
+				fscanf(p, "%lf", tar->tiempo);
 				antt = BuscarAnterior (tar->id_op, (*initar));
 				if( initar == NULL ){
 					(*initar) = tar;
@@ -768,7 +768,7 @@ void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opc
 				printf("opc->id=%d\n",opc->id);
 				fscanf(p, "%s", opc->Nombre);
 				printf("opc->nombre=%s\n",opc->Nombre);
-				fscanf(p, "%f", opc->cHoraMObra);
+				fscanf(p, "%lf", opc->cHoraMObra);
 				printf("opc->coso de vale=%f\n",opc->cHoraMObra);
 				printf("CARGO\n");
 				(*iniopc) = InsertarOpcion (opc, (*iniopc));
@@ -797,7 +797,7 @@ void CargaPendientes (FILE *p, struct pendientes *pend, struct pendientes **tope
 				fscanf(p, "%d", pend->id_tarea);
 				fscanf(p, "%d", pend->id_trabajo);
 				fscanf(p, "%d", pend->orden);
-				fscanf(p, "%f", pend->tiempo);
+				fscanf(p, "%lf", pend->tiempo);
 				Apilar (&pend, tope);
 			}
 		}
@@ -880,7 +880,7 @@ void DescargaTareas (FILE *p, struct tarea *tar, struct tarea *auxt, struct tare
 			fprintf(p, "%d", initar->id_op);
 			fprintf(p, "%d", initar->id_tarea);
 			fprintf(p, "%d", initar->orden);
-			fprintf(p, "%f", initar->tiempo);
+			fprintf(p, "%lf", initar->tiempo);
 			printf("CARGO\n");
 			if(tar!=auxt){
 				tar=auxt;
@@ -938,7 +938,7 @@ void DescargaOpciones (FILE *p, struct opcion *opc, struct opcion *iniopc){
 			printf("Entro OPCIONES  WHILE \n");
 			fprintf(p, "%d", iniopc->id);
 			fprintf(p, "%s", iniopc->Nombre);
-			fprintf(p, "%f", iniopc->cHoraMObra);
+			fprintf(p, "%lf", iniopc->cHoraMObra);
 			printf("CARGO \n");
 			iniopc = iniopc->sgte;
 			printf("RECORRIO \n");
@@ -961,7 +961,7 @@ void DescargaPendientes (FILE *p, struct pendientes *pend, struct pendientes *to
 			fprintf(p, "%d", pend->id_tarea);
 			fprintf(p, "%d", pend->id_trabajo);
 			fprintf(p, "%d", pend->orden);
-			fprintf(p, "%f", pend->tiempo);
+			fprintf(p, "%lf", pend->tiempo);
 			Apilar (&pend, &tpaux);	
 		}
 		fclose(p);
@@ -1075,8 +1075,8 @@ void ListadoDeOpciones (struct opcion **iniopcion) {
     while (aux != NULL) {
         cont = cont + 1;
         printf("--------------------------\n");
-        printf("Opción %d: %s. \n", cont, aux->Nombre);
-        printf("Precio de mano de obra: %.2f . \n", aux->cHoraMObra);  
+        printf("OpciÃ³n %d: %s. \n", cont, aux->Nombre);
+        printf("Precio de mano de obra: %.2lf . \n", aux->cHoraMObra);  
         printf("ID de la opcion: %d. \n", aux->id);
         printf("--------------------------\n");
         aux = aux->sgte; 
@@ -1085,22 +1085,22 @@ void ListadoDeOpciones (struct opcion **iniopcion) {
 
 int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materiales **raiz, struct materialesop **inimat, int _cuatrometros){
 	int o, cont=0;
-	float total=0, auxc=0;
+	double total=0, auxc=0;
 	struct opcion *aux = (*iniopcion);
 	
 	printf("Las opciones disponibles son: \n");
 	while (aux != NULL){
 		cont = cont + 1;
 		printf("--------------------------\n");
-		printf("Opción %d: %s. \n", cont, aux->Nombre);
+		printf("OpciÃ³n %d: %s. \n", cont, aux->Nombre);
 		printf("ID de la opcion: %d. \n", aux->id);
 		auxc = OperacionCosto ((*raiz), aux->id, inimat);
 		total = aux->cHoraMObra + auxc;
 		
 		if (_cuatrometros == 0){
-			printf("El precio de mano de obra es: %.2f, pero con el costo de materiales queda en: %.2f .\n", aux->cHoraMObra, total + (aux->cHoraMObra));
+			printf("El precio de mano de obra es: %.2lf, pero con el costo de materiales queda en: %.2lf .\n", aux->cHoraMObra, total + (aux->cHoraMObra));
 		} else {
-			printf("El precio de mano de obra es: %.2f, pero con el costo de los materiales y del trabajo en altura queda en: %.2f \n", aux->cHoraMObra, ((((total+ aux->cHoraMObra) * 20)/100) + (total + aux->cHoraMObra)));
+			printf("El precio de mano de obra es: %.2lf, pero con el costo de los materiales y del trabajo en altura queda en: %.2lf \n", aux->cHoraMObra, ((((total+ aux->cHoraMObra) * 20)/100) + (total + aux->cHoraMObra)));
 		}
 		printf("--------------------------\n");
 		total = 0; //se reincia el total para que no vaya acumulando a lo largo del recorrido
@@ -1128,14 +1128,14 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
 };*/
 	pila = Vacia(*tope);
   	if (pila == 1) {
-        printf("La pila está Vacia\n");
+        printf("La pila estÃ¡ Vacia\n");
    	} else {
   		Desapilar(nodo, tope);
     	if ((*nodo)->completado == 1) {
-    		printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s ya está terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);
+    		printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s ya estÃ¡ terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);
 			free(*nodo);
   		} else {
-   			printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s aun no está terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);	
+   			printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s aun no estÃ¡ terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);	
 			Apilar(nodo, &topeaux);
    		}
    	}
