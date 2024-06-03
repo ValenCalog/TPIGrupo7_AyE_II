@@ -72,6 +72,7 @@ int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniop, struct materiales
 
 int GenerarIdMaterial(struct materiales *r);
 int InsertarOpcion (struct opcion * nvop,struct opcion * iniop);
+int InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
 
 int Menu (int opc);
 
@@ -103,8 +104,6 @@ void DesencolarTrabajos(struct trabajos **ds, struct trabajos **e, struct trabaj
 
 void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s);
 void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s);
-
-void InsertarCliente (struct cliente ** nv,struct cliente ** inicli);
 
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope);
 void ListadoDeOpciones (struct opcion **iniop); //este solo muestra las opciones que hay
@@ -409,7 +408,7 @@ void AltaDeClientes (struct cliente **inicli){
 			nvcliente->id = BuscarMayorIdCliente( *inicli ) +1;
 		}
 		nvcliente->sgte = NULL;
-		InsertarCliente( &nvcliente, inicli );
+		inicli = InsertarCliente( &nvcliente, inicli );
 	}else{
 		printf( "\n|||||| Error de asignacion de espacio de Memoria ||||||" );
 	}
@@ -944,13 +943,15 @@ void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos 
 	*nv = NULL;
 }
 
-void InsertarCliente(struct cliente ** nv,struct cliente ** inicli){
+int InsertarCliente(struct cliente ** nv,struct cliente ** inicli){
 	struct cliente *aux=NULL;
 	aux = (*inicli);
-	while( aux->sgte != NULL ){
-		aux = aux->sgte;
+	if (aux != NULL) {
+		aux->sgte = InsertarCliente (nv, aux->sgte);
+	} else {
+		aux = nv;
 	}
-	aux->sgte = (*nv);
+	return (aux);
 }
 
 int InsertarOpcion (struct opcion *nvop, struct opcion *iniop){
