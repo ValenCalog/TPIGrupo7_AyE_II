@@ -1411,7 +1411,7 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	ini=salida; //Guarda el inicio de la cola de trabajos
 	completarlista(&L,iniopc);//Ahora tenemos una lista donde cada nodo tiene un id op y un int acumulativo
 	auxL=L;  
-	DesencolarTrabajos(aux,entrada,salida);
+	DesencolarTrabajos(&aux,&entrada,&salida);
 	while(salida->id_trabajo!=ini->id_trabajo){//El while se va a detener cuando recorra toda la cola de trabajos
 		while(band=!1){//Se va a detener cuando auxL este en la posicion donde debe incrementarse la cantidad de ventas
 			if(aux->id_opcion!=auxL->id_op){
@@ -1423,9 +1423,9 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 		auxL->ventas++;//Se incrementa la cantidad de ventas en esa opcion
 		band=0;
 		auxL=L;
-		EncolarTrabajos(aux,entrada,salida);
+		EncolarTrabajos(&aux,&entrada,&salida);
 		aux=NULL;
-		DesencolarTrabajos(aux,entrada,salida);
+		DesencolarTrabajos(&aux,&entrada,&salida);
 	}
 	//Ahora solo debemos recorrer la lista de opcionesfav e ir mostrando la cantidad de ventas por opcion
 	auxL=L;
@@ -1436,7 +1436,7 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 }
 
 void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
-	struct opcionesfav *new=NULL,*aux=NULL;
+	struct opcionesfav *nuevo=NULL,*aux=NULL;
 	int encontro=0;
 	aux=(*Inicio);
 	while(ini_opciones!=NULL){
@@ -1448,12 +1448,12 @@ void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
 			}
 		}
 		if(encontro==0){
-			new=(struct opcinesfav *)malloc(sizeof(struct opcionesfav));
-			if(new!=NULL){
-				new->id_op=ini_opciones->id;
-				new->ventas=0;
-				new->sgte=NULL;
-				insertaropfav(&new,&Inicio);
+			nuevo=(struct opcionesfav *) malloc(sizeof(struct opcionesfav));
+			if(nuevo!=NULL){
+				nuevo->id_op=ini_opciones->id;
+				nuevo->ventas=0;
+				nuevo->sgte=NULL;
+				insertaropfav(&nuevo,&Inicio);
 
 			}else{
 				printf("No hay espacio en memoria");
