@@ -351,11 +351,11 @@ struct materiales* DescargarArbol (struct materiales *raiz, FILE *p){
 		if((p=fopen("materiales.txt", "a+"))==NULL){
 			printf("||||||| Error de apertura de archivo Materiales durante la carga |||||||\n");
 		}else{
-			fprintf(p, "%f", raiz->cantidad);
-			fprintf(p, "%f", raiz->costo_uni);
-			fprintf(p, "%s", raiz->descripcion);
-			fprintf(p, "%d", raiz->id);
-			fprintf(p, "%s", raiz->unimed);
+			fprintf(p, "%f;", raiz->cantidad);
+			fprintf(p, "%f;", raiz->costo_uni);
+			fprintf(p, "%s;", raiz->descripcion);
+			fprintf(p, "%d;", raiz->id);
+			fprintf(p, "%s\n", raiz->unimed);
 			fclose(p);
 		}
 		raiz->derch = DescargarArbol(raiz->derch, p);
@@ -1022,12 +1022,12 @@ void Desapilar (struct pendientes **nodo, struct pendientes **tp){
 
 void DescargaClientes( FILE *p, struct cliente *cli, struct cliente *inicli){
 	if((p=fopen("clientes.txt", "w"))==NULL){
-		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
+		printf("||||||| Error de apertura de archivo Clientes durante la Descarga |||||||\n");
 	}else{
 		while(inicli != NULL){
-			fprintf(p, "%ld;" , inicli->DNI);
-			fprintf(p, "%d;" , inicli->id);
-			fprintf(p, "%s\n" , inicli->Nombre);
+			fprintf(p, "%ld;%d;%s" , inicli->DNI, inicli->id, inicli->Nombre);
+			//fprintf(p, "%d;" , inicli->id);
+			//fprintf(p, "%s\n" , inicli->Nombre);
 			inicli = inicli->sgte;
 		}
 		fclose(p);
@@ -1161,7 +1161,7 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 	printf("Entro DESCARGAS CLIENTES\n");
 	DescargaClientes (p, cli, inicli);
 	printf("Entro DESCARGAS ARBOL\n");
-	raiz = DescargarArbol (raiz, p);
+	raiz = DescargarArbol (raiz, p);		
 	printf("Entro DESCARGAS MATERIALESOP\n");
 	DescargaMaterialesOpcion(p, mato, inimat);
 	printf("Entro DESCARGAS TAREAS\n");
@@ -1213,7 +1213,6 @@ void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos 
 }
 
 struct cliente * InsertarCliente(struct cliente *nv,struct cliente *inicli){
-	struct cliente *aux=NULL;
 	printf ("LLEGO A CLIENTES \n");
 	if (inicli != NULL) {
 		printf ("ingreso clientes distinto a null A CLIENTES \n");
