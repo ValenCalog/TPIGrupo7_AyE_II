@@ -3,6 +3,10 @@
 #include <string.h>
 #include <time.h>
 
+struct opcionesfav{
+	int id_op,ventas;
+};
+
 struct fecha{
 	int dia, mes, anio;
 };
@@ -171,7 +175,7 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 5:
-				OpcionesMasVendidas();
+				OpcionesMasVendidas(e,s,iniopc);
 				opc=-1; 
 				break;
 			case 6:
@@ -1252,13 +1256,13 @@ struct opcion * InsertarOpcion (struct opcion *nvop, struct opcion *iniop) {
 
     printf("LLEGO A opcion\n");
 
-    // Caso especial: la lista está vacía
+    // Caso especial: la lista est? vac?
     if (iniop == NULL) {
         printf("ingleso a clientes else opcion\n");
         iniop = nvop;
         iniop->sgte = NULL;
     } else {
-        // Recorrer la lista hasta encontrar el último elemento
+        // Recorrer la lista hasta encontrar el ?ltimo elemento
         while (aux != NULL) {
             prev = aux;
             aux = aux->sgte;
@@ -1347,5 +1351,48 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
    	}
 }
 
-void OpcionesMasVendidas (){
+void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc){
+	struct trabajos *ini=NULL*aux=NULL;
+	struct opcionesfav *L;
+	ini=salida;
+	DesencolarTrabajos(aux,entrada,salida);
+	while(salida->id_trabajo!=ini->id_trabajo){
+		completarlista(&L,iniopc);
+		EncolarTrabajos(aux,entrada,salida);
+		aux=NULL;
+		DesencolarTrabajos(aux,entrada,salida);
+	}
+	/*struct trabajos{ //Cola.
+    int id_trabajo, id_opcion, opcion, cuatromtrs;
+    char direccion[30];
+    int id_tecnico, id_cliente;
+	int fc_fin;
+    struct trabajos *sgte;
+};*/
+	//void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s)
+	
+}
+
+void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
+	struct opcionesfav *new=NULL,*aux=NULL;
+	int encontro;
+	aux=(*Inicio);
+	while(ini_opciones!=NULL){
+		while(encontro!=1 && aux!=NULL){
+			if(ini_opciones->id_op==aux->id_op){
+				encontro=1;
+			}else{
+				(*L)=(*L)->sgte;
+			}
+		}
+		if(encontro==0){
+			new=(struct opcinesfav *)malloc(sizeof(struct opcionesfav));
+			if(new!=NULL){
+				new->id_op=ini_opciones->id;
+
+			}else{
+				printf("No hay espacio en memoria");
+			}
+		}
+	}
 }
