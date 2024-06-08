@@ -5,6 +5,7 @@
 
 struct opcionesfav{
 	int id_op,ventas;
+	struct opcionesfav *sgte;
 };
 
 struct fecha{
@@ -134,7 +135,9 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope);
 void ListadoDeOpciones (struct opcion **iniop); //este solo muestra las opciones que hay
 void recorrerIRD(struct materiales *r);
 
-void OpcionesMasVendidas ();
+void insertaropfav(struct opcionesfav **nv, struct opcionesfav **ini);
+void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones);
+void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc);
 
 int main(int argc, char *argv[]){
 	struct cliente *inicli=NULL;
@@ -1438,47 +1441,74 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
 }
 
 void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc){
-	struct trabajos *ini=NULL*aux=NULL;
-	struct opcionesfav *L;
-	ini=salida;
-	DesencolarTrabajos(aux,entrada,salida);
-	while(salida->id_trabajo!=ini->id_trabajo){
-		completarlista(&L,iniopc);
-		EncolarTrabajos(aux,entrada,salida);
+	struct trabajos *ini=NULL,*aux=NULL;
+	struct opcionesfav *L=NULL,*auxL=NULL;
+	int band=0;
+	ini=salida; //Guarda el inicio de la cola de trabajos
+	completarlista(&L,iniopc);//Ahora tenemos una lista donde cada nodo tiene un id op y un int acumulativo
+	auxL=L;  
+	DesencolarTrabajos(&aux,&entrada,&salida);
+	while(salida->id_trabajo!=ini->id_trabajo){//El while se va a detener cuando recorra toda la cola de trabajos
+		while(band=!1){//Se va a detener cuando auxL este en la posicion donde debe incrementarse la cantidad de ventas
+			if(aux->id_opcion!=auxL->id_op){
+				auxL=auxL->sgte;
+			}else{
+				band=1;
+			}
+		}
+		auxL->ventas++;//Se incrementa la cantidad de ventas en esa opcion
+		band=0;
+		auxL=L;
+		EncolarTrabajos(&aux,&entrada,&salida);
 		aux=NULL;
-		DesencolarTrabajos(aux,entrada,salida);
+		DesencolarTrabajos(&aux,&entrada,&salida);
 	}
-	/*struct trabajos{ //Cola.
-    int id_trabajo, id_opcion, opcion, cuatromtrs;
-    char direccion[30];
-    int id_tecnico, id_cliente;
-	int fc_fin;
-    struct trabajos *sgte;
-};*/
-	//void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s)
+	//Ahora solo debemos recorrer la lista de opcionesfav e ir mostrando la cantidad de ventas por opcion
+	auxL=L;
+	while(auxL!=NULL){
+		printf("\nLa cantidad de ventas de la opcion %i es: %i",auxL->id_op,auxL->ventas);
+	}	
 	
 }
 
 void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
-	struct opcionesfav *new=NULL,*aux=NULL;
-	int encontro;
+	struct opcionesfav *nuevo=NULL,*aux=NULL;
+	int encontro=0;
 	aux=(*Inicio);
 	while(ini_opciones!=NULL){
-		while(encontro!=1 && aux!=NULL){
-			if(ini_opciones->id_op==aux->id_op){
+		while(encontro!=1 || aux!=NULL){
+			if(ini_opciones->id==aux->id_op){
 				encontro=1;
 			}else{
-				(*L)=(*L)->sgte;
+				aux=aux->sgte;
 			}
 		}
 		if(encontro==0){
-			new=(struct opcinesfav *)malloc(sizeof(struct opcionesfav));
-			if(new!=NULL){
-				new->id_op=ini_opciones->id;
+			nuevo=(struct opcionesfav *) malloc(sizeof(struct opcionesfav));
+			if(nuevo!=NULL){
+				nuevo->id_op=ini_opciones->id;
+				nuevo->ventas=0;
+				nuevo->sgte=NULL;
+				insertaropfav(&nuevo,&Inicio);
 
 			}else{
 				printf("No hay espacio en memoria");
 			}
 		}
+		encontro=0;
+		ini_opciones=ini_opciones->sgte;
+		aux=(*Inicio);
 	}
+
+}
+
+void insertaropfav(struct opcionesfav **nv, struct opcionesfav **ini){
+	struct opcionesfav *auxi=NULL;
+	auxi = (*ini);
+	while(auxi->sgte!=NULL){
+		auxi=auxi->sgte;
+	}
+	auxi->sgte=(*nv);
+	auxi=NULL;
+
 }
