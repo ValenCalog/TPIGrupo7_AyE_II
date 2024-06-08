@@ -626,20 +626,25 @@ void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct c
                     printf("-------No hay espacio de memoria-------\n");
 					band = 1;
                 } else {
+                	
+                	if (a != NULL) {
+                        cli->id=atoi(a);
+                    }
+                    printf("id: %d \n", cli->id);
+                    
+                	a = strtok(NULL, d);
+                    if (a != NULL) {
+                        strcpy(cli->Nombre,a);
+                    }
+                    printf("nomb %s\n", cli->Nombre);
+                	
+                	a = strtok(NULL, d);
                 	if(a!=NULL){
                 		cli->DNI=atol(a);	
 					}
 					printf("dni: %ld \n", cli->DNI);
-                    a = strtok(NULL, d);
-                    if (a != NULL) {
-                        cli->id=atoi(a);
-                    }
-                    printf("id: %d \n", cli->id);
-                    a = strtok(NULL, d);
-                    if (a != NULL) {
-                        strcpy(cli->Nombre,a);
-                    }
-					printf("nomb %s\n", cli->Nombre);
+                    
+                
                     (*inicli) = InsertarCliente (cli, (*inicli));
                     a = strtok(NULL, d); 
                 }
@@ -1029,7 +1034,7 @@ void DescargaClientes( FILE *p, struct cliente *cli, struct cliente *inicli){
 		printf("||||||| Error de apertura de archivo Clientes durante la Descarga |||||||\n");
 	}else{
 		while(inicli != NULL){
-			fprintf(p, "%ld;%d;%s" , inicli->DNI, inicli->id, inicli->Nombre);
+			fprintf(p, "%d;%s;%ld\n" ,  inicli->id, inicli->Nombre ,inicli->DNI);
 			//fprintf(p, "%d;" , inicli->id);
 			//fprintf(p, "%s\n" , inicli->Nombre);
 			inicli = inicli->sgte;
