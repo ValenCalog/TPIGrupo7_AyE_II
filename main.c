@@ -128,6 +128,7 @@ void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos 
 
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope);
 void ListadoDeOpciones (struct opcion **iniop); //este solo muestra las opciones que hay
+void recorrerIRD(struct materiales *r);
 
 void OpcionesMasVendidas ();
 
@@ -184,6 +185,16 @@ int main(int argc, char *argv[]){
 				break;
 			case 8:
 				AltaDeClientes(&inicli);
+				opc=-1;
+				break;
+			case 9:
+				if(raiz!=NULL){
+					printf("\nMATERIALES: ");
+					recorrerIRD(raiz);
+					printf("\n");
+				}else{
+					printf("\nNo hay materiales cargados en el stock de la empresa");
+				}
 				opc=-1;
 				break;
 		}
@@ -306,13 +317,13 @@ int GenerarIdMaterial (struct materiales *r){
 
 int Menu (int o){
 	int contgency = 0;
-	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) && (o!=7) && (o!=8)){
+	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) && (o!=7) && (o!=8) && (o!=9)){
 		if (contgency >= 1){
 			printf ("El valor que ingreso no es valido, vuelva a ingresar una opcion. \n" );
 			fflush (stdin);
 			scanf ("%d", &o );
 		}else{
-			printf ("-------------------Bienvenido al menu :D-------------------\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para ver las opciones mas vendidas.\n---Ingrese 6 para dar de alta un material.\n---Ingrese 7 para dar de alta un tecnico.\n---Ingrese 8 para dar de alta un cliente.\n" );
+			printf ("-------------------Bienvenido al menu :D-------------------\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para ver las opciones mas vendidas.\n---Ingrese 6 para dar de alta un material.\n---Ingrese 7 para dar de alta un tecnico.\n---Ingrese 8 para dar de alta un cliente.\n---Ingrese 9 para listar materiales.\n" );
 			fflush (stdin);
 			scanf ("%d", &o);
 			contgency++;
@@ -351,15 +362,18 @@ int VerificarId (struct materiales *r, int idRandom){
 //Structs
 struct materiales* DescargarArbol (struct materiales *raiz, FILE *p){
 	if(raiz!=NULL){
+		printf("\nholaaa");
 		raiz->izq = DescargarArbol (raiz->izq, p);
 		if((p=fopen("materiales.txt", "a+"))==NULL){
 			printf("||||||| Error de apertura de archivo Materiales durante la carga |||||||\n");
 		}else{
-			fprintf(p, "%f;", raiz->cantidad);
-			fprintf(p, "%f;", raiz->costo_uni);
-			fprintf(p, "%s;", raiz->descripcion);
+			printf("probandoooo");
+			printf("\nraiz->cantidad: %f", raiz->cantidad);
 			fprintf(p, "%d;", raiz->id);
-			fprintf(p, "%s\n", raiz->unimed);
+			fprintf(p, "%s;", raiz->descripcion);
+			fprintf(p, "%s;", raiz->unimed);
+			fprintf(p, "%f;", raiz->cantidad);
+			fprintf(p, "%f\n", raiz->costo_uni);
 			fclose(p);
 		}
 		raiz->derch = DescargarArbol(raiz->derch, p);
@@ -462,14 +476,29 @@ void AltaDeMateriales (struct materiales **raiz){
 		
 		printf( "\n---Ingrese el precio unitario del nuevo material: " );
 		fflush(stdin);
-		scanf( "%f", &nuevo_mat->costo_uni );
+		scanf( "%lf", &nuevo_mat->costo_uni );
 		
 		printf( "\n---Ingrese la cantidad a almacenar del nuevo material: ");
 		fflush(stdin);
-		scanf( "%f", &nuevo_mat->cantidad );
-		
+		scanf( "%lf", &nuevo_mat->cantidad );
+		nuevo_mat->derch = NULL;
+		nuevo_mat->izq = NULL;
 		(*raiz) = InsertarNuevoMaterial ( (*raiz), nuevo_mat );
 		printf("Material agregado exitosamente.\n");
+	}
+}
+
+//Para el listado de todo el arbol de materiales
+void recorrerIRD(struct materiales *r){
+	if(r!=NULL){
+		recorrerIRD(r->izq);
+		printf("\n------------------------");
+		printf("\nId material: %d", r->id);
+		printf("\nDescripcion material: %s", r->descripcion);
+		printf("\nUnidad de medida: %s", r->unimed);
+		printf("\nPrecio unitario: %f", r->costo_uni);
+		printf("\nCantidad disponible: %.0f", r->cantidad);
+		recorrerIRD(r->derch);
 	}
 }
 
@@ -656,50 +685,68 @@ void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct c
 }
 
 void CargaMateriales (FILE *p, struct materiales *mat, struct materiales *auxm, struct materiales **raiz){
-	int cont=0;
+	int cont=0, band = 0;
 	p=NULL;
 	if((p=fopen("materiales.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales durante la carga |||||||\n");
 	}else{
-		char d[]=" ", cadaux[1000], *a;
-		fgets(cadaux, 999,p);
-		a=strtok(cadaux,d);
-		printf("COMPROBACION ARCH= %s \n", cadaux);
-		while(a!=NULL){
-			mat=(struct materiales *) malloc(sizeof (struct materiales) );
-			if(mat==NULL){
-				printf("-------No hay espacio de memoria-------\n");
-			}else{
-				switch(cont) {
-					case 0:
-						mat->cantidad=atof(a);
-						cont++;
-						break;
-					case 1:
-						mat->costo_uni=atof(a);
-						cont++;
-						break;
-					case 2:
+		char d[] = ";", cadaux[1000]="", *a;
+        char *prueba;
+		
+		prueba = fgets(cadaux, sizeof(cadaux), p);
+        while (prueba != NULL) {
+            a = strtok(cadaux, d);
+            printf("COMPROBACION ARCH= %s \n", cadaux);
+            
+            while ((a != NULL) && (band == 0)) {
+                mat = (struct materiales *) malloc(sizeof(struct materiales));
+                if (mat == NULL) {
+                    printf("-------No hay espacio de memoria-------\n");
+					band = 1;
+                } else {
+					
+					
+					/*
+					fprintf(p, "%d;", raiz->id);
+					fprintf(p, "%s;", raiz->descripcion);
+					fprintf(p, "%s;", raiz->unimed);
+					fprintf(p, "%f;", raiz->cantidad); mat->cantidad=atof(a);
+					fprintf(p, "%f;\n", raiz->costo_uni); mat->costo_uni=atof(a);
+					*/
+					
+                    if(a != NULL){
+                    	mat->id=atoi(a);	
+					}
+					a = strtok(NULL, d);
+					if(a != NULL){
 						strcpy(mat->descripcion,a);
-						cont++;
-						break;
-					case 3:
-						mat->id=atoi(a);
-						cont++;
-						break;
-					case 4:
+					}
+					a = strtok(NULL, d);
+					if( a != NULL){
 						strcpy(mat->unimed,a);
-						cont=0;
-						auxm = (*raiz);
-						auxm = InsertarMaterial(mat, auxm);
-						(*raiz) = auxm;
-						break;
-				}
-			}
-			free (mat);
-			a=strtok(NULL, d);
-		}
-		fclose(p);
+					}
+					a = strtok(NULL, d);
+					if(a != NULL){
+						mat->cantidad=atof(a);
+					}
+					a= strtok(NULL, d);
+					if(a != NULL){
+						mat->costo_uni=atof(a);
+					}
+					
+					mat->izq = NULL;
+					mat->derch = NULL;
+					(*raiz) = InsertarMaterial(mat, (*raiz));
+					
+					a= strtok(NULL, d);
+                    
+                }
+                
+            }
+            prueba = fgets(cadaux, sizeof(cadaux), p);
+        }
+        printf("\nllgeue aca arriba del fclose");
+        fclose(p);
 	}
 }
 
@@ -1169,8 +1216,11 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 	struct pendientes *pend=NULL, *tpaux=NULL;
 	printf("Entro DESCARGAS CLIENTES\n");
 	DescargaClientes (p, cli, inicli);
-	printf("Entro DESCARGAS ARBOL\n");
-	raiz = DescargarArbol (raiz, p);		
+	if((p = fopen("materiales.txt", "w")) != NULL){
+		fclose(p); //lo abri en w primero porque adentro de descargar arbol se abre en a+ y se guardan datos de la otra ejecucion. O sea, se escribe lo mismo varias veces
+		printf("Entro DESCARGAS ARBOL\n");
+		raiz = DescargarArbol (raiz, p);	
+	}		
 	printf("Entro DESCARGAS MATERIALESOP\n");
 	DescargaMaterialesOpcion(p, mato, inimat);
 	printf("Entro DESCARGAS TAREAS\n");
