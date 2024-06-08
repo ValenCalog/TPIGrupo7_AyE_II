@@ -109,8 +109,8 @@ void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct c
 void CargaMateriales (FILE *p, struct materiales *mat, struct materiales *auxm, struct materiales **raiz);
 void CargaMaterialesOpcion (FILE *p, struct materialesop *mato, struct materialesop *antm, struct materialesop **inimat);
 void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *auxt, struct tarea **initar);
-void CargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico **et, struct tecnico **st);
-void CargaTrabajos (FILE  *p, struct trabajos *trab, struct trabajos **ent, struct trabajos **sal);
+void CargaTecnicos (FILE *p, struct tecnico **tech, struct tecnico **et, struct tecnico **st);
+void CargaTrabajos (FILE  *p, struct trabajos **trab, struct trabajos **ent, struct trabajos **sal);
 void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opcion **iniopc);
 void CargaPendientes (FILE *p, struct pendientes *pend, struct pendientes **tope);
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 3:
-				AltaDeTrabajos(&inicli, &iniopc, &et, &st, &e, &s, &inimat, &raiz); //et y st para técnico, e y s para trabajo
+				AltaDeTrabajos(&inicli, &iniopc, &et, &st, &e, &s, &inimat, &raiz); //et y st para t�cnico, e y s para trabajo
 				opc=-1;
 				break;
 			case 4:
@@ -243,13 +243,13 @@ double OperacionCosto (struct materiales *raiz, int codop, struct materialesop *
 int BuscarCliente (int id, struct cliente *ini){
 	int encontroid=0;
 	
-	while (ini != NULL){
+	while ((ini != NULL) && (encontroid == 0)){
 		if (ini->id == id){
 			encontroid = 1;
-		} else {
-			ini = ini->sgte;
 		}
+		ini = ini->sgte;
 	}
+	printf("\nId: %d", encontroid);
 	return (encontroid);	
 }
 
@@ -300,6 +300,7 @@ int BuscarTecnico (struct tecnico **nodo, struct tecnico **e, struct tecnico **s
 
 int BuscarMayorIdTecnico (struct tecnico *e, struct tecnico *s){
 	int maxId = s->id;
+	s = s->sgte;
 	while (s != NULL){
 		if (s->id > maxId){
 			maxId = s->id;
@@ -436,7 +437,7 @@ void AltaDeClientes (struct cliente **inicli){
 	nvcliente = ( struct cliente * ) malloc( sizeof( struct cliente ) );
 	
 	if( nvcliente != NULL ){
-		printf( "\n¡Bienvenido a SistemaSeguro S.A!" );
+		printf( "\n�Bienvenido a SistemaSeguro S.A!" );
 		printf( "\nA continuacion le pediremos una serie de datos para poder registrarlo como cliente." );
 		printf( "\n---Digite su DNI: " );
 		scanf( "%ld", &nvcliente->DNI );
@@ -548,7 +549,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
     	fflush (stdin);
     	
     	while ((nuevo_trab->cuatromtrs > 1) || (nuevo_trab->cuatromtrs < 0)){
-    		printf ("\n |||| Opción inválida |||| \n--- Ponga 1 o 0: ");
+    		printf ("\n |||| Opci�n inv�lida |||| \n--- Ponga 1 o 0: ");
     		scanf ("%i", &nuevo_trab->cuatromtrs);
     		fflush (stdin);
 		}
@@ -563,10 +564,12 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 		fflush(stdin);
    		printf ("\nIngrese su ID de cliente: ");
    		fflush (stdin);
-   		scanf ("%i",&nuevo_trab->id_cliente); 
+   		scanf ("%d",&nuevo_trab->id_cliente); 
+   		fflush (stdin);
+   		printf("\nHolaProbando");
 		if (BuscarCliente (nuevo_trab->id_cliente, (*_inicli))==0){
             printf ("\n--- No se ha encontrado un cliente asociado a la ID ingresada---");
-            printf ("\n ¿Desea darse de alta como cliente? ");
+            printf ("\n �Desea darse de alta como cliente? ");
             printf ("\n 1)Si");
             printf ("\n 2)No");
             printf ("\n --> ");
@@ -594,18 +597,25 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 	                    break;
 				}
             }        
-        }
+        }else{
+        	EncolarTrabajos(&nuevo_trab, eTra, sTra);
+           	printf("Trabajo agregado exitosamente.\n");	
+		}
 	}    
 }
 
 void AltaDeTecnicos (struct tecnico **e, struct tecnico **s){
 	struct tecnico *nv;
+	printf("\nHolaaaaaaaa");
 	nv = (struct tecnico*) malloc (sizeof (struct tecnico));
 	if (nv!=NULL){
 		if (*e == NULL){
+			printf("\nHola");
 			nv->id = 1;
 		}else{
+			printf("\nOuYeA");
 			nv->id = BuscarMayorIdTecnico(*e, *s) +1;	
+			printf("\nEstot aca");
 		}
 		printf ("\nDNI: ");
 		scanf ("%d", &nv->DNI);
@@ -614,6 +624,8 @@ void AltaDeTecnicos (struct tecnico **e, struct tecnico **s){
 		nv->sgte = NULL;
 		EncolarTecnico (&nv, e, s);
 		printf("Tecnico agregado exitosamente.\n");
+	}else{
+		printf("\nNo hay espacio de memoria para nuevos tecnicos");
 	}
 }
 
@@ -677,7 +689,7 @@ void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct c
 					}
 					printf("dni: %ld \n", cli->DNI);
                     
-                
+                	cli->sgte = NULL;
                     (*inicli) = InsertarCliente (cli, (*inicli));
                     a = strtok(NULL, d); 
                 }
@@ -857,102 +869,128 @@ void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *
 	}
 }
 
-void CargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico **et, struct tecnico **st){
-	int cont=0;
+void CargaTecnicos (FILE *p, struct tecnico **tech, struct tecnico **et, struct tecnico **st){
+	int band=0;
 	p=NULL;
 	if((p=fopen("tecnicos.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Tecnicos durante la carga |||||||\n");
 	}else{
-		char d[]=" ", cadaux[1000], *a;
-		fgets(cadaux, 999,p);
-		a=strtok(cadaux,d);
-		printf("COMPROBACION ARCH= %s \n", cadaux);
-		while(a!=NULL){
-			tech=(struct tecnico *) malloc(sizeof (struct tecnico) );
-			if(tech==NULL){
-				printf("-------No hay espacio de memoria-------\n");
-			}else{
-				switch(cont) {
-					case 0:
-						tech->DNI=atol(a);
-						cont++;
-						break;
-					case 1:
-						tech->id=atoi(a);
-						cont++;
-						break;
-					case 2:
-						strcpy(tech->Nombre,a);
-						cont=0;
-						EncolarTecnico(&tech, &(*et), &(*st));
-						break;
-				}
-				free(tech);
-				a=strtok(NULL, d);
-			}
-		}
-		fclose(p);
+		char d[] = ";", cadaux[1000]="", *a;
+        char *prueba;
+		
+		prueba = fgets(cadaux, sizeof(cadaux), p);
+        while (prueba != NULL) {
+            a = strtok(cadaux, d);
+            printf("COMPROBACION ARCH= %s \n", cadaux);
+            
+            while ((a != NULL) && (band == 0)) {
+                *tech = (struct tecnico *) malloc(sizeof(struct tecnico));
+                if (*tech == NULL) {
+                    printf("-------No hay espacio de memoria-------\n");
+					band = 1;
+                } else {
+                	//id nombre dni
+                	if(a!=NULL){
+                		(*tech)->id = atoi(a);
+					}
+					
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        strcpy((*tech)->Nombre, a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        (*tech)->DNI=atol(a);
+                    }
+                    (*tech)->sgte = NULL;
+					printf("\nId: %d, Nomb: %s, DNI: %ld", (*tech)->id, (*tech)->Nombre, (*tech)->DNI);
+                    EncolarTecnico(tech, et, st);
+                    a = strtok(NULL, d);
+                }
+            }
+            prueba = fgets(cadaux, sizeof(cadaux), p);
+        }
+        fclose(p);
 	}
 }
 
-void CargaTrabajos (FILE  *p, struct trabajos *trab, struct trabajos **ent, struct trabajos **sal){
-	int cont=0;
-	int fecha;
+void CargaTrabajos (FILE  *p, struct trabajos **trab, struct trabajos **ent, struct trabajos **sal){
+	int band=0;
+	int fecha=0;
 	p=NULL;
 	if((p=fopen("trabajos.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Trabajos durante la carga |||||||\n");
 	}else{
-		char d[]=" ", cadaux[1000], *a;
-		fgets(cadaux, 999,p);
-		a=strtok(cadaux,d);;
-		printf("COMPROBACION ARCH= %s \n", cadaux);
-		while(a!=NULL){
-			trab=(struct trabajos *) malloc(sizeof (struct trabajos) );
-			if(trab==NULL){
-				printf("-------No hay espacio de memoria-------\n");
-			}else{
-				switch(cont) {
-					case 0:
-						trab->cuatromtrs=atoi(a);
-						cont++;
-						break;
-					case 1:
-						strcpy(trab->direccion,a);
-						cont++;
-						break;
-					case 2:
-						fecha=atoi(a);
-						trab->fc_fin = fecha;
-						cont++;
-						break;
-					case 3:
-						trab->id_cliente=atoi(a);
-						cont++;
-						break;
-					case 4:
-						trab->id_opcion=atoi(a);
-						cont++;
-						break;
-					case 5:
-						trab->id_tecnico=atoi(a);
-						cont++;
-						break;
-					case 6:
-						trab->id_trabajo=atoi(a);
-						cont++;
-						break;
-					case 7:
-						trab->opcion=atoi(a);
-						cont=0;
-						EncolarTrabajos(&trab, &(*ent), &(*sal));
-						break;
-				}
-				free(trab);
-				a=strtok(NULL, d);
-			}
-		}
-		fclose(p);
+		char d[] = ";", cadaux[1000]="", *a;
+        char *prueba;
+		
+		prueba = fgets(cadaux, sizeof(cadaux), p);
+        while (prueba != NULL) {
+            a = strtok(cadaux, d);
+            printf("COMPROBACION ARCH= %s \n", cadaux);
+            while ((a != NULL) && (band == 0)) {
+                *trab = (struct trabajos *) malloc(sizeof(struct trabajos));
+                if (*trab == NULL) {
+                    printf("-------No hay espacio de memoria-------\n");
+					band = 1;
+                } else {
+                	if(a != NULL){
+                		(*trab)->id_trabajo = atoi(a);
+					}
+                  
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                         (*trab)->id_opcion=atoi(a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        (*trab)->id_cliente=atoi(a);
+                    }
+                    
+                	a = strtok(NULL, d);
+                    if (a != NULL) {
+                       	(*trab)->id_tecnico=atoi(a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        (*trab)->cuatromtrs=atoi(a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        strcpy((*trab)->direccion,a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        fecha=atoi(a);
+						(*trab)->fc_fin = fecha;
+                    }
+                    
+					(*trab)->sgte = NULL;
+                    EncolarTrabajos(trab, ent, sal);
+                    a = strtok(NULL, d);
+                }
+            }
+            prueba = fgets(cadaux, sizeof(cadaux), p);
+        }
+        fclose(p);
 	}
+	
+	/*Orden:
+		fprintf(p, "%d;", trab->id_trabajo);  
+		fprintf(p, "%d;", trab->id_opcion);   
+		fprintf(p, "%d;", trab->id_cliente);  
+		fprintf(p, "%d;", trab->id_tecnico);  
+		fprintf(p, "%d;", trab->cuatromtrs); 
+		fprintf(p, "%s;", trab->direccion);  
+		fprintf(p, "%d\n", trab->fc_fin);  	f
+											
+			EncolarTrabajos(*trab, ent, sal);
+	*/
 }
 
 void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opcion **iniopc) {
@@ -985,7 +1023,7 @@ void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opc
                     if (a != NULL) {
                         opc->cHoraMObra = atof(a);
                     }
-
+					opc->sgte =NULL; //por si acaso
                     (*iniopc) = InsertarOpcion(opc, (*iniopc));
                     a = strtok(NULL, d);
                 }
@@ -1065,9 +1103,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	printf("Entro CARGA TAREAS\n");
 	CargaTareas (p, tar, antt, auxt, initar);
 	printf("Entro CARGA TECNICOS\n");
-	CargaTecnicos (p, tech, et, st);
+	CargaTecnicos (p, &tech, et, st);
 	printf("Entro CARGA TRABAJOS\n");
-	CargaTrabajos (p, trab, ent, sal);
+	CargaTrabajos (p, &trab, ent, sal);
 	printf("Entro CARGA OPCIONES\n");
 	CargaOpciones (p, opc, anto, iniopc);
 	printf("Entro CARGA PENDIENTES\n");
@@ -1139,10 +1177,9 @@ void DescargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico *et, struct
 	}else{
 		while(st!=NULL){
 			DesencolarTecnico (&tech, &et, &st);
-			fprintf(p, "%ld ", tech->DNI);
-			fprintf(p, "%d ", tech->id);
-			fprintf(p, "%s ", tech->Nombre);
-			EncolarTecnico (&tech, &et, &st);
+			fprintf(p, "%d;", tech->id);
+			fprintf(p, "%s;", tech->Nombre);
+			fprintf(p, "%ld\n", tech->DNI);
 		}
 		fclose(p);
 	}
@@ -1155,14 +1192,13 @@ void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, str
 	}else{
 		while(sal!=NULL){
 			DesencolarTrabajos (&trab, &ent, &sal);
-			fscanf(p, "%d ", trab->cuatromtrs);
-			fprintf(p, "%s ", trab->direccion);
-			fprintf(p, "%d ", trab->fc_fin);
-			fprintf(p, "%d ", trab->id_cliente);
-			fprintf(p, "%d ", trab->id_opcion);
-			fprintf(p, "%d ", trab->id_tecnico);
-			fprintf(p, "%d ", trab->id_trabajo);
-			EncolarTrabajos (&trab, &ent, &sal);
+			fprintf(p, "%d;", trab->id_trabajo);
+			fprintf(p, "%d;", trab->id_opcion);
+			fprintf(p, "%d;", trab->id_cliente);
+			fprintf(p, "%d;", trab->id_tecnico);
+			fprintf(p, "%d;", trab->cuatromtrs);
+			fprintf(p, "%s;", trab->direccion);
+			fprintf(p, "%d\n", trab->fc_fin);
 		}
 		fclose(p);
 	}
