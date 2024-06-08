@@ -605,42 +605,45 @@ void BuscarPrecioMaterial (double *unit, struct materiales *raiz, int codmat){
 }
 
 void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct cliente **inicli){
-	int cont=0;
+	int cont=0, band = 0;
 	if((p=fopen("clientes.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
-		
-		
-		char d[]=" ", cadaux[1000], *a;
-		fgets(cadaux, 999,p);
-		a=strtok(cadaux,d);
-		fscanf(p, "%s", &cadaux);
-		printf("COMPROBACION ARCH= %s \n", cadaux);
-		while(a!=NULL){
-			cli=(struct cliente *) malloc(sizeof (struct cliente) );
-			if(cli==NULL){
-				printf("-------No hay espacio de memoria-------\n");
-			}else{
-					cli->DNI=atol(a);
+		char d[] = ";", cadaux[1000]="", *a;
+        char *prueba;
+		prueba = fgets(cadaux, sizeof(cadaux), p);
+        while (prueba != NULL) {
+            a = strtok(cadaux, d);
+            printf("COMPROBACION ARCH= %s \n", cadaux);
+            
+            while ((a != NULL) && (band == 0)) {
+                cli = (struct cliente *) malloc(sizeof(struct cliente));
+                if (cli == NULL) {
+                    printf("-------No hay espacio de memoria-------\n");
+					band = 1;
+                } else {
+                	if(a!=NULL){
+                		cli->DNI=atol(a);	
+					}
 					printf("dni: %ld \n", cli->DNI);
-					a=strtok(NULL, d);
-					cli->id=atoi(a);
-					printf("id: %d \n", cli->id);
-					printf("FUNC");
-					a=strtok(NULL, d);
-					printf("FUNC");
-					printf("%s \n",a);
-					strcpy(cli->Nombre,a);
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        cli->id=atoi(a);
+                    }
+                    printf("id: %d \n", cli->id);
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        strcpy(cli->Nombre,a);
+                    }
 					printf("nomb %s\n", cli->Nombre);
-					a=strtok(NULL, d);
-					printf("FCWORKS 1\n");
-					(*inicli) = InsertarCliente (cli, (*inicli));
-					printf("FCWORKS 2\n");
-			}
-		}
-		printf("SALIO DEL WHILE\n");
-		fclose(p);
-	}
+                    (*inicli) = InsertarCliente (cli, (*inicli));
+                    a = strtok(NULL, d); 
+                }
+            }
+            prueba = fgets(cadaux, sizeof(cadaux), p);
+        }
+        fclose(p);
+    }
 }
 
 void CargaMateriales (FILE *p, struct materiales *mat, struct materiales *auxm, struct materiales **raiz){
@@ -924,7 +927,7 @@ void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opc
                     }
 
                     (*iniopc) = InsertarOpcion(opc, (*iniopc));
-                    a = strtok(NULL, d); // mover a la siguiente parte del token
+                    a = strtok(NULL, d);
                 }
             }
             prueba = fgets(cadaux, sizeof(cadaux), p);
@@ -1022,8 +1025,8 @@ void DescargaClientes( FILE *p, struct cliente *cli, struct cliente *inicli){
 		printf("||||||| Error de apertura de archivo Clientes durante la carga |||||||\n");
 	}else{
 		while(inicli != NULL){
-			fprintf(p, "%ld " , inicli->DNI);
-			fprintf(p, "%d " , inicli->id);
+			fprintf(p, "%ld;" , inicli->DNI);
+			fprintf(p, "%d;" , inicli->id);
 			fprintf(p, "%s\n" , inicli->Nombre);
 			inicli = inicli->sgte;
 		}
