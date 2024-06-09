@@ -560,17 +560,19 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
     	nuevo_trab->opcion = op;
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
+    	nuevo_trab->id_trabajo = BuscarMayorIdTrab (sTra) + 1; //va a buscar el mayor id
+    	nuevo_trab->fc_fin = 0; //inicializa la fecha fin en 0 
     	printf ("\n---Ingrese la direccion de la instalacion: " );
     	fflush(stdin);
     	gets (nuevo_trab->direccion);
-		nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec);
-		fflush(stdin);
-   		printf ("\nIngrese su ID de cliente: ");
-   		fflush (stdin);
-   		scanf ("%d",&nuevo_trab->id_cliente); 
-   		fflush (stdin);
-   		printf("\nHolaProbando");
-		if (BuscarCliente (nuevo_trab->id_cliente, (*_inicli))==0){
+	nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec);
+	fflush(stdin);
+   	printf ("\nIngrese su ID de cliente: ");
+   	fflush (stdin);
+   	scanf ("%d",&nuevo_trab->id_cliente); 
+   	fflush (stdin);
+   	printf("\nHolaProbando");
+	if (BuscarCliente (nuevo_trab->id_cliente, (*_inicli))==0){
             printf ("\n--- No se ha encontrado un cliente asociado a la ID ingresada---");
             printf ("\n �Desea darse de alta como cliente? ");
             printf ("\n 1)Si");
