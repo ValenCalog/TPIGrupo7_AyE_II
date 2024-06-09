@@ -1575,8 +1575,8 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 		insertaropcionordenada(&auxL,&Lord);
 	}
 
+	printf("\nTOP 4 opciones mas vendidas: ");
 	for(i=1;i<=4;i++){
-		printf("\nTOP 4 opciones mas vendidas");
 		printf("\n%i) Opcion %i, con %i ventas",i,Lord->id_op,Lord->ventas);
 		Lord=Lord->sgte;
 	}
