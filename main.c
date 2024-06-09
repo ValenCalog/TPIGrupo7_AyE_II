@@ -291,15 +291,14 @@ int BuscarMayorIdTrab (struct trabajos *s){
 }
 
 int BuscarTecnico (struct tecnico **nodo, struct tecnico **e, struct tecnico **s){
-	int cont = 0, id = 0;
+	int cont = 0;
 	while (cont == 0){
 		DesencolarTecnico (nodo, e, s);
 		cont = cont + 1;
 		printf ("Su tecnico sera: %s.\n", (*nodo)->Nombre);
-		id = (*nodo)->id;
-		EncolarTecnico (nodo, e, s); //puse el return abajo y cambie la forma ya qu eno enviaba el id del nodo
+		return ((*nodo)->id);
+		EncolarTecnico (nodo, e, s);
 	}
-	return id;
 }
 
 int BuscarMayorIdTecnico (struct tecnico *e, struct tecnico *s){
@@ -559,28 +558,14 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 		}
 		
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
-    	printf("\nHOLAA2");
     	nuevo_trab->opcion = op;
-    	printf("\nHOLAA3");
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
-    	printf("\nHOLAA4");
-    	if(*sTra != NULL){
-    		printf("\nHolaa5");
-    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (*sTra) + 1; //va a buscar el mayor id
-		}else{
-			printf("\nHolaa6");
-			nuevo_trab->id_trabajo = 1;
-		}
-    	
-    	nuevo_trab->fc_fin.dia = 0; //inicializa la fecha fin en 0 
-    	nuevo_trab->fc_fin.mes = 0;
-    	nuevo_trab->fc_fin.anio = 0;
+    	nuevo_trab->id_trabajo = BuscarMayorIdTrab (sTra) + 1; //va a buscar el mayor id
+    	nuevo_trab->fc_fin = 0; //inicializa la fecha fin en 0 
     	printf ("\n---Ingrese la direccion de la instalacion: " );
     	fflush(stdin);
     	gets (nuevo_trab->direccion);
-    	printf("\nArriba de buscar tecnico");
 	nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec);
-	printf("\nAbajo");
 	fflush(stdin);
    	printf ("\nIngrese su ID de cliente: ");
    	fflush (stdin);
@@ -942,7 +927,7 @@ void CargaTrabajos (FILE  *p, struct trabajos **trab, struct trabajos **ent, str
 	if((p=fopen("trabajos.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Trabajos durante la carga |||||||\n");
 	}else{
-		char d[] = ";", cadaux[1000]="", *a, *b, cadauxFec[11]="";
+		char d[] = ";", cadaux[1000]="", *a;
         char *prueba;
 		
 		prueba = fgets(cadaux, sizeof(cadaux), p);
@@ -986,27 +971,10 @@ void CargaTrabajos (FILE  *p, struct trabajos **trab, struct trabajos **ent, str
                     
                     a = strtok(NULL, d);
                     if (a != NULL) {
-                    	strncpy(cadauxFec, a, 10);
-                    	b = strtok(cadauxFec, "/");
-                    	if(b!=NULL){
-                    		(*trab)->fc_fin.dia = atoi(b);
-						}
-                    	
-                    	b = strtok(NULL,"/");
-                    	if(b!=NULL){
-                    		(*trab)->fc_fin.mes = atoi(b);
-						}
-                    	
-                    	b = strtok(NULL,"/");
-                    	if(b!=NULL){
-                    		(*trab)->fc_fin.anio = atoi(b);
-						}
-                    	
+                        fecha=atoi(a);
+						(*trab)->fc_fin = fecha;
                     }
                     
-                    printf("\nTrabajo: ");
-                    printf("\nId: %d", (*trab)->id_trabajo);
-                    printf("\nFecha: %d/%d/%d", (*trab)->fc_fin.dia, (*trab)->fc_fin.mes, (*trab)->fc_fin.anio);
 					(*trab)->sgte = NULL;
                     EncolarTrabajos(trab, ent, sal);
                     a = strtok(NULL, d);
@@ -1235,7 +1203,7 @@ void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, str
 			fprintf(p, "%d;", trab->id_tecnico);
 			fprintf(p, "%d;", trab->cuatromtrs);
 			fprintf(p, "%s;", trab->direccion);
-			fprintf(p, "%d/%d/%d\n", trab->fc_fin.dia, trab->fc_fin.mes, trab->fc_fin.anio);
+			fprintf(p, "%d\n", trab->fc_fin);
 		}
 		fclose(p);
 	}
@@ -1478,9 +1446,46 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	struct trabajos *ini=NULL,*aux=NULL;
 	struct opcionesfav *L=NULL,*auxL=NULL;
 	int band=0;
+	struct fecha fecha1_1,fecha2_2;
+	long fecha1,fecha2,mayor,menor,fecha_trabajo;
+	
+	printf("Ingrese el dia de la primer fecha: ");
+	scanf("%i",&fecha1_1.dia);
+	printf("Ingrese el mes de la primer fecha: ");
+	scanf("%i",&fecha1_1.mes);
+	printf("Ingrese el anio de la primer fecha: ");
+	scanf("%i",&fecha1_1.anio);
+	fflush(stdin);
+	
+	printf("Ingrese el dia de la segunda fecha: ");
+	scanf("%i",&fecha2_2.dia);
+	printf("Ingrese el mes de la segunda fecha: ");
+	scanf("%i",&fecha2_2.mes);
+	printf("Ingrese el anio de la segunda fecha: ");
+	scanf("%i",&fecha2_2.anio);
+	fflush(stdin);
+	
+	fecha1=(fecha1_1.anio * 10000) + (fecha1_1.mes * 100) + fecha1_1.dia;
+	fecha2=(fecha2_2.anio * 10000) + (fecha2_2.mes * 100) + fecha2_2.dia;
+	
+	if(fecha1>fecha2){
+		mayor=fecha1;
+		menor=fecha2;
+	}else{
+		if(fecha2>fecha1){
+			mayor=fecha2;
+			menor=fecha1;
+		}else{
+			mayor=fecha1;
+			menor=fecha1;
+		}
+	}
+	fflush(stdin);
+
+
 	ini=salida; //Guarda el inicio de la cola de trabajos
 	completarlista(&L,iniopc);//Ahora tenemos una lista donde cada nodo tiene un id op y un int acumulativo
-	auxL=L;  
+	auxL=L;
 	DesencolarTrabajos(&aux,&entrada,&salida);
 	while(salida->id_trabajo!=ini->id_trabajo){//El while se va a detener cuando recorra toda la cola de trabajos
 		while(band=!1){//Se va a detener cuando auxL este en la posicion donde debe incrementarse la cantidad de ventas
@@ -1490,18 +1495,25 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 				band=1;
 			}
 		}
-		auxL->ventas++;//Se incrementa la cantidad de ventas en esa opcion
+
+		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia; 
+
+		if(fecha_trabajo<=mayor && fecha_trabajo>=menor){
+			auxL->ventas++;//Se incrementa la cantidad de ventas en esa opcion
+		}
+					
 		band=0;
 		auxL=L;
 		EncolarTrabajos(&aux,&entrada,&salida);
 		aux=NULL;
 		DesencolarTrabajos(&aux,&entrada,&salida);
 	}
+
 	//Ahora solo debemos recorrer la lista de opcionesfav e ir mostrando la cantidad de ventas por opcion
 	auxL=L;
 	while(auxL!=NULL){
 		printf("\nLa cantidad de ventas de la opcion %i es: %i",auxL->id_op,auxL->ventas);
-	}	
+	}
 	
 }
 
@@ -1509,8 +1521,8 @@ void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
 	struct opcionesfav *nuevo=NULL,*aux=NULL;
 	int encontro=0;
 	aux=(*Inicio);
-	while(ini_opciones!=NULL){
-		while(encontro!=1 || aux!=NULL){
+	while(ini_opciones!=NULL){ //recorre toda la lista de opciones
+		while(encontro!=1 || aux!=NULL){ //recorre las opciones fav buscando la que coincide con el id opc que esta leyendo
 			if(ini_opciones->id==aux->id_op){
 				encontro=1;
 			}else{
