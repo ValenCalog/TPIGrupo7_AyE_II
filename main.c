@@ -271,6 +271,7 @@ double OperacionCosto (struct materiales *raiz, int codop, struct materialesop *
 	}
 	return (costomat);
 }
+
 //ints
 int BuscarCliente (int id, struct cliente *ini){
 	int encontroid=0;
@@ -326,6 +327,10 @@ int BuscarMayorIdOpc (struct opcion *ini){
 		ini = ini->sgte;
 	}
 	return (idMax);
+}
+
+int BuscarMayorIdTarea (struct tarea *ini){
+	
 }
 
 int BuscarMayorIdTrab (struct trabajos **nodo, struct trabajos **e, struct trabajos **s){
@@ -720,22 +725,32 @@ void AltaDeMateriales (struct materiales **raiz){
 
 void AltaDeMaterialesOP (struct materiales *raiz, struct materialesop **inimat, int id){
 	struct materialesop *newmat=NULL;
-	int idaux=0, band=0;
+	int idaux=0, band=0, opc=1;
 	newmat = (struct materialesop *) malloc (sizeof (struct materialesop));
 	if(newmat == NULL){
 		printf( ":( No hay espacio en memoria \n" );
 	}else{
-		printf("\n--- Ingrese el id de material: ");
-		scanf("%d", &idaux);
-		band = BuscarIdMaterialesOP (raiz, idaux, band);
-		if(band==0){
-			printf("\n|||| El material no se encuentra en el almacen ||||");
-		}else{
-			newmat->idmat=idaux;
-			newmat->id_opcion=id;
-			printf("\n--- Ingrese la cantidad del material a utilizar: ");
-			scanf("%d", &newmat->cantidad);
-			(*inimat) = InsertarMaterialesOp (newmat, (*inimat));
+		printf("--- Ingrese (1) para cargar un material o (0) para terminar: ");
+		fflush(stdin);
+		scanf("%d", &opc);
+		while(opc!=0){
+			printf("\n--- Ingrese el id de material: ");
+			fflush(stdin);
+			scanf("%d", &idaux);
+			band = BuscarIdMaterialesOP (raiz, idaux, band);
+			if(band==0){
+				printf("\n|||| El material no se encuentra en el almacen ||||");
+			}else{
+				newmat->idmat=idaux;
+				newmat->id_opcion=id;
+				printf("\n--- Ingrese la cantidad del material a utilizar: ");
+				fflush(stdin);
+				scanf("%d", &newmat->cantidad);
+				(*inimat) = InsertarMaterialesOp (newmat, (*inimat));
+			}
+			printf("--- Ingrese (1) para cargar un material o (0) para terminar: ");
+			fflush(stdin);
+			scanf("%d", &opc);
 		}
 	}
 }
@@ -769,14 +784,38 @@ void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct mater
 }
 
 void AltaDeTareas (struct tarea **initar, int id){
-	
-	/*struct tarea{ //Lista Doblemente Enlazada.
-	     int id_op, id_tarea, orden;
-	     double tiempo;
-	     char descripcion[30];
-	     struct tarea *sgte, *ant;
-	};*/
-	
+	struct tarea *newtar=NULL;
+	int band=0, opc=1;
+	newtar = (struct tarea *) malloc (sizeof (struct tarea));
+	if(newtar == NULL){
+		printf( ":( No hay espacio en memoria \n" );
+	}else{
+		printf("--- Ingrese (1) para cargar una tarea o (0) para terminar: ");
+		fflush(stdin);
+		scanf("%d", &opc);
+		while(opc!=0){
+			newtar->id_op=id;
+			
+			if ((*initar) == NULL){
+				newtar->id_tarea = 1;
+			}else{
+				newtar->id_tarea = BuscarMayorIdTarea ((*initar)) + 1;
+			}
+			
+			printf("\n--- Ingrese el orden: ");
+			fflush(stdin);
+			scanf("%d", &newtar->orden);
+			printf("\n--- Ingrese el tiempo estimado: ");
+			fflush(stdin);
+			scanf("%lf", &newtar->tiempo);
+			printf("\n--- Ingrese una descripcion: ");
+			fflush(stdin);
+			gets(newtar->descripcion);
+			printf("--- Ingrese (1) para cargar una tarea o (0) para terminar: ");
+			fflush(stdin);
+			scanf("%d", &opc);
+		}
+	}
 }
 
 void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra, struct materialesop **_inimat, struct materiales **raiz, struct tarea **_initar){
