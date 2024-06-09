@@ -23,7 +23,7 @@ struct trabajos{ //Cola.
     int id_trabajo, id_opcion, opcion, cuatromtrs;
     char direccion[30];
     int id_tecnico, id_cliente;
-	int fc_fin;
+	struct fecha fc_fin;
     struct trabajos *sgte;
 };
 
@@ -291,14 +291,15 @@ int BuscarMayorIdTrab (struct trabajos *s){
 }
 
 int BuscarTecnico (struct tecnico **nodo, struct tecnico **e, struct tecnico **s){
-	int cont = 0;
+	int cont = 0, id = 0;
 	while (cont == 0){
 		DesencolarTecnico (nodo, e, s);
 		cont = cont + 1;
 		printf ("Su tecnico sera: %s.\n", (*nodo)->Nombre);
-		return ((*nodo)->id);
-		EncolarTecnico (nodo, e, s);
+		id = (*nodo)->id;
+		EncolarTecnico (nodo, e, s); //puse el return abajo y cambie la forma ya qu eno enviaba el id del nodo
 	}
+	return id;
 }
 
 int BuscarMayorIdTecnico (struct tecnico *e, struct tecnico *s){
@@ -558,14 +559,28 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 		}
 		
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
+    	printf("\nHOLAA2");
     	nuevo_trab->opcion = op;
+    	printf("\nHOLAA3");
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
-    	nuevo_trab->id_trabajo = BuscarMayorIdTrab (sTra) + 1; //va a buscar el mayor id
-    	nuevo_trab->fc_fin = 0; //inicializa la fecha fin en 0 
+    	printf("\nHOLAA4");
+    	if(*sTra != NULL){
+    		printf("\nHolaa5");
+    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (*sTra) + 1; //va a buscar el mayor id
+		}else{
+			printf("\nHolaa6");
+			nuevo_trab->id_trabajo = 1;
+		}
+    	
+    	nuevo_trab->fc_fin.dia = 0; //inicializa la fecha fin en 0 
+    	nuevo_trab->fc_fin.mes = 0;
+    	nuevo_trab->fc_fin.anio = 0;
     	printf ("\n---Ingrese la direccion de la instalacion: " );
     	fflush(stdin);
     	gets (nuevo_trab->direccion);
+    	printf("\nArriba de buscar tecnico");
 	nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec);
+	printf("\nAbajo");
 	fflush(stdin);
    	printf ("\nIngrese su ID de cliente: ");
    	fflush (stdin);
@@ -927,7 +942,7 @@ void CargaTrabajos (FILE  *p, struct trabajos **trab, struct trabajos **ent, str
 	if((p=fopen("trabajos.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Trabajos durante la carga |||||||\n");
 	}else{
-		char d[] = ";", cadaux[1000]="", *a;
+		char d[] = ";", cadaux[1000]="", *a, *b, cadauxFec[11]="";
         char *prueba;
 		
 		prueba = fgets(cadaux, sizeof(cadaux), p);
@@ -971,10 +986,27 @@ void CargaTrabajos (FILE  *p, struct trabajos **trab, struct trabajos **ent, str
                     
                     a = strtok(NULL, d);
                     if (a != NULL) {
-                        fecha=atoi(a);
-						(*trab)->fc_fin = fecha;
+                    	strncpy(cadauxFec, a, 10);
+                    	b = strtok(cadauxFec, "/");
+                    	if(b!=NULL){
+                    		(*trab)->fc_fin.dia = atoi(b);
+						}
+                    	
+                    	b = strtok(NULL,"/");
+                    	if(b!=NULL){
+                    		(*trab)->fc_fin.mes = atoi(b);
+						}
+                    	
+                    	b = strtok(NULL,"/");
+                    	if(b!=NULL){
+                    		(*trab)->fc_fin.anio = atoi(b);
+						}
+                    	
                     }
                     
+                    printf("\nTrabajo: ");
+                    printf("\nId: %d", (*trab)->id_trabajo);
+                    printf("\nFecha: %d/%d/%d", (*trab)->fc_fin.dia, (*trab)->fc_fin.mes, (*trab)->fc_fin.anio);
 					(*trab)->sgte = NULL;
                     EncolarTrabajos(trab, ent, sal);
                     a = strtok(NULL, d);
@@ -1203,7 +1235,7 @@ void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, str
 			fprintf(p, "%d;", trab->id_tecnico);
 			fprintf(p, "%d;", trab->cuatromtrs);
 			fprintf(p, "%s;", trab->direccion);
-			fprintf(p, "%d\n", trab->fc_fin);
+			fprintf(p, "%d/%d/%d\n", trab->fc_fin.dia, trab->fc_fin.mes, trab->fc_fin.anio);
 		}
 		fclose(p);
 	}
