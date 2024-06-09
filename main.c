@@ -140,7 +140,7 @@ void insertaropfav(struct opcionesfav **nv, struct opcionesfav **ini);
 void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones);
 void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc);
 void insertaropcionordenada(struct opcionesfav **auxL,struct opcionesfav **Lord);
-struct opcionesfav * buscaropanterior(int ventas,struct opcionesfav *rc)
+struct opcionesfav * buscaropanterior(struct opcionesfav *auxL,struct opcionesfav *rc);
 
 
 int main(int argc, char *argv[]){
@@ -1584,21 +1584,21 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 
 void insertaropcionordenada(struct opcionesfav **auxL,struct opcionesfav **Lord){
 	struct opcionesfav *ant=NULL;
-	ant=buscaropanterior(auxL->ventas,Lord);
+	ant=buscaropanterior(auxL,Lord);
 	if(ant != NULL){
-		auxL->sgte=ant->sgte;
-		ant->sgte=auxL;
+		(*auxL)->sgte = ant->sgte;
+		ant->sgte=(*auxL);
 	}else{
-		auxL->sgte=Lord;
-		Lord=auxL;
+		(*auxL)->sgte=(*Lord);
+		(*Lord)=(*auxL);
 	}
 
 }
 
-struct opcionesfav * buscaropanterior(int ventas,struct opcionesfav *rc){
+struct opcionesfav * buscaropanterior(struct opcionesfav *auxL,struct opcionesfav *rc){
 	struct opcionesfav *Ant=NULL;
 	while(rc!=NULL){
-		if(rc->ventas<ventas){
+		if(rc->ventas<auxL->ventas){
 			rc=NULL;
 		}else{
 			Ant=rc;
