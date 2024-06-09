@@ -71,6 +71,7 @@ double OperacionTiempo (int id,struct tarea ** initar);
 double OperacionCosto (struct materiales *raiz, int codop,struct materialesop ** inimat);
 
 int BuscarCliente (int codcliente, struct cliente *ini);
+int BuscarIdMaterialesOP (struct materiales *r, int id, int band);
 int BuscarMayorIdCliente(struct cliente *ini);
 int BuscarMayorIdTarea(struct tarea *ini);
 int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
@@ -90,7 +91,6 @@ char* BuscarNombreCliente(int id, struct cliente *inicli);
 char* BuscarNombreOpcion(int id, struct opcion *iniop);
 
 struct cliente* InsertarCliente (struct cliente *nv,struct cliente *inicli);
-struct materiales* BuscarIdMaterialesOP (struct materiales *r, int id, int *band);
 struct materiales* DescargarArbol (struct materiales *raiz, FILE *p);
 struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz);
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
@@ -281,6 +281,25 @@ int BuscarCliente (int id, struct cliente *ini){
 	}
 	printf("salio del while\n");
 	return (encontroid);	
+}
+
+int BuscarIdMaterialesOP (struct materiales *r, int id, int band){
+	if (r == NULL){
+		printf("\n |||| No hay materiales disponibles ||||");
+		return (band);
+	}else{
+		if (r->id == id){
+			printf("\n Se encontro el material en el almacen :) ");
+			band=1;
+			return (band);
+		}else{
+			if (id < r->id){
+				band = BuscarIdMaterialesOP (r->izq, id, band);
+			}else{
+				band = BuscarIdMaterialesOP (r->derch, id, band);
+			}
+		}
+	}
 }
 
 int BuscarMayorIdCliente (struct cliente *ini){
@@ -519,25 +538,6 @@ struct materiales* DescargarArbol (struct materiales *raiz, FILE *p){
 	return (raiz);
 }
 
-struct materiales * BuscarIdMaterialesOP (struct materiales *r, int id, int *band){
-	if (r == NULL){
-		printf("\n |||| No hay materiales disponibles ||||");
-		return (r);
-	}else{
-		if (r->id == id){
-			printf("\n Se encontro el material en el almacen :) ");
-			(*band)=1;
-			return (r);
-		}else{
-			if (id < r->id){
-				r->izq = BuscarIdMaterialesOP (r->izq, id, &(*band));
-			}else{
-				r->derch = BuscarIdMaterialesOP (r->derch, id, &(*band));
-			}
-		}
-	}
-}
-
 struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz){
 	if (raiz == NULL) {
 		raiz = mat;
@@ -714,7 +714,7 @@ void AltaDeMaterialesOP (struct materiales *raiz, struct materialesop **inimat, 
 	}else{
 		printf("\n--- Ingrese el id de material: ");
 		scanf("%d", &idaux);
-		raiz = BuscarIdMaterialesOP (raiz, idaux, &band);
+		band = BuscarIdMaterialesOP (raiz, idaux, band);
 		if(band==0){
 			printf("\n|||| El material no se encuentra en el almacen ||||");
 		}else{
@@ -730,14 +730,6 @@ void AltaDeMaterialesOP (struct materiales *raiz, struct materialesop **inimat, 
 void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materiales *raiz, struct materialesop **inimat){
 	struct opcion *nueva_op;
 	nueva_op = (struct opcion *) malloc (sizeof (struct opcion) );
-	
-	/*struct opcion{ //Lista Enlazada Simple.
-	     int id;
-	     char Nombre[30];
-	     double cHoraMObra; //cortesia de vale. (vale me arruinaste la vida con ese nombre)
-	     struct opcion *sgte;
-	};*/
-	
 	if (nueva_op == NULL){
 		printf( ":( No hay espacio en memoria \n" );
 	}else{
