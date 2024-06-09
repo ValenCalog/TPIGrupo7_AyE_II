@@ -75,7 +75,7 @@ int BuscarCliente (int codcliente, struct cliente *ini);
 int BuscarMayorIdCliente(struct cliente *ini);
 int BuscarMayorIdTarea(struct tarea *ini);
 int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
-int BuscarMayorIdTrab(struct trabajos **nodo, struct trabajos **e, struct trabajos **s);
+int BuscarMayorIdTrab(struct trabajos *nodo, struct trabajos *e, struct trabajos *s);
 int BuscarMayorIdOpc(struct opcion *ini);
 int BuscarTecnico (struct tecnico **nodo, struct tecnico **et, struct tecnico **st);
 int BuscarIDTecnico (int id, struct tecnico **nodo, struct tecnico **et, struct tecnico **st);
@@ -101,6 +101,7 @@ struct materialesop* InsertarMaterialesOp(struct materialesop **nv,struct materi
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
 struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
 struct opcion* InsertarOpcion (struct opcion * nvop,struct opcion *iniop);
+struct trabajos * DesencolarParaBuscarMayorID (struct trabajos *nv, struct trabajos *e, struct trabajos *s);
 
 
 void AltaDeClientes (struct cliente **inicli);
@@ -298,22 +299,28 @@ int BuscarMayorIdOpc (struct opcion *ini){
 	return (idMax);
 }
 
-int BuscarMayorIdTrab (struct trabajos **nodo, struct trabajos **e, struct trabajos **s){
+int BuscarMayorIdTrab (struct trabajos *nodo, struct trabajos *e, struct trabajos *s){
 	int mayor=0;
-	if (ColaVacia(*s) == 0){
+	
+	if (ColaVacia(s) == 0){
 		return mayor;
 	} else {
-		while (!ColaVacia(*s)){
-			DesencolarTrabajos(nodo, e, s);
-			if ((*nodo)->id_trabajo > mayor){
-				mayor = (*nodo)->id_trabajo;
-				EncolarTrabajos(nodo, e, s);
-			} else {
-				EncolarTrabajos(nodo, e, s);
+		while (!ColaVacia(s)){
+			DesencolarParaBuscarMayorID (nodo, e, s);
+			if (nodo->id_trabajo > mayor){
+				mayor = nodo->id_trabajo;
 			}
 		}
 	}
 	return(mayor);
+}
+
+struct trabajos * DesencolarParaBuscarMayorID (struct trabajos *n, struct trabajos *e, struct trabajos *s){
+	n = s;
+	s = s->sgte;
+	if (s == NULL){
+		e = NULL;
+	}
 }
 
 int BuscarTecnico (struct tecnico **nodo, struct tecnico **e, struct tecnico **s){
@@ -592,7 +599,7 @@ void AltaDeTareas (struct tarea **initar){
 
 void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra, struct materialesop **_inimat, struct materiales **raiz){
     struct tecnico *nodoaux = NULL; 
-    struct trabajos *nuevo_trab=NULL, *aux=NULL;
+    struct trabajos *nuevo_trab=NULL, *aux=NULL, *eaux= (*eTra), *saux=(*sTra);
     int op, opmenu=-1;
     
     system("cls");
@@ -613,8 +620,8 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 		
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
-    	if(*sTra != NULL){
-    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (&aux, eTra, sTra) + 1; //va a buscar el mayor id
+    	if(sTra != NULL){
+    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (aux, eaux, saux) + 1; //va a buscar el mayor id
 		}else{
 			nuevo_trab->id_trabajo = 1;
 		}
@@ -1529,39 +1536,39 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
    	}
 }
 
-void ListadoDeTrabajosDeTecnicos (struct trabajos **e, struct trabajos **s, struct tecnico **et, struct tecnico **st, struct opcion **l, struct cliente **r){
-	int id, tec=0;
-	char nombre_op[30], nombre_cli[30];
-	struct tecnico *nodo=NULL;
-	struct trabajos *aux=NULL;
-	
-	printf("Ingrese el ID del técnico para ver sus trabajos: \n");
-	scanf("%d", &id);
-	tec = BuscarIDTecnico(id, &nodo, et, st); //hacer funcion
-	if (tec == 0){
-		printf("El tecnico no existe.\n");
-		//hacer que vaya al menu
-	} else {
-		while (!ColaVacia(*s)){ //pongo para que recorra toda la cola de tecnicos porque un tecnico puede tener varios trabajos
-			DesencolarTrabajos(&aux, e, s);
-			if (aux->id_tecnico == id){
-				printf("ID del trabajo: %d \n", aux->id_trabajo);
-				nombre_op[30] = BuscarNombreOpcion(aux->id_opcion, *l);
-				printf("El nombre de la opcion es: %s \n", nombre_op);
-				nombre_cli[30] = BuscarNombreCliente(aux->id_cliente, *r);
-				printf("El nombre del cliente es: %s \n", nombre_cli);
-				printf("La ubicacion es: %s \n", aux->direccion);
-				if (aux->cuatromtrs == 1){
-					printf("Requiere trabajo en altura.\n");
-				} else{
-					printf("No requiere trabajo en altura.\n");
-				}
-				EncolarTrabajos(&aux, e, s);
-			} else {
-				EncolarTrabajos(&aux, e, s);
-			}
-		}
-	}	
+void ListadoDeTrabajosDeTecnicos(struct trabajos **e, struct trabajos **s, struct tecnico **et, struct tecnico **st, struct opcion **l, struct cliente **r) {
+    int id, tec = 0;
+    char nombre_op[30], nombre_cli[30];
+    struct tecnico *nodo = NULL;
+    struct trabajos *aux = NULL;
+
+    printf("Ingrese el ID del técnico para ver sus trabajos: \n");
+    scanf("%d", &id);
+    tec = BuscarIDTecnico(id, &nodo, et, st);
+    if (tec == 0) {
+        printf("El técnico no existe.\n");
+        // hacer que vaya al menú
+    } else {
+        while (!ColaVacia(*s)) {
+            DesencolarTrabajos(&aux, e, s);
+            if (aux->id_tecnico == id) {
+                printf("ID del trabajo: %d \n", aux->id_trabajo);
+                strcpy(nombre_op, BuscarNombreOpcion(aux->id_opcion, *l)); // Copia el nombre de la opción a nombre_op
+                printf("El nombre de la opción es: %s \n", nombre_op);
+                strcpy(nombre_cli, BuscarNombreCliente(aux->id_cliente, *r)); // Copia el nombre del cliente a nombre_cli
+                printf("El nombre del cliente es: %s \n", nombre_cli);
+                printf("La ubicación es: %s \n", aux->direccion);
+                if (aux->cuatromtrs == 1) {
+                    printf("Requiere trabajo en altura.\n");
+                } else {
+                    printf("No requiere trabajo en altura.\n");
+                }
+                EncolarTrabajos(&aux, e, s);
+            } else {
+                EncolarTrabajos(&aux, e, s);
+            }
+        }
+    }
 }
 
 char* BuscarNombreOpcion(int id, struct opcion *r) {
