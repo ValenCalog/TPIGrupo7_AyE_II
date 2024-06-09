@@ -100,6 +100,7 @@ struct opcion* InsertarOpcion (struct opcion * nvop,struct opcion *iniop);
 void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales **r);
 void AltaDeOpciones (struct opcion ** iniop);
+void AltaDeTareas (struct tarea **initar);
 void AltaDeTrabajos (struct cliente ** inicli,struct opcion ** iniop, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct materialesop **inimat, struct materiales **r);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
@@ -202,6 +203,10 @@ int main(int argc, char *argv[]){
 				}else{
 					printf("\nNo hay materiales cargados en el stock de la empresa");
 				}
+				opc=-1;
+				break;
+			case 10:
+				AltaDeTareas (&initar);
 				opc=-1;
 				break;
 		}
@@ -535,6 +540,10 @@ void AltaDeOpciones (struct opcion ** iniop){
 		(*iniop) = InsertarOpcion (nueva_op, (*iniop));
 		printf("Opcion agregada exitosamente.\n");
 	}
+}
+
+void AltaDeTareas (struct tarea **initar){
+	
 }
 
 void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra, struct materialesop **_inimat, struct materiales **raiz){
@@ -1406,7 +1415,7 @@ struct opcion * InsertarOpcion (struct opcion *nvop, struct opcion *iniop) {
     }
 
     printf("salio de fc\n");
-    getch(); // No recomendado en algunos entornos, considera usar getchar() o printf("Press any key...\n"); getchar();
+    getchar(); // No recomendado en algunos entornos, considera usar getchar() o printf("Press any key...\n"); getchar();
     return iniop;
 }
 
@@ -1577,7 +1586,7 @@ void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
 				nuevo->id_op=ini_opciones->id;
 				nuevo->ventas=0;
 				nuevo->sgte=NULL;
-				insertaropfav(&nuevo,&Inicio);
+				insertaropfav(&nuevo,&(*Inicio));
 
 			}else{
 				printf("No hay espacio en memoria");
