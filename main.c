@@ -1478,9 +1478,46 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	struct trabajos *ini=NULL,*aux=NULL;
 	struct opcionesfav *L=NULL,*auxL=NULL;
 	int band=0;
+	struct fecha fecha1_1,fecha2_2;
+	long fecha1,fecha2,mayor,menor,fecha_trabajo;
+	
+	printf("Ingrese el dia de la primer fecha: ");
+	scanf("%i",&fecha1_1.dia);
+	printf("Ingrese el mes de la primer fecha: ");
+	scanf("%i",&fecha1_1.mes);
+	printf("Ingrese el anio de la primer fecha: ");
+	scanf("%i",&fecha1_1.anio);
+	fflush(stdin);
+	
+	printf("Ingrese el dia de la segunda fecha: ");
+	scanf("%i",&fecha2_2.dia);
+	printf("Ingrese el mes de la segunda fecha: ");
+	scanf("%i",&fecha2_2.mes);
+	printf("Ingrese el anio de la segunda fecha: ");
+	scanf("%i",&fecha2_2.anio);
+	fflush(stdin);
+	
+	fecha1=(fecha1_1.anio * 10000) + (fecha1_1.mes * 100) + fecha1_1.dia;
+	fecha2=(fecha2_2.anio * 10000) + (fecha2_2.mes * 100) + fecha2_2.dia;
+	
+	if(fecha1>fecha2){
+		mayor=fecha1;
+		menor=fecha2;
+	}else{
+		if(fecha2>fecha1){
+			mayor=fecha2;
+			menor=fecha1;
+		}else{
+			mayor=fecha1;
+			menor=fecha1;
+		}
+	}
+	fflush(stdin);
+
+
 	ini=salida; //Guarda el inicio de la cola de trabajos
 	completarlista(&L,iniopc);//Ahora tenemos una lista donde cada nodo tiene un id op y un int acumulativo
-	auxL=L;  
+	auxL=L;
 	DesencolarTrabajos(&aux,&entrada,&salida);
 	while(salida->id_trabajo!=ini->id_trabajo){//El while se va a detener cuando recorra toda la cola de trabajos
 		while(band=!1){//Se va a detener cuando auxL este en la posicion donde debe incrementarse la cantidad de ventas
@@ -1490,18 +1527,25 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 				band=1;
 			}
 		}
-		auxL->ventas++;//Se incrementa la cantidad de ventas en esa opcion
+
+		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia; 
+
+		if(fecha_trabajo<=mayor && fecha_trabajo>=menor){
+			auxL->ventas++;//Se incrementa la cantidad de ventas en esa opcion
+		}
+					
 		band=0;
 		auxL=L;
 		EncolarTrabajos(&aux,&entrada,&salida);
 		aux=NULL;
 		DesencolarTrabajos(&aux,&entrada,&salida);
 	}
+
 	//Ahora solo debemos recorrer la lista de opcionesfav e ir mostrando la cantidad de ventas por opcion
 	auxL=L;
 	while(auxL!=NULL){
 		printf("\nLa cantidad de ventas de la opcion %i es: %i",auxL->id_op,auxL->ventas);
-	}	
+	}
 	
 }
 
@@ -1509,8 +1553,8 @@ void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
 	struct opcionesfav *nuevo=NULL,*aux=NULL;
 	int encontro=0;
 	aux=(*Inicio);
-	while(ini_opciones!=NULL){
-		while(encontro!=1 || aux!=NULL){
+	while(ini_opciones!=NULL){ //recorre toda la lista de opciones
+		while(encontro!=1 || aux!=NULL){ //recorre las opciones fav buscando la que coincide con el id opc que esta leyendo
 			if(ini_opciones->id==aux->id_op){
 				encontro=1;
 			}else{
