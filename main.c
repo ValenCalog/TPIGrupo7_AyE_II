@@ -827,66 +827,80 @@ void CargaMaterialesOpcion (FILE *p, struct materialesop *mato, struct materiale
 }
 
 void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *auxt, struct tarea **initar){
-	int cont=0;
+	int band=0;
 	p=NULL;
 	if((p=fopen("tareas.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
 	}else{
-		char d[]=" ", cadaux[1000], *a;
-		fgets(cadaux, 999,p);
-		a=strtok(cadaux,d);
-		printf("COMPROBACION ARCH= %s \n", cadaux);
-		while(a!=NULL){
-			tar=(struct tarea *) malloc(sizeof (struct tarea) );
-			if(tar==NULL){
-				printf("-------No hay espacio de memoria-------\n");
-			}else{
-				switch(cont) {
-					case 0:
-						strcpy(tar->descripcion,a);
-						cont++;
-						break;
-					case 1:
+		char d[] = ";", cadaux[1000]="", *a;
+        char *prueba;
+		
+		prueba = fgets(cadaux, sizeof(cadaux), p);
+        while (prueba != NULL) {
+            a = strtok(cadaux, d);
+            printf("COMPROBACION ARCH= %s \n", cadaux);
+            
+            while ((a != NULL) && (band == 0)) {
+                tar = (struct tarea *) malloc(sizeof(struct tarea));
+                if (tar == NULL) {
+                    printf("-------No hay espacio de memoria-------\n");
+					band = 1;
+                } else {
+                    //ORDEN: id tarea, id opcion, descripcion, orden, tiempo
+                    if(a != NULL){
+                    	tar->id_tarea=atoi(a);
+					}
+					a = strtok(NULL, d);
+					if(a != NULL){
 						tar->id_op=atoi(a);
-						cont++;
-						break;
-					case 2:
-						tar->id_tarea=atoi(a);
-						cont++;
-						break;
-					case 3:
+					}
+					a = strtok(NULL, d);
+					if(a != NULL){
+						strcpy(tar->descripcion,a);
+					}
+					a = strtok(NULL, d);
+					if(a != NULL){
 						tar->orden=atoi(a);
-						cont++;
-						break;
-					case 4:
+					}
+					a = strtok(NULL, d);
+					if(a != NULL){
 						tar->tiempo=atof(a);
-						cont=0;
-						antt = BuscarAnterior (tar->id_op, (*initar));
-						if( initar == NULL ){
+					}
+					
+					printf("\nPROBANDO TAREA");
+					printf("\nid_tarea: %d", tar->id_tarea);
+					printf("\nid_opc: %d", tar->id_op);
+					
+					tar->ant = NULL;
+					tar->sgte = NULL;
+					
+					//Esto despues reemplazamos por una funcion de insertar
+					antt = BuscarAnterior (tar->id_op, (*initar));
+					if( initar == NULL ){
+						(*initar) = tar;
+						(*initar)->sgte = NULL;
+						(*initar)->ant = NULL;
+					}else{
+						if( antt == NULL ){
 							(*initar) = tar;
-							(*initar)->sgte = NULL;
-							(*initar)->ant = NULL;
 						}else{
-							if( antt == NULL ){
-								(*initar) = tar;
-							}else{
-								auxt = antt->sgte;
-								tar->ant = antt;
-								antt->sgte = tar;
-								if( auxt != NULL ){
-									tar->sgte = auxt;
-									auxt->ant = tar;
-								}
+							auxt = antt->sgte;
+							tar->ant = antt;
+							antt->sgte = tar;
+							if( auxt != NULL ){
+								tar->sgte = auxt;
+								auxt->ant = tar;
 							}
 						}
-						break;
-				}
-				free (tar);
-				a=strtok(NULL, d);
-			}
-		}
-		fclose(p);
-	}
+					}
+					
+					a = strtok(NULL, d);
+                }
+            }
+            prueba = fgets(cadaux, sizeof(cadaux), p);
+        }
+        fclose(p);
+    }
 }
 
 void CargaTecnicos (FILE *p, struct tecnico **tech, struct tecnico **et, struct tecnico **st){
@@ -1189,18 +1203,14 @@ void DescargaTareas (FILE *p, struct tarea *tar, struct tarea *auxt, struct tare
 	if((p=fopen("tareas.txt","w"))==NULL){
 		printf("||||||| Error de apertura de archivo Tareas durante la carga |||||||\n");
 	}else{
-		tar = NULL;
-		auxt = initar;
-		while(initar != tar){
-			fprintf(p, "%s ", initar->descripcion);
-			fprintf(p, "%d ", initar->id_op);
-			fprintf(p, "%d ", initar->id_tarea);
-			fprintf(p, "%d ", initar->orden);
-			fprintf(p, "%f ", initar->tiempo);
+		while(initar != NULL){
+			//ORDEN: id tarea, id opcion, descripcion, orden, tiempo
+			fprintf(p, "%d;", initar->id_tarea);
+			fprintf(p, "%d;", initar->id_op);
+			fprintf(p, "%s;", initar->descripcion);
+			fprintf(p, "%d;", initar->orden);
+			fprintf(p, "%f\n", initar->tiempo);
 			printf("CARGO\n");
-			if(tar!=auxt){
-				tar=auxt;
-			}
 			initar=initar->sgte;
 		}
 		fclose(p);
