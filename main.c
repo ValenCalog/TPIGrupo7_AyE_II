@@ -515,7 +515,7 @@ struct materiales * BuscarIdMaterialesOP (struct materiales *r, int id, int *ban
 	}else{
 		if (r->id == id){
 			printf("\n Se encontro el material en el almacen :) ");
-			band=1;
+			(*band)=1;
 			return (r);
 		}else{
 			if (id < r->id){
