@@ -75,7 +75,7 @@ int BuscarCliente (int codcliente, struct cliente *ini);
 int BuscarMayorIdCliente(struct cliente *ini);
 int BuscarMayorIdTarea(struct tarea *ini);
 int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
-int BuscarMayorIdTrab(struct trabajos *s);
+int BuscarMayorIdTrab(struct trabajos **nodo, struct trabajos **e, struct trabajos **s);
 int BuscarMayorIdOpc(struct opcion *ini);
 int BuscarTecnico (struct tecnico **nodo, struct tecnico **et, struct tecnico **st);
 int BuscarIDTecnico (int id, struct tecnico **nodo, struct tecnico **et, struct tecnico **st);
@@ -299,15 +299,22 @@ int BuscarMayorIdOpc (struct opcion *ini){
 	return (idMax);
 }
 
-int BuscarMayorIdTrab (struct trabajos *s){
-	int maxId = s->id_trabajo;
-	while(s!=NULL){
-		if(s->id_trabajo > maxId){
-			maxId = s->id_trabajo;
+int BuscarMayorIdTrab (struct trabajos **nodo, struct trabajos **e, struct trabajos **s){
+	int mayor=0;
+	if (ColaVacia(s) == 0){
+		return mayor;
+	} else {
+		while (!ColaVacia(s)){
+			DesencolarTrabajos(nodo, e, s);
+			if ((*nodo)->id_trabajo > mayor){
+				mayor = (*nodo)->id_trabajo;
+				EncolarTrabajos(nodo, e, s);
+			} else {
+				EncolarTrabajos(nodo, e, s);
+			}
 		}
-		s = s->sgte;
 	}
-	return maxId;
+	return(mayor);
 }
 
 int BuscarTecnico (struct tecnico **nodo, struct tecnico **e, struct tecnico **s){
@@ -607,7 +614,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 		
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
-    	nuevo_trab->id_trabajo = BuscarMayorIdTrab ((*sTra)) + 1; //va a buscar el mayor id
+    	nuevo_trab->id_trabajo = BuscarMayorIdTrab (aux, eTra, sTra) + 1; //va a buscar el mayor id
 		nuevo_trab->fc_fin.anio = 0;
 		nuevo_trab->fc_fin.dia = 0;
 		nuevo_trab->fc_fin.mes = 0;
