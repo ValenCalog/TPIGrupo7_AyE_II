@@ -300,10 +300,10 @@ int BuscarMayorIdOpc (struct opcion *ini){
 
 int BuscarMayorIdTrab (struct trabajos **nodo, struct trabajos **e, struct trabajos **s){
 	int mayor=0;
-	if (ColaVacia(s) == 0){
+	if (ColaVacia(*s) == 0){
 		return mayor;
 	} else {
-		while (!ColaVacia(s)){
+		while (!ColaVacia(*s)){
 			DesencolarTrabajos(nodo, e, s);
 			if ((*nodo)->id_trabajo > mayor){
 				mayor = (*nodo)->id_trabajo;
@@ -352,7 +352,7 @@ int GenerarIdMaterial (struct materiales *r){
 
 int Menu (int o){
 	int contgency = 0;
-	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) && (o!=7) && (o!=8) && (o!=9)){
+	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) && (o!=7) && (o!=8) && (o!=9) && (o!=10) && (o!=11)){
 		if (contgency >= 1){
 			printf ("El valor que ingreso no es valido, vuelva a ingresar una opcion. \n" );
 			fflush (stdin);
@@ -614,7 +614,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
     	if(*sTra != NULL){
-    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (aux, eTra, sTra) + 1; //va a buscar el mayor id
+    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (&aux, eTra, sTra) + 1; //va a buscar el mayor id
 		}else{
 			nuevo_trab->id_trabajo = 1;
 		}
@@ -1537,18 +1537,18 @@ void ListadoDeTrabajosDeTecnicos (struct trabajos **e, struct trabajos **s, stru
 	
 	printf("Ingrese el ID del técnico para ver sus trabajos: \n");
 	scanf("%d", &id);
-	tec = BuscarIDTecnico(id, nodo, et, st); //hacer funcion
+	tec = BuscarIDTecnico(id, &nodo, et, st); //hacer funcion
 	if (tec == 0){
 		printf("El tecnico no existe.\n");
 		//hacer que vaya al menu
 	} else {
-		while (!ColaVacia(s)){ //pongo para que recorra toda la cola de tecnicos porque un tecnico puede tener varios trabajos
-			DesencolarTrabajos(nodo, e, s);
+		while (!ColaVacia(*s)){ //pongo para que recorra toda la cola de tecnicos porque un tecnico puede tener varios trabajos
+			DesencolarTrabajos(&aux, e, s);
 			if (aux->id_tecnico == id){
 				printf("ID del trabajo: %d \n", aux->id_trabajo);
-				nombre_op[30] = BuscarNombreOpcion(aux->id_opcion, l);
+				nombre_op[30] = BuscarNombreOpcion(aux->id_opcion, *l);
 				printf("El nombre de la opcion es: %s \n", nombre_op);
-				nombre_cli[30] = BuscarNombreCliente(aux->id_cliente, r);
+				nombre_cli[30] = BuscarNombreCliente(aux->id_cliente, *r);
 				printf("El nombre del cliente es: %s \n", nombre_cli);
 				printf("La ubicacion es: %s \n", aux->direccion);
 				if (aux->cuatromtrs == 1){
@@ -1556,9 +1556,9 @@ void ListadoDeTrabajosDeTecnicos (struct trabajos **e, struct trabajos **s, stru
 				} else{
 					printf("No requiere trabajo en altura.\n");
 				}
-				EncolarTrabajos(nodo, e, s);
+				EncolarTrabajos(&aux, e, s);
 			} else {
-				EncolarTrabajos(nodo, e, s);
+				EncolarTrabajos(&aux, e, s);
 			}
 		}
 	}	
@@ -1587,7 +1587,7 @@ char* BuscarNombreCliente(int id, struct cliente *l) {
 int BuscarIDTecnico(int id, struct tecnico **aux, struct tecnico **e, struct tecnico **s){
 	int band = 0;
 	
-	while ((!ColaTecVacia(s)) && (band == 0)){ //hacer funcion
+	while ((!ColaTecVacia(*s)) && (band == 0)){ //hacer funcion
 		DesencolarTecnico(aux, e, s);
 		if (id == (*aux)->id){
 			band = 1;
@@ -1686,7 +1686,7 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 
 void insertaropcionordenada(struct opcionesfav **auxL,struct opcionesfav **Lord){
 	struct opcionesfav *ant=NULL;
-	ant=buscaropanterior(auxL,Lord);
+	ant=buscaropanterior(*auxL,*Lord);
 	if(ant != NULL){
 		(*auxL)->sgte = ant->sgte;
 		ant->sgte=(*auxL);
