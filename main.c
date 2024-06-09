@@ -74,7 +74,7 @@ int BuscarCliente (int codcliente, struct cliente *ini);
 int BuscarMayorIdCliente(struct cliente *ini);
 int BuscarMayorIdTarea(struct tarea *ini);
 int BuscarMayorIdTecnico(struct tecnico *e, struct tecnico *s);
-int BuscarMayorIdTrab(struct trabajos *nodo, struct trabajos *e, struct trabajos *s);
+int BuscarMayorIdTrab(struct trabajos **nodo, struct trabajos **e, struct trabajos **s);
 int BuscarMayorIdOpc(struct opcion *ini);
 int BuscarTecnico (struct tecnico **nodo, struct tecnico **et, struct tecnico **st);
 int BuscarIDTecnico (int id, struct tecnico **nodo, struct tecnico **et, struct tecnico **st);
@@ -101,8 +101,8 @@ struct trabajos * DesencolarParaBuscarMayorID (struct trabajos *nv, struct traba
 
 void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales **r);
-void AltaDeMaterialesOP (struct materialesop **inimat, int id);
-void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materialesop **inimat);
+void AltaDeMaterialesOP (struct materiales *raiz, struct materialesop **inimat, int id);
+void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materiales *raiz, struct materialesop **inimat);
 void AltaDeTareas (struct tarea **initar, int id);
 void AltaDeTrabajos (struct cliente ** inicli,struct opcion ** iniop, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct materialesop **inimat, struct materiales **r);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
@@ -121,12 +121,12 @@ void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones);
 void Desapilar (struct pendientes **nodo, struct pendientes **tp);
 void DescargaClientes ( FILE *p, struct cliente *cli, struct cliente *inicli);
 void DescargaTareas (FILE *p, struct tarea *tar, struct tarea *auxt, struct tarea *initar);
-void DescargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico *et, struct tecnico *st);
+void DescargaTecnicos (FILE *p, struct tecnico **tech, struct tecnico **et, struct tecnico **st);
 void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, struct trabajos *sal);
 void DescargaOpciones (FILE *p, struct opcion *opc, struct opcion *iniopc);
 void DescargaMaterialesOpcion(FILE *p, struct materialesop *mato, struct materialesop *inimat);
 void DescargaPendientes (FILE *p, struct pendientes **pend, struct pendientes **tope);
-void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes **tope);
+void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico **et, struct tecnico **st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes **tope);
 void DesencolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s);
 void DesencolarTrabajos(struct trabajos **ds, struct trabajos **e, struct trabajos **s);
 void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s);
@@ -167,7 +167,7 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 2:
-				AltaDeOpciones(&iniopc, &initar, &inimat);
+				AltaDeOpciones(&iniopc, &initar, raiz, &inimat);
 				opc=-1;
 				break;
 			case 3:
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]){
 				break;
 		}
 	}
-	DescargaSupremaDeEstructuras(p, inicli, raiz, inimat, initar, et, st, e, s, iniopc, &tope);
+	DescargaSupremaDeEstructuras(p, inicli, raiz, inimat, initar, &et, &st, e, s, iniopc, &tope);
 	return (0);
 }
 
@@ -305,19 +305,30 @@ int BuscarMayorIdOpc (struct opcion *ini){
 	return (idMax);
 }
 
-int BuscarMayorIdTrab (struct trabajos *nodo, struct trabajos *e, struct trabajos *s){
-	int mayor=0;
+int BuscarMayorIdTrab (struct trabajos **nodo, struct trabajos **e, struct trabajos **s){
+	int mayor=1;
+	struct trabajos *eAux = NULL, *sAux= NULL;
 	
-	if (ColaVacia(s) == 0){
+	if (ColaVacia(*s) == 1){
+		printf("\nhola? la cola esta vaciaaaaaa");
 		return mayor;
 	} else {
-		while (!ColaVacia(s)){
-			DesencolarParaBuscarMayorID (nodo, e, s);
-			if (nodo->id_trabajo > mayor){
-				mayor = nodo->id_trabajo;
+		while (!ColaVacia(*s)){
+			printf("\nHOLAAA GENTE ESTAMOS ACA DENTRO");
+			DesencolarTrabajos(nodo, e, s);
+			printf("\nCONTENIDO DE nodo: %d", (*nodo)->id_trabajo);
+			if ((*nodo)->id_trabajo > mayor){
+				mayor = (*nodo)->id_trabajo;
 			}
+			EncolarTrabajos(nodo, &eAux, &sAux);
+		}
+		
+		while(!ColaVacia(sAux)){
+			DesencolarTrabajos(nodo, &eAux, &sAux);
+			EncolarTrabajos(nodo, e, s);
 		}
 	}
+	printf("\nCONTENIDO DE MAYOR: %d", mayor);
 	return(mayor);
 }
 
@@ -563,9 +574,11 @@ struct tarea* BuscarAnterior (int dato, struct tarea *rc){
 struct trabajos * DesencolarParaBuscarMayorID (struct trabajos *n, struct trabajos *e, struct trabajos *s){
 	n = s;
 	s = s->sgte;
+	n->sgte = NULL;
 	if (s == NULL){
 		e = NULL;
 	}
+	return n;
 }
 
 struct opcion * InsertarOpcion (struct opcion *nvop, struct opcion *iniop) {
@@ -756,8 +769,11 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 		
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
-    	if(sTra != NULL){
-    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (aux, eaux, saux) + 1; //va a buscar el mayor id
+    	printf("\nCONTENIDO DE STRAB %p: ", *sTra);
+    	//printf("\nID STRAB: %d", (*sTra)->id_trabajo);
+    	if(*sTra != NULL){
+    		printf("\nHOla?");
+    		nuevo_trab->id_trabajo = (BuscarMayorIdTrab (&aux, eTra, sTra)) + 1; //va a buscar el mayor id
 		}else{
 			nuevo_trab->id_trabajo = 1;
 		}
@@ -1455,16 +1471,16 @@ void DescargaTareas (FILE *p, struct tarea *tar, struct tarea *auxt, struct tare
 	}
 }
 
-void DescargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico *et, struct tecnico *st){
+void DescargaTecnicos (FILE *p, struct tecnico **tech, struct tecnico **et, struct tecnico **st){
 	p=NULL;
 	if((p=fopen("tecnicos.txt","w"))==NULL){
 		printf("||||||| Error de apertura de archivo Tecnicos durante la carga |||||||\n");
 	}else{
-		while(st!=NULL){
-			DesencolarTecnico (&tech, &et, &st);
-			fprintf(p, "%d;", tech->id);
-			fprintf(p, "%s;", tech->Nombre);
-			fprintf(p, "%ld\n", tech->DNI);
+		while(*st!=NULL){
+			DesencolarTecnico (tech, et, st);
+			fprintf(p, "%d;", (*tech)->id);
+			fprintf(p, "%s;", (*tech)->Nombre);
+			fprintf(p, "%ld\n", (*tech)->DNI);
 		}
 		fclose(p);
 	}
@@ -1531,7 +1547,7 @@ void DescargaPendientes (FILE *p, struct pendientes **pend, struct pendientes **
 	}
 }
 
-void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes **tope){
+void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico **et, struct tecnico **st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes **tope){
 	printf("Entro DESCARGAS \n");
 	struct cliente *cli=NULL;
 	struct materialesop *mato=NULL;
@@ -1552,7 +1568,7 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 	printf("Entro DESCARGAS TAREAS\n");
 	DescargaTareas (p, tar, auxt, initar);
 	printf("Entro DESCARGAS TECNICOS\n");
-	DescargaTecnicos (p, tech, et, st);
+	DescargaTecnicos (p, &tech, et, st);
 	printf("Entro DESCARGAS TRABAJOS\n");
 	DescargaTrabajos (p, trab, ent, sal);
 	printf("Entro DESCARGAS OPCIONES\n");
@@ -1563,11 +1579,16 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 
 
 void DesencolarTecnico (struct tecnico **ds, struct tecnico **e, struct tecnico **s){
-	(*ds) = (*s);
-	(*s)=(*s)->sgte;
-	if (*s == NULL){
-		(*e) = NULL;	
-	} 
+	if(*s!=NULL){
+		(*ds) = (*s);
+		(*s)=(*s)->sgte;
+		if (*s == NULL){
+			(*e) = NULL;	
+		} 
+	}else{
+		(*e) = NULL;
+	}
+	(*ds)->sgte = NULL;
 }
 
 void DesencolarTrabajos (struct trabajos **ds, struct trabajos **e, struct trabajos **s){
@@ -1585,6 +1606,7 @@ void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s)
 		(*e)->sgte = *nv;
 	}
 	*e=*nv;
+	(*e)->sgte = NULL;
 	*nv = NULL;
 }
 
