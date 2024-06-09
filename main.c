@@ -91,9 +91,8 @@ int VerificarId(struct materiales *r, int idRandom);
 int ColaVacia (struct trabajos *s);
 int ColaTecVacia(struct tecnico *s);
 
-char BuscarNombreOpcion (int id, struct opcion *iniop);
-char BuscarNombreCliente(int id, struct cliente *ini);
-
+char* BuscarNombreOpcion(int id, struct opcion *iniop);
+char* BuscarNombreCliente(int id, struct cliente *inicli);
 
 struct materiales* DescargarArbol (struct materiales *raiz, FILE *p);
 struct cliente* InsertarCliente (struct cliente *nv,struct cliente *inicli);
@@ -1542,7 +1541,7 @@ void ListadoDeTrabajosDeTecnicos (struct trabajos **e, struct trabajos **s, stru
 			DesencolarTrabajos(nodo, e, s);
 			if (aux->id_tecnico == id){
 				printf("ID del trabajo: %d \n", aux->id_trabajo);
-				nombre_op[30]= BuscarNombreOpcion(aux->id_opcion, l);
+				nombre_op[30] = BuscarNombreOpcion(aux->id_opcion, l);
 				printf("El nombre de la opcion es: %s \n", nombre_op);
 				nombre_cli[30] = BuscarNombreCliente(aux->id_cliente, r);
 				printf("El nombre del cliente es: %s \n", nombre_cli);
@@ -1560,30 +1559,24 @@ void ListadoDeTrabajosDeTecnicos (struct trabajos **e, struct trabajos **s, stru
 	}	
 }
 
-char BuscarNombreOpcion (int idop, struct opcion *r){
-	int band = 0;
-	
-	while ((r != NULL) && (band == 0)){
-		if (idop == r->id){
-			band = 1;
-			return(r->Nombre);
-		} else {
-			r = r->sgte;	
-		}
-	}
+char* BuscarNombreOpcion(int id, struct opcion *r) {
+    while (r != NULL) {
+        if (id == r->id) {
+            return r->Nombre;
+        }
+        r = r->sgte;
+    }
+    return NULL; // Devuelve NULL si no se encuentra el ID
 }
 
-char BuscarNombreCliente(int idcli, struct cliente *l){
-	int band = 0;
-	
-	while ((l!= NULL) && (band == 0)){
-		if (idcli == l->id){
-			band = 1;
-			return (l->Nombre);
-		} else {
-			l = l->sgte;
-		}
-	}
+char* BuscarNombreCliente(int id, struct cliente *l) {
+    while (l != NULL) {
+        if (id == l->id) {
+            return l->Nombre;
+        }
+        l = l->sgte;
+    }
+    return NULL; // Devuelve NULL si no se encuentra el ID
 }
 
 int BuscarIDTecnico(int id, struct tecnico **aux, struct tecnico **e, struct tecnico **s){
@@ -1600,7 +1593,6 @@ int BuscarIDTecnico(int id, struct tecnico **aux, struct tecnico **e, struct tec
 	}
 	return (band);
 }
-
 void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc){
 	struct trabajos *ini=NULL,*aux=NULL;
 	struct opcionesfav *L=NULL,*auxL=NULL,*Lord=NULL;
