@@ -138,6 +138,9 @@ void recorrerIRD(struct materiales *r);
 void insertaropfav(struct opcionesfav **nv, struct opcionesfav **ini);
 void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones);
 void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc);
+void insertaropcionordenada(struct opcionesfav **auxL,struct opcionesfav **Lord);
+struct opcionesfav * buscaropanterior(int ventas,struct opcionesfav *rc)
+
 
 int main(int argc, char *argv[]){
 	struct cliente *inicli=NULL;
@@ -1486,8 +1489,8 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
 
 void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc){
 	struct trabajos *ini=NULL,*aux=NULL;
-	struct opcionesfav *L=NULL,*auxL=NULL;
-	int band=0;
+	struct opcionesfav *L=NULL,*auxL=NULL,*Lord=NULL;
+	int band=0,i;
 	struct fecha fecha1_1,fecha2_2;
 	long fecha1,fecha2,mayor,menor,fecha_trabajo;
 	
@@ -1551,12 +1554,49 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 		DesencolarTrabajos(&aux,&entrada,&salida);
 	}
 
-	//Ahora solo debemos recorrer la lista de opcionesfav e ir mostrando la cantidad de ventas por opcion
-	auxL=L;
+	/*auxL=L;
 	while(auxL!=NULL){
 		printf("\nLa cantidad de ventas de la opcion %i es: %i",auxL->id_op,auxL->ventas);
+	}*/
+	auxL=NULL;
+	while(L!=NULL){
+		auxL=L;
+		L=L->sgte;
+		auxL->sgte=NULL; //Se "Desenlista" el nodo y se vuelve a INSERTAR ordenado
+		insertaropcionordenada(&auxL,&Lord);
 	}
-	
+
+	for(i=1;i<=4;i++){
+		printf("\nTOP 4 opciones mas vendidas");
+		printf("\n%i) Opcion %i, con %i ventas",i,Lord->id_op,Lord->ventas);
+		Lord=Lord->sgte;
+	}
+}
+
+void insertaropcionordenada(struct opcionesfav **auxL,struct opcionesfav **Lord){
+	struct opcionesfav *ant=NULL;
+	ant=buscaropanterior(auxL->ventas,Lord);
+	if(ant != NULL){
+		auxL->sgte=ant->sgte;
+		ant->sgte=auxL;
+	}else{
+		auxL->sgte=Lord;
+		Lord=auxL;
+	}
+
+}
+
+struct opcionesfav * buscaropanterior(int ventas,struct opcionesfav *rc){
+	struct opcionesfav *Ant=NULL;
+	while(rc!=NULL){
+		if(rc->ventas<ventas){
+			rc=NULL;
+		}else{
+			Ant=rc;
+			rc=rc->sgte;
+		}
+	}
+	return(Ant);
 }
 
 void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
