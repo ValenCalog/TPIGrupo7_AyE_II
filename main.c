@@ -101,9 +101,9 @@ struct trabajos * DesencolarParaBuscarMayorID (struct trabajos *nv, struct traba
 
 void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales **r);
-void AltaDeMaterialesOP (struct materialesop **inimat, struct opcion *nueva_op);
+void AltaDeMaterialesOP (struct materialesop **inimat, int id);
 void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materialesop **inimat);
-void AltaDeTareas (struct tarea **initar, struct opcion *nueva_op);
+void AltaDeTareas (struct tarea **initar, int id);
 void AltaDeTrabajos (struct cliente ** inicli,struct opcion ** iniop, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct materialesop **inimat, struct materiales **r);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
 void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
@@ -672,13 +672,30 @@ void AltaDeMateriales (struct materiales **raiz){
 	}
 }
 
-void AltaDeMaterialesOP (struct materialesop **inimat, struct opcion *nueva_op){
+void AltaDeMaterialesOP (struct materialesop **inimat, int id){
+	struct materialesop *newmat=NULL;
+	newmat = (struct materialesop *) malloc (sizeof (struct materialesop));
 	
+	/*struct materialesop{ //Lista Enlazada Simple.
+		int idmat, cantidad, id_opcion;
+		struct materialesop *sgte;
+	};*/
+	
+	if(newmat == NULL){
+		
+	}
 }
 
 void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materialesop **inimat){
 	struct opcion *nueva_op;
 	nueva_op = (struct opcion *) malloc (sizeof (struct opcion) );
+	
+	/*struct opcion{ //Lista Enlazada Simple.
+	     int id;
+	     char Nombre[30];
+	     double cHoraMObra; //cortesia de vale. (vale me arruinaste la vida con ese nombre)
+	     struct opcion *sgte;
+	};*/
 	
 	if (nueva_op == NULL){
 		printf( ":( No hay espacio en memoria \n" );
@@ -699,13 +716,20 @@ void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct mater
 		fflush(stdin);
 		nueva_op->sgte = NULL;
 		(*iniop) = InsertarOpcion (nueva_op, (*iniop));
-		AltaDeTareas (&(*initar), nueva_op);
-		AltaDeMaterialesOP (&(*inimat), nueva_op);
+		AltaDeTareas (&(*initar), nueva_op->id);
+		AltaDeMaterialesOP (&(*inimat), nueva_op->id);
 		printf("Opcion agregada exitosamente.\n");
 	}
 }
 
-void AltaDeTareas (struct tarea **initar, struct opcion *nueva_op){
+void AltaDeTareas (struct tarea **initar, int id){
+	
+	/*struct tarea{ //Lista Doblemente Enlazada.
+	     int id_op, id_tarea, orden;
+	     double tiempo;
+	     char descripcion[30];
+	     struct tarea *sgte, *ant;
+	};*/
 	
 }
 
