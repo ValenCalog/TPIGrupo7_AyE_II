@@ -89,11 +89,12 @@ int VerificarId(struct materiales *r, int idRandom);
 char* BuscarNombreCliente(int id, struct cliente *inicli);
 char* BuscarNombreOpcion(int id, struct opcion *iniop);
 
-struct materiales* DescargarArbol (struct materiales *raiz, FILE *p);
 struct cliente* InsertarCliente (struct cliente *nv,struct cliente *inicli);
+struct materiales* BuscarIdMaterialesOP (struct materiales *r, int id, int *band);
+struct materiales* DescargarArbol (struct materiales *raiz, FILE *p);
 struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz);
-struct materialesop * InsertarMaterialesOp(struct materialesop *nv,struct materialesop *inimat);
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
+struct materialesop * InsertarMaterialesOp(struct materialesop *nv,struct materialesop *inimat);
 struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
 struct opcion* InsertarOpcion (struct opcion * nvop,struct opcion *iniop);
 struct opcionesfav * buscaropanterior(struct opcionesfav *auxL,struct opcionesfav *rc);
@@ -101,8 +102,8 @@ struct trabajos * DesencolarParaBuscarMayorID (struct trabajos *nv, struct traba
 
 void AltaDeClientes (struct cliente **inicli);
 void AltaDeMateriales (struct materiales **r);
-void AltaDeMaterialesOP (struct materialesop **inimat, int id);
-void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materialesop **inimat);
+void AltaDeMaterialesOP (struct materiales *raiz, struct materialesop **inimat, int id);
+void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materiales *raiz, struct materialesop **inimat);
 void AltaDeTareas (struct tarea **initar, int id);
 void AltaDeTrabajos (struct cliente ** inicli,struct opcion ** iniop, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct materialesop **inimat, struct materiales **r);
 void AltaDeTecnicos(struct tecnico **e, struct tecnico **s);
@@ -167,7 +168,7 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 2:
-				AltaDeOpciones(&iniopc, &initar, &inimat);
+				AltaDeOpciones(&iniopc, &initar, raiz, &inimat);
 				opc=-1;
 				break;
 			case 3:
@@ -507,6 +508,25 @@ struct materiales* DescargarArbol (struct materiales *raiz, FILE *p){
 	return (raiz);
 }
 
+struct materiales * BuscarIdMaterialesOP (struct materiales *r, int id, int *band){
+	if (r == NULL){
+		printf("\n |||| No hay materiales disponibles ||||");
+		return (r);
+	}else{
+		if (r->id == id){
+			printf("\n Se encontro el material en el almacen :) ");
+			band=1;
+			return (r);
+		}else{
+			if (id < r->id){
+				r->izq = BuscarIdMaterialesOP (r->izq, id, &(*band));
+			}else{
+				r->derch = BuscarIdMaterialesOP (r->derch, id, &(*band));
+			}
+		}
+	}
+}
+
 struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz){
 	if (raiz == NULL) {
 		raiz = mat;
@@ -672,21 +692,29 @@ void AltaDeMateriales (struct materiales **raiz){
 	}
 }
 
-void AltaDeMaterialesOP (struct materialesop **inimat, int id){
+void AltaDeMaterialesOP (struct materiales *raiz, struct materialesop **inimat, int id){
 	struct materialesop *newmat=NULL;
+	int idaux=0, band=0;
 	newmat = (struct materialesop *) malloc (sizeof (struct materialesop));
-	
-	/*struct materialesop{ //Lista Enlazada Simple.
-		int idmat, cantidad, id_opcion;
-		struct materialesop *sgte;
-	};*/
-	
 	if(newmat == NULL){
-		
+		printf( ":( No hay espacio en memoria \n" );
+	}else{
+		printf("\n--- Ingrese el id de material: ");
+		scanf("%d", &idaux);
+		raiz = BuscarIdMaterialesOP (raiz, idaux, &band);
+		if(band==0){
+			printf("\n|||| El material no se encuentra en el almacen ||||");
+		}else{
+			newmat->idmat=idaux;
+			newmat->id_opcion=id;
+			printf("\n--- Ingrese la cantidad del material a utilizar: ");
+			scanf("%d", &newmat->cantidad);
+			(*inimat) = InsertarMaterialesOp (newmat, (*inimat));
+		}
 	}
 }
 
-void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materialesop **inimat){
+void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materiales *raiz, struct materialesop **inimat){
 	struct opcion *nueva_op;
 	nueva_op = (struct opcion *) malloc (sizeof (struct opcion) );
 	
@@ -717,7 +745,7 @@ void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct mater
 		nueva_op->sgte = NULL;
 		(*iniop) = InsertarOpcion (nueva_op, (*iniop));
 		AltaDeTareas (&(*initar), nueva_op->id);
-		AltaDeMaterialesOP (&(*inimat), nueva_op->id);
+		AltaDeMaterialesOP (raiz, &(*inimat), nueva_op->id);
 		printf("Opcion agregada exitosamente.\n");
 	}
 }
@@ -749,7 +777,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
     	fflush (stdin);
     	
     	while ((nuevo_trab->cuatromtrs > 1) || (nuevo_trab->cuatromtrs < 0)){
-    		printf ("\n |||| Opci?n inv?lida |||| \n--- Ponga 1 o 0: ");
+    		printf ("\n |||| Opcion invalida |||| \n--- Ponga 1 o 0: ");
     		scanf ("%i", &nuevo_trab->cuatromtrs); 
     		fflush (stdin);
 		}
@@ -1368,7 +1396,6 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	CargaPendientes (p, &pend, tope);
 }
 
-
 void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
 	struct opcionesfav *nuevo=NULL,*aux=NULL;
 	int encontro=0;
@@ -1561,7 +1588,6 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 	DescargaPendientes (p, &pend, tope);
 }
 
-
 void DesencolarTecnico (struct tecnico **ds, struct tecnico **e, struct tecnico **s){
 	(*ds) = (*s);
 	(*s)=(*s)->sgte;
@@ -1642,21 +1668,21 @@ void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
 	int pila;
 	struct pendientes *topeaux=NULL;
 	/*struct pendientes{ //Pila.
-	int id_tarea, id_trabajo, orden, completado;
-	float tiempo;
-    char descripcion[30];
-    struct pendientes *sgte;
-};*/
+		int id_tarea, id_trabajo, orden, completado;
+		float tiempo;
+	    char descripcion[30];
+	    struct pendientes *sgte;
+	};*/
 	pila = Vacia(*tope);
   	if (pila == 1) {
-        printf("La pila estÃ¡ Vacia\n");
+        printf("La pila esta Vacia\n");
    	} else {
   		Desapilar(nodo, tope);
     	if ((*nodo)->completado == 1) {
-    		printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s ya estÃ¡ terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);
+    		printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s ya esta terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);
 			free(*nodo);
   		} else {
-   			printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s aun no estÃ¡ terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);	
+   			printf("La tarea %d del trabajo con ID %d, con orden %d y descripcion %s aun no esta terminada.\n", (*nodo)->id_tarea, (*nodo)->id_trabajo, (*nodo)->orden, (*nodo)->descripcion);	
 			Apilar(nodo, &topeaux);
    		}
    	}
