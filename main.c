@@ -140,6 +140,10 @@ void ListadoDeTrabajosDeTecnicos (struct trabajos **entrada, struct trabajos **s
 void recorrerIRD(struct materiales *r);
 void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc);
 
+//Consigna 5
+void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc,struct materiales *raiz,struct materialesop *inimat,struct tarea *initar);
+double BuscarPrecioManodeObra(float id,struct opcion *ini);
+
 int main(int argc, char *argv[]){
 	struct cliente *inicli=NULL;
 	struct materiales *raiz=NULL;
@@ -1756,6 +1760,94 @@ void recorrerIRD(struct materiales *r){
 		printf("\nCantidad disponible: %.0f", r->cantidad);
 		recorrerIRD(r->derch);
 	}
+}
+
+/*5) Listar los trabajos realizados (finalizados) entre dos fechas. 
+Imprimir por pantalla: Nro de trabajo, nombre opción, importe total de materiales, 
+importe total de mano de obra (tomando en cuenta si se hizo a más de 4 mentros) e importe total parcial. 
+Al final del listado, imprimir el importe total de todos los trabajos realizados.*/
+
+void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc,struct materiales *raiz,struct materialesop *inimat,struct tarea *initar){
+	struct trabajos *ini=NULL,*aux=NULL;
+	double totalfinal=0,materiales=0,manodeobra=0,totalparcial=0;
+	struct fecha fecha1_1,fecha2_2;
+	long fecha1,fecha2,mayor,menor,fecha_trabajo;
+	
+	printf("\n\nIngrese el dia de la primer fecha: ");
+	scanf("%i",&fecha1_1.dia);
+	printf("\nIngrese el mes de la primer fecha: ");
+	scanf("%i",&fecha1_1.mes);
+	printf("\nIngrese el anio de la primer fecha: ");
+	scanf("%i",&fecha1_1.anio);
+	fflush(stdin);
+	
+	printf("\n\nIngrese el dia de la segunda fecha: ");
+	scanf("%i",&fecha2_2.dia);
+	printf("\nIngrese el mes de la segunda fecha: ");
+	scanf("%i",&fecha2_2.mes);
+	printf("\nIngrese el anio de la segunda fecha: ");
+	scanf("%i",&fecha2_2.anio);
+	fflush(stdin);
+	
+	fecha1=(fecha1_1.anio * 10000) + (fecha1_1.mes * 100) + fecha1_1.dia;
+	fecha2=(fecha2_2.anio * 10000) + (fecha2_2.mes * 100) + fecha2_2.dia;
+	
+	if(fecha1>fecha2){
+		mayor=fecha1;
+		menor=fecha2;
+	}else{
+		if(fecha2>fecha1){
+			mayor=fecha2;
+			menor=fecha1;
+		}else{
+			mayor=fecha1;
+			menor=fecha1;
+		}
+	}
+	fflush(stdin);
+	
+	ini=salida; //Guarda el inicio de la cola de trabajos
+	DesencolarTrabajos(&aux,&entrada,&salida);
+	
+	/*struct trabajos{ //Cola.
+    int id_trabajo, id_opcion, opcion, cuatromtrs;
+    char direccion[30];
+    int id_tecnico, id_cliente;
+	struct fecha fc_fin;
+    struct trabajos *sgte;
+    };
+    
+    ------------------------------------------------------------------------------------------------------------------
+*/
+	while(salida->id_trabajo!=ini->id_trabajo){
+		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia; 
+		if(fecha_trabajo<=mayor && fecha_trabajo>=menor){
+			materiales = OperacionCosto(raiz,aux->id_opcion,inimat);
+			printf("\nEl costo de materiales es: %f",materiales);
+			manodeobra = (OperacionTiempo(aux->id_opcion,initar) * BuscarPrecioManodeObra(aux->id_opcion,iniopc)) + (BuscarPrecioManodeObra(aux->id_opcion,iniopc)*aux->cuatromtrs*0.80);
+			printf("\nEl costo de mano de obra es: %f",manodeobra);
+			totalparcial = materiales + manodeobra;
+			printf("\nEl total parcial del trabajo es: %f",totalparcial);
+			printf("\nID trabajo: %i",aux->id_trabajo);
+			printf("\nID opcion: %i",aux->id_opcion);
+			fflush(stdin);
+		}
+		EncolarTrabajos(&aux,&entrada,&salida);
+		aux=NULL;
+		DesencolarTrabajos(&aux,&entrada,&salida);
+	}
+}
+
+double BuscarPrecioManodeObra(float id,struct opcion *ini){
+	struct opcion *aux=NULL;
+	while(aux->id!=id){
+		aux=aux->sgte;
+	}
+	printf("\nNombre de la opcion: ");
+	puts(aux->Nombre);
+	fflush(stdin);
+	return(aux->cHoraMObra);
+	
 }
 
 void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc){
