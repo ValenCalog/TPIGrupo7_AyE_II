@@ -803,7 +803,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs, _initar); 
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
     	if(sTra != NULL){
-    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (aux, eaux, saux) + 1; //va a buscar el mayor id
+    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (&aux, &eaux, &saux) + 1; //va a buscar el mayor id
 		}else{
 			nuevo_trab->id_trabajo = 1;
 		}
@@ -1839,9 +1839,9 @@ void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcio
 	while(salida->id_trabajo!=ini->id_trabajo){
 		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia; 
 		if(fecha_trabajo<=mayor && fecha_trabajo>=menor){
-			materiales = OperacionCosto(raiz,aux->id_opcion,inimat);
+			materiales = OperacionCosto(raiz,aux->id_opcion, &inimat);
 			printf("\nEl costo de materiales es: %f",materiales);
-			manodeobra = (OperacionTiempo(aux->id_opcion,initar) * BuscarPrecioManodeObra(aux->id_opcion,iniopc)) + (BuscarPrecioManodeObra(aux->id_opcion,iniopc)*aux->cuatromtrs*0.80);
+			manodeobra = (OperacionTiempo(aux->id_opcion, &initar) * BuscarPrecioManodeObra(aux->id_opcion,iniopc)) + (BuscarPrecioManodeObra(aux->id_opcion,iniopc)*aux->cuatromtrs*0.80);
 			printf("\nEl costo de mano de obra es: %f",manodeobra);
 			totalparcial = materiales + manodeobra;
 			printf("\nEl total parcial del trabajo es: %f",totalparcial);
