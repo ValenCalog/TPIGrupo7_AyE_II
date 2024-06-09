@@ -176,7 +176,7 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 3:
-				AltaDeTrabajos(&inicli, &iniopc, &et, &st, &e, &s, &inimat, &raiz); //et y st para t?cnico, e y s para trabajo
+				AltaDeTrabajos (&inicli, &iniopc, &et, &st, &e, &s, &inimat, &raiz, &initar);
 				opc=-1;
 				break;
 			case 4:
