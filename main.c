@@ -593,8 +593,8 @@ void AltaDeTareas (struct tarea **initar){
 
 void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra, struct materialesop **_inimat, struct materiales **raiz){
     struct tecnico *nodoaux = NULL; 
-    struct trabajos *nuevo_trab;
-    int op;
+    struct trabajos *nuevo_trab=NULL, *aux=NULL;
+    int op, opmenu=-1;
     
     system("cls");
     nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos));
@@ -618,7 +618,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 		nuevo_trab->fc_fin.anio = 0;
 		nuevo_trab->fc_fin.dia = 0;
 		nuevo_trab->fc_fin.mes = 0;
-    	printf ("\n---Ingrese la direccion de la instalacion: " );
+    	printf ("\n---Ingrese la direccion de la instalacion: \n" );
     	fflush(stdin);
     	gets (nuevo_trab->direccion);
 		nuevo_trab->id_tecnico = BuscarTecnico(&nodoaux, eTec, sTec);
