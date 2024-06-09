@@ -269,10 +269,11 @@ int BuscarCliente (int id, struct cliente *ini){
 	while ((ini != NULL) && (encontroid == 0)){
 		if (ini->id == id){
 			encontroid = 1;
-		}
-		ini = ini->sgte;
+		} else {
+			ini = ini->sgte;
+		}	
 	}
-	printf("\nId: %d", encontroid);
+	printf("salio del while\n");
 	return (encontroid);	
 }
 
@@ -513,6 +514,7 @@ void AltaDeClientes (struct cliente **inicli){
 			printf("Entra al else \n");
 			nvcliente->id = BuscarMayorIdCliente( *inicli ) +1;
 		}
+		printf("Su ID de cliente es: %d \n", nvcliente->id);
 		nvcliente->sgte = NULL;
 		(*inicli) = InsertarCliente( nvcliente,(*inicli) );
 		printf("Cliente agregado exitosamente. \n");
@@ -520,7 +522,6 @@ void AltaDeClientes (struct cliente **inicli){
 		printf( "\n|||||| Error de asignacion de espacio de Memoria ||||||" );
 	}
 }
-
 void AltaDeMateriales (struct materiales **raiz){
     struct materiales *nuevo_mat;
 
@@ -580,6 +581,7 @@ void AltaDeOpciones (struct opcion ** iniop){
 			nueva_op->id = BuscarMayorIdOpc((*iniop)) + 1;
 		}
 		fflush(stdin);
+		printf("El id de la opcion es: %d \n", nueva_op->id);
 		
 		printf( "---Digite el nombre de la nueva opcion: \n" );
 		gets( nueva_op->Nombre );
@@ -600,7 +602,7 @@ void AltaDeTareas (struct tarea **initar){
 void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra, struct materialesop **_inimat, struct materiales **raiz){
     struct tecnico *nodoaux = NULL; 
     struct trabajos *nuevo_trab=NULL, *aux=NULL, *eaux= (*eTra), *saux=(*sTra);
-    int op, opmenu=-1;
+    int op, ops, cli;
     
     system("cls");
     nuevo_trab = (struct trabajos *) malloc(sizeof (struct trabajos));
@@ -625,6 +627,7 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 		}else{
 			nuevo_trab->id_trabajo = 1;
 		}
+		printf("El ID de trabajo es: %d \n", nuevo_trab->id_trabajo);
     
 		nuevo_trab->fc_fin.anio = 0;
 		nuevo_trab->fc_fin.dia = 0;
@@ -638,34 +641,33 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
    		fflush (stdin);
    		scanf ("%d",&nuevo_trab->id_cliente); 
    		fflush (stdin);
-   		printf("\nHolaProbando");
-		if (BuscarCliente (nuevo_trab->id_cliente, (*_inicli))==0){
+   		cli = BuscarCliente(nuevo_trab->id_cliente, (*_inicli));
+		if (cli == 0){
             printf ("\n--- No se ha encontrado un cliente asociado a la ID ingresada---");
-            printf ("\n ?Desea darse de alta como cliente? ");
-            printf ("\n 1)Si");
-            printf ("\n 2)No");
+            printf ("\n ¿Desea darse de alta como cliente? ");
+            printf ("\n 1) Si");
+            printf ("\n 2) No");
             printf ("\n --> ");
-            scanf ("%i",&op);
+            scanf ("%i",&ops);
             fflush (stdin);
-			while (nuevo_trab->id_opcion !=0){
-                switch (op){
+			while (ops !=0){
+                switch (ops){
 	                case 1:
 	            	    AltaDeClientes(_inicli);
 	            	    if (nuevo_trab->id_cliente != 0){
            					EncolarTrabajos(&nuevo_trab, eTra, sTra);
            				    printf("Trabajo agregado exitosamente.\n");
         				}
-	                    op=0;
+        				ops=0;
 	                    break;
 	                case 2:
-	                    printf("\nDisculpe las molestias, vuelva pronto");
-	                    nuevo_trab->id_cliente=0;
-						op=0;
+	                    printf("\nDisculpe las molestias, vuelva pronto \n");
+	                    ops=0;
 	                    break;
 	                default:
 	                    printf("Ingrese una opcion valida: ");
 	                    printf("\n--> ");
-	                    scanf("%i",&op);
+	                    scanf("%i",&ops);
 	                    break;
 				}
             }        
