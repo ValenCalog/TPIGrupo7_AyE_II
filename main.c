@@ -613,7 +613,12 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 		
     	op = ListadoDeOpcionesParaAltaDeTrabajo (_iniop, raiz, _inimat, nuevo_trab->cuatromtrs); 
     	nuevo_trab->id_opcion = op; //el id de la opcion es el mismo que el nro de opcion
-    	nuevo_trab->id_trabajo = BuscarMayorIdTrab (aux, eTra, sTra) + 1; //va a buscar el mayor id
+    	if(*sTra != NULL){
+    		nuevo_trab->id_trabajo = BuscarMayorIdTrab (aux, eTra, sTra) + 1; //va a buscar el mayor id
+		}else{
+			nuevo_trab->id_trabajo = 1;
+		}
+    
 		nuevo_trab->fc_fin.anio = 0;
 		nuevo_trab->fc_fin.dia = 0;
 		nuevo_trab->fc_fin.mes = 0;
