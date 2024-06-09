@@ -92,7 +92,7 @@ char* BuscarNombreOpcion(int id, struct opcion *iniop);
 struct materiales* DescargarArbol (struct materiales *raiz, FILE *p);
 struct cliente* InsertarCliente (struct cliente *nv,struct cliente *inicli);
 struct materiales* InsertarMaterial (struct materiales *mat, struct materiales *raiz);
-struct materialesop* InsertarMaterialesOp(struct materialesop **nv,struct materialesop **inimat);
+struct materialesop * InsertarMaterialesOp(struct materialesop *nv,struct materialesop *inimat);
 struct materiales* InsertarNuevoMaterial (struct materiales *r, struct materiales *nodo);
 struct tarea* BuscarAnterior (int id_op, struct tarea *initar);
 struct opcion* InsertarOpcion (struct opcion * nvop,struct opcion *iniop);
@@ -110,23 +110,23 @@ void Apilar (struct pendientes **nodo, struct pendientes **tpaux);
 void BuscarPrecioMaterial (double *unitario, struct materiales *r, int codmat);
 void CargaClientes (FILE *p, struct cliente *cli, struct cliente *antc, struct cliente **inicli);
 void CargaMateriales (FILE *p, struct materiales *mat, struct materiales *auxm, struct materiales **raiz);
-void CargaMaterialesOpcion (FILE *p, struct materialesop *mato, struct materialesop *antm, struct materialesop **inimat);
 void CargaTareas (FILE *p, struct tarea *tar, struct tarea *antt, struct tarea *auxt, struct tarea **initar);
 void CargaTecnicos (FILE *p, struct tecnico **tech, struct tecnico **et, struct tecnico **st);
 void CargaTrabajos (FILE  *p, struct trabajos **trab, struct trabajos **ent, struct trabajos **sal);
 void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opcion **iniopc);
-void CargaPendientes (FILE *p, struct pendientes *pend, struct pendientes **tope);
+void CargaMaterialesOpcion (FILE *p, struct materialesop *mato, struct materialesop *antm, struct materialesop **inimat);
+void CargaPendientes (FILE *p, struct pendientes **pend, struct pendientes **tope);
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **e, struct trabajos **s, struct opcion **iniopc, struct pendientes **tope);
 void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones);
 void Desapilar (struct pendientes **nodo, struct pendientes **tp);
 void DescargaClientes ( FILE *p, struct cliente *cli, struct cliente *inicli);
-void DescargaMaterialesOpcion(FILE *p, struct materialesop *mato, struct materialesop *inimat);
 void DescargaTareas (FILE *p, struct tarea *tar, struct tarea *auxt, struct tarea *initar);
 void DescargaTecnicos (FILE *p, struct tecnico *tech, struct tecnico *et, struct tecnico *st);
 void DescargaTrabajos (FILE *p, struct trabajos *trab, struct trabajos *ent, struct trabajos *sal);
 void DescargaOpciones (FILE *p, struct opcion *opc, struct opcion *iniopc);
-void DescargaPendientes (FILE *P, struct pendientes *pen, struct pendientes *tope, struct pendientes *tpaux);
-void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *e, struct trabajos *s, struct opcion *iniopc, struct pendientes *tope);
+void DescargaMaterialesOpcion(FILE *p, struct materialesop *mato, struct materialesop *inimat);
+void DescargaPendientes (FILE *p, struct pendientes **pend, struct pendientes **tope);
+void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes **tope);
 void DesencolarTecnico(struct tecnico **ds, struct tecnico **e, struct tecnico **s);
 void DesencolarTrabajos(struct trabajos **ds, struct trabajos **e, struct trabajos **s);
 void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s);
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 3:
-				AltaDeTrabajos(&inicli, &iniopc, &et, &st, &e, &s, &inimat, &raiz); //et y st para tï¿½cnico, e y s para trabajo
+				AltaDeTrabajos(&inicli, &iniopc, &et, &st, &e, &s, &inimat, &raiz); //et y st para t�cnico, e y s para trabajo
 				opc=-1;
 				break;
 			case 4:
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]){
 				break;
 		}
 	}
-	DescargaSupremaDeEstructuras(p, inicli, raiz, inimat, initar, et, st, e, s, iniopc, tope);
+	DescargaSupremaDeEstructuras(p, inicli, raiz, inimat, initar, et, st, e, s, iniopc, &tope);
 	return (0);
 }
 
@@ -538,15 +538,13 @@ struct materiales* InsertarNuevoMaterial (struct materiales *raiz, struct materi
 	return (raiz);
 }
 
-struct materialesop * InsertarMaterialesOp(struct materialesop **nv,struct materialesop **inimat){
-	struct materialesop *aux=NULL;
-	aux = (*inimat);
-	if (aux != NULL) {
-		aux->sgte = InsertarMaterialesOp (&(*nv), &aux->sgte);
+struct materialesop * InsertarMaterialesOp(struct materialesop *nv,struct materialesop *inimat){
+	if (inimat != NULL) {
+		inimat->sgte = InsertarMaterialesOp (nv, inimat->sgte);
 	} else {
-		aux = (*nv);
+		inimat = nv;
 	}
-	return (aux);
+	return (inimat);
 }
 
 struct tarea* BuscarAnterior (int dato, struct tarea *rc){
@@ -953,42 +951,48 @@ void CargaMateriales (FILE *p, struct materiales *mat, struct materiales *auxm, 
 }
 
 void CargaMaterialesOpcion (FILE *p, struct materialesop *mato, struct materialesop *antm, struct materialesop **inimat){
-	int cont=0;
+	int band=0;
 	p=NULL;
 	antm=NULL;
 	if((p=fopen("materialesop.txt","r"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales por Opcion durante la carga |||||||\n");
 	}else{
-		char d[]=" ", cadaux[1000], *a;
-		fgets(cadaux, 999,p);
-		a=strtok(cadaux,d);
-		printf("COMPROBACION ARCH= %s \n", cadaux);
-		while(a!=NULL){
-			
-			mato=(struct materialesop *) malloc(sizeof(struct materialesop));
-			if(mato==NULL){
-				printf("-------No hay espacio de memoria-------\n");
-			}else{
-				switch(cont) {
-					case 0:
-						mato->cantidad=atoi(a);
-						cont++;
-						break;
-					case 1:
-						mato->idmat=atoi(a);
-						cont++;
-						break;
-					case 2:
-						mato->id_opcion=atoi(a);
-						cont=0;
-						(*inimat) = InsertarMaterialesOp (&mato, &(*inimat));
-						break;
-				}
-			}
-			free (mato);
-			a=strtok(NULL, d);
-		}
-		fclose(p);
+		char d[] = ";", cadaux[1000]="", *a;
+        char *prueba;
+		
+		prueba = fgets(cadaux, sizeof(cadaux), p);
+        while (prueba != NULL) {
+            a = strtok(cadaux, d);
+            printf("COMPROBACION ARCH= %s \n", cadaux);
+            
+            while ((a != NULL) && (band == 0)) {
+                mato = (struct materialesop *) malloc(sizeof(struct materialesop));
+                if (mato == NULL) {
+                    printf("-------No hay espacio de memoria-------\n");
+					band = 1;
+                } else {
+                	if(a!=NULL){
+                		mato->idmat=atoi(a);
+					}
+                   
+                    a = strtok(NULL, d);
+                    
+                    if (a != NULL) {
+                        mato->id_opcion=atoi(a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                       mato->cantidad=atoi(a);
+                    }
+					mato->sgte = NULL;
+                    (*inimat) = InsertarMaterialesOp (mato, *inimat);
+                    a = strtok(NULL, d);
+                }
+            }
+            prueba = fgets(cadaux, sizeof(cadaux), p);
+        }
+        fclose(p);
 	}
 }
 
@@ -1251,54 +1255,66 @@ void CargaOpciones (FILE *p, struct opcion *opc, struct opcion *anto, struct opc
     }
 }
 
-void CargaPendientes (FILE *p, struct pendientes *pend, struct pendientes **tope){
-	int cont=0;
+void CargaPendientes (FILE *p, struct pendientes **pend, struct pendientes **tope){
+	int band=0;
 	p=NULL;
 	if((p=fopen("pendientes.txt", "r"))==NULL){
 		printf("||||||| Error de apertura de archivo Pendientes durante la carga |||||||\n");
 	}else{
-		char d[]=" ", cadaux[1000], *a;
-		fgets(cadaux, 999,p);
-		a=strtok(cadaux,d);
-		printf("COMPROBACION ARCH= %s \n", cadaux);
-		while(a!=NULL){
-			pend=(struct pendientes *) malloc(sizeof(struct pendientes));
-			if(pend==NULL){
-				printf("-------No hay espacio de memoria-------\n");
-			}else{
-				switch(cont) {
-					case 0:
-						pend->completado=atoi(a);
-						cont++;
-						break;
-					case 1:
-						strcpy(pend->descripcion,a);
-						cont++;
-						break;
-					case 2:
-						pend->id_tarea=atoi(a);
-						cont++;
-						break;
-					case 3:
-						pend->id_trabajo=atoi(a);
-						cont++;
-						break;
-					case 4:
-						pend->orden=atoi(a);
-						cont++;
-						break;
-					case 5:
-						pend->tiempo=atof(a);
-						cont=0;
-						Apilar (&pend, tope);
-						break;
-				}
-			}
-			a=strtok(NULL, d);
-			free (pend);
-		}
-		fclose(p);
+		char d[] = ";", cadaux[1000]="", *a;
+        char *prueba;
+		
+		prueba = fgets(cadaux, sizeof(cadaux), p);
+        while (prueba != NULL) {
+            a = strtok(cadaux, d);
+            printf("COMPROBACION ARCH= %s \n", cadaux);
+            
+            while ((a != NULL) && (band == 0)) {
+                *pend=(struct pendientes *) malloc(sizeof(struct pendientes));
+                if (*pend == NULL) {
+                    printf("-------No hay espacio de memoria-------\n");
+					band = 1;
+                } else {
+                	//id tarea, id trabajo, desc, tiempo, orden
+                    if(a != NULL){
+                    	(*pend)->id_tarea=atoi(a);
+					}
+                    a = strtok(NULL, d);
+                    
+                    if (a != NULL) {
+                        (*pend)->id_trabajo=atoi(a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        strcpy((*pend)->descripcion,a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        (*pend)->tiempo=atof(a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        (*pend)->orden=atoi(a);
+                    }
+                    
+                    a = strtok(NULL, d);
+                    if (a != NULL) {
+                        (*pend)->completado=atoi(a);
+                    }
+                    
+					(*pend)->sgte = NULL;
+					Apilar (pend, tope);
+                    a = strtok(NULL, d);
+                }
+            }
+            prueba = fgets(cadaux, sizeof(cadaux), p);
+        }
+        fclose(p);
 	}
+	
 }
 
 void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar, struct tecnico **et, struct tecnico **st, struct trabajos **ent, struct trabajos **sal, struct opcion **iniopc, struct pendientes **tope){
@@ -1325,8 +1341,9 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	printf("Entro CARGA OPCIONES\n");
 	CargaOpciones (p, opc, anto, iniopc);
 	printf("Entro CARGA PENDIENTES\n");
-	CargaPendientes (p, pend, tope);
+	CargaPendientes (p, &pend, tope);
 }
+
 
 void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
 	struct opcionesfav *nuevo=NULL,*aux=NULL;
@@ -1384,10 +1401,11 @@ void DescargaMaterialesOpcion(FILE *p, struct materialesop *mato, struct materia
 	if((p=fopen("materialesop.txt", "w"))==NULL){
 		printf("||||||| Error de apertura de archivo Materiales por Opcion durante la carga |||||||\n");
 	}else{
+		//id mat, id op, cant
 		while(inimat != NULL){
-			fprintf(p, "%d ", inimat->cantidad);
-			fprintf(p, "%d ", inimat->idmat);
-			fprintf(p, "%d ", inimat->id_opcion);
+			fprintf(p, "%d;", inimat->idmat);
+			fprintf(p, "%d;", inimat->id_opcion);
+			fprintf(p, "%d\n", inimat->cantidad);
 			inimat = inimat->sgte;
 		}
 		fclose(p);
@@ -1469,26 +1487,27 @@ void DescargaOpciones (FILE *p, struct opcion *opc, struct opcion *iniopc){
 	printf("Salio OPCIONES \n");
 }
 
-void DescargaPendientes (FILE *p, struct pendientes *pend, struct pendientes *tope, struct pendientes *tpaux){
+void DescargaPendientes (FILE *p, struct pendientes **pend, struct pendientes **tope){
 	p=NULL;
 	if((p=fopen("pendientes.txt", "w"))==NULL){
 		printf("||||||| Error de apertura de archivo Pendientes durante la carga |||||||\n");
 	}else{
-		while(tope != NULL){
-			Desapilar (&pend, &tope);
-			fprintf(p, "%d ", pend->completado);
-			fprintf(p, "%s ", pend->descripcion);
-			fprintf(p, "%d ", pend->id_tarea);
-			fprintf(p, "%d ", pend->id_trabajo);
-			fprintf(p, "%d ", pend->orden);
-			fprintf(p, "%f ", pend->tiempo);
-			Apilar (&pend, &tpaux);	
+		while(*tope != NULL){
+			Desapilar (pend, tope);
+			//id tarea, id trabajo, desc, tiempo, orden
+			printf("\nPROBANDO: %d", (*pend)->id_tarea);
+			fprintf(p, "%d;", (*pend)->id_tarea);
+			fprintf(p, "%d;", (*pend)->id_trabajo);
+			fprintf(p, "%s;", (*pend)->descripcion);
+			fprintf(p, "%f;", (*pend)->tiempo);
+			fprintf(p, "%d;", (*pend)->orden);
+			fprintf(p, "%d\n", (*pend)->completado);
 		}
 		fclose(p);
 	}
 }
 
-void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes *tope){
+void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct materiales *raiz, struct materialesop *inimat, struct tarea *initar, struct tecnico *et, struct tecnico *st, struct trabajos *ent, struct trabajos *sal, struct opcion *iniopc, struct pendientes **tope){
 	printf("Entro DESCARGAS \n");
 	struct cliente *cli=NULL;
 	struct materialesop *mato=NULL;
@@ -1515,8 +1534,9 @@ void DescargaSupremaDeEstructuras (FILE *p, struct cliente *inicli, struct mater
 	printf("Entro DESCARGAS OPCIONES\n");
 	DescargaOpciones (p, opc, iniopc);
 	printf("Entro DESCARGAS PENDIENTES\n");
-	DescargaPendientes (p, pend, tope, tpaux);
+	DescargaPendientes (p, &pend, tope);
 }
+
 
 void DesencolarTecnico (struct tecnico **ds, struct tecnico **e, struct tecnico **s){
 	(*ds) = (*s);
