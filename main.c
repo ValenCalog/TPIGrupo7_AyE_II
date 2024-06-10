@@ -442,6 +442,8 @@ int GenerarIdMaterial (struct materiales *r){
 }
 
 int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materiales **raiz, struct materialesop **inimat, int _cuatrometros, struct tarea **initar_){
+	system("cls");
+   	printf("-----Está viendo las opciones para dar de alta un trabajo.-----\n\n");
 	int o, cont=0;
 	double auxc=0, auxtiempo=0, auxcosto=0, total=0;
 	struct opcion *aux = (*iniopcion);
@@ -670,6 +672,8 @@ struct opcionesfav * buscaropanterior(struct opcionesfav *auxL,struct opcionesfa
 
 //Voids
 void AltaDeClientes (struct cliente **inicli){
+	system("cls");
+   	printf("-----Está dando de alta a un cliente.-----\n\n");
 	struct cliente *nvcliente = NULL;
 	
 	nvcliente = ( struct cliente * ) malloc( sizeof( struct cliente ) );
@@ -701,6 +705,8 @@ void AltaDeClientes (struct cliente **inicli){
 }
 
 void AltaDeMateriales (struct materiales **raiz){
+	system("cls");
+   	printf("-----Esta dando de alta un material.-----\n\n");
     struct materiales *nuevo_mat;
 
     nuevo_mat = (struct materiales *) malloc (sizeof (struct materiales) );
@@ -766,6 +772,8 @@ void AltaDeMaterialesOP (struct materiales *raiz, struct materialesop **inimat, 
 }
 
 void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materiales *raiz, struct materialesop **inimat){
+	system("cls");
+   	printf("-----Esta dando de alta una opcion.-----\n\n");
 	struct opcion *nueva_op;
 	nueva_op = (struct opcion *) malloc (sizeof (struct opcion) );
 	if (nueva_op == NULL){
@@ -794,6 +802,8 @@ void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct mater
 }
 
 void AltaDeTareas (struct tarea **initar, int id){
+	system("cls");
+   	printf("-----Esta dando de alta una tarea.-----\n\n");
 	struct tarea *newtar=NULL, *antt=NULL , *auxt=NULL;
 	int band=0, opc=1;
 	newtar = (struct tarea *) malloc (sizeof (struct tarea));
@@ -847,6 +857,8 @@ void AltaDeTareas (struct tarea **initar, int id){
 }
 
 void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct tecnico **eTec, struct tecnico **sTec, struct trabajos **eTra, struct trabajos **sTra, struct materialesop **_inimat, struct materiales **raiz, struct tarea **_initar){
+    system("cls");
+    printf("-----Esta dando de alta un trabajo.-----\n\n");
     struct tecnico *nodoaux = NULL; 
     struct trabajos *nuevo_trab=NULL, *aux=NULL, *eaux= (*eTra), *saux=(*sTra);
     int op, ops, cli;
@@ -926,6 +938,8 @@ void AltaDeTrabajos (struct cliente **_inicli, struct opcion **_iniop, struct te
 }
 
 void AltaDeTecnicos (struct tecnico **e, struct tecnico **s){
+	system("cls");
+   	printf("-----Esta dando de alta a un tecnico.-----\n\n");
 	struct tecnico *nv;
 	printf("\nHolaaaaaaaa");
 	nv = (struct tecnico*) malloc (sizeof (struct tecnico));
