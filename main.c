@@ -2007,7 +2007,6 @@ void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcio
 	printf("\n\nIngrese el dia de la primer fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha1_1.dia);
-	printf("Ingrese el mes de la primer fecha: ");
 	while ((fecha1_1.dia < 0) && (fecha1_1.dia > 31)){
 		printf("\n\nDia invalido, ingrese de nuevo: ");
 		fflush(stdin);
@@ -2161,7 +2160,6 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	printf("\n\nIngrese el dia de la primer fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha1_1.dia);
-	printf("Ingrese el mes de la primer fecha: ");
 	while ((fecha1_1.dia < 0) && (fecha1_1.dia > 31)){
 		printf("\n\nDia invalido, ingrese de nuevo: ");
 		fflush(stdin);
