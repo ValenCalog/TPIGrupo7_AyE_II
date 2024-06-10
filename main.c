@@ -10,7 +10,7 @@ struct opcionesfav{
 
 struct fecha{
 	int dia, mes, anio;
-};
+}fecha1_1, fecha2_2;
 
 struct materiales{ //Arbol de Busqueda Binaria.
      int id;
@@ -142,7 +142,7 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 void copiarTareasPendientes(struct tarea *iniTar, struct pendientes **tpPend, int idTrab, int idOp);
 //Consigna 5
 void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc,struct materiales *raiz,struct materialesop *inimat,struct tarea *initar);
-double BuscarPrecioManodeObra(float id,struct opcion *ini);
+double BuscarPrecioManodeObra(int id,struct opcion *ini);
 
 int main(int argc, char *argv[]){
 	struct cliente *inicli=NULL;
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]){
 					fflush(stdin);
 					scanf("%i",&id_trabajo);
 				}
-				ListadoPendientes(id_trabajo,&tope);
+				ListadoPendientes(id_trabajo, &tope, &e, &s);
 				opc=-1;
 				break;
 			case 5:
@@ -224,9 +224,11 @@ int main(int argc, char *argv[]){
 				break;
 			case 11:
 				trabajosentre(e,s,iniopc,raiz,inimat,initar);
+				opc=-1;
 				break;
 			case 12:
 				OpcionesMasVendidas(e,s,iniopc);
+				opc=-1;
 				break;
 		}
 	}
@@ -1569,35 +1571,52 @@ void CargaSupremaDeEstructuras (FILE *p, struct cliente **inicli, struct materia
 	CargaPendientes (p, &pend, tope);
 }
 
-void completarlista(struct opcionesfav**Inicio, struct opcion *ini_opciones){
+void completarlista(struct opcionesfav **Inicio, struct opcion *ini_opciones){
 	struct opcionesfav *nuevo=NULL,*aux=NULL;
 	int encontro=0;
+	printf("Te encontre perra\n");
 	aux=(*Inicio);
 	while(ini_opciones!=NULL){ //recorre toda la lista de opciones
+	printf("ENTRO WHILE PROBLEMATIC\n");
 		while(encontro!=1 || aux!=NULL){ //recorre las opciones fav buscando la que coincide con el id opc que esta leyendo
-			if(ini_opciones->id==aux->id_op){
+			printf("ENTRO A OTRO WHILE PROBLEMATIC\n");
+			printf("ini_opciones: %d\n", ini_opciones->id);
+			printf("aux_id: %d\n", aux->id_op);
+			if(ini_opciones->id == aux->id_op){
+				printf("IFE FUNC\n");
 				encontro=1;
 			}else{
+				printf("ELSE FUNC\n");
 				aux=aux->sgte;
 			}
+			printf("jumpin jack\n");
 		}
+		printf("SALIO DEL OTRO WHILE PROBLEMATIC\n");
 		if(encontro==0){
+			printf("IFE FUNC 2\n");
 			nuevo=(struct opcionesfav *) malloc(sizeof(struct opcionesfav));
 			if(nuevo!=NULL){
+				printf("IFE FUNC 3\n");
 				nuevo->id_op=ini_opciones->id;
 				nuevo->ventas=0;
 				nuevo->sgte=NULL;
+				printf("ASIGNATIONS ON POINT\n");
 				insertaropfav(&nuevo,&(*Inicio));
-
+				printf("que cantidad de funciones por dios\n");
 			}else{
 				printf("No hay espacio en memoria");
 			}
+			printf("SALIO IFE FUNC 3\n");
 		}
+		printf("SALIO IFE FUNC 2\n");
 		encontro=0;
+		printf("IN\n");
 		ini_opciones=ini_opciones->sgte;
+		printf("OUT\n");
 		aux=(*Inicio);
+		printf("ASIGNATION\n");
 	}
-
+	printf("fin fuc");
 }
 
 void Desapilar (struct pendientes **nodo, struct pendientes **tp){
@@ -1983,80 +2002,58 @@ Al final del listado, imprimir el importe total de todos los trabajos realizados
 void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc,struct materiales *raiz,struct materialesop *inimat,struct tarea *initar){
 	struct trabajos *ini=NULL,*aux=NULL;
 	double totalfinal=0,materiales=0,manodeobra=0,totalparcial=0;
-	struct fecha fecha1_1,fecha2_2;
 	long fecha1,fecha2,mayor,menor,fecha_trabajo;
 	
 	printf("\n\nIngrese el dia de la primer fecha: ");
-	fflush(stdin);
 	scanf("%i",&fecha1_1.dia);
-	while ((fecha1_1.dia < 0) && (fecha1_1.dia > 31)){
-		printf("\n\nDia invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha1_1.dia);
-	}
+	printf("CARGO 1.1\n");
+	fflush(stdin);
 	printf("\nIngrese el mes de la primer fecha: ");
-	fflush(stdin);
 	scanf("%i",&fecha1_1.mes);
-	while ((fecha1_1.mes < 0) && (fecha1_1.mes > 12)){
-		printf("\nMes invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha1_1.mes);
-	}
-	printf("\nIngrese el año de la primer fecha: ");
+	printf("CARGO 1.2\n");
 	fflush(stdin);
+	printf("\nIngrese el anio de la primer fecha: ");
 	scanf("%i",&fecha1_1.anio);
-	while ((fecha1_1.anio < 2000) && (fecha1_1.anio >= 2030)){
-		printf("\nAño invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha1_1.anio);
-	}
-	
-	//comento porque me mareé
+	printf("CARGO 1.3\n");
+	fflush(stdin);
 	
 	printf("\n\nIngrese el dia de la segunda fecha: ");
-	fflush(stdin);
 	scanf("%i",&fecha2_2.dia);
-	while ((fecha2_2.dia < 0) && (fecha2_2.dia > 31)){
-		printf("\n\nDia invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha2_2.dia);
-	}
-	printf("\nIngrese el mes de la segunda fecha: ");
+	printf("CARGO 2.1\n");
 	fflush(stdin);
+	printf("\n\nIngrese el mes de la segunda fecha: ");
 	scanf("%i",&fecha2_2.mes);
-	while ((fecha2_2.mes < 0) && (fecha2_2.mes > 12)){
-		printf("\nMes invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha2_2.mes);
-	}
-	printf("\nIngrese el anio de la segunda fecha: ");
+	printf("CARGO 2.2\n");
 	fflush(stdin);
+	printf("\n\nIngrese el anio de la segunda fecha: ");
 	scanf("%i",&fecha2_2.anio);
-	while ((fecha2_2.anio < 2000) && (fecha2_2.anio > 2030)){
-		printf("\nIngrese el anio de la segunda fecha: ");
-		fflush(stdin);
-		scanf("%i",&fecha2_2.anio);
-	}
+	printf("CARGO 2.3\n");
+	fflush(stdin);
 	
-	fecha1=(fecha1_1.anio * 10000) + (fecha1_1.mes * 100) + fecha1_1.dia;
-	fecha2=(fecha2_2.anio * 10000) + (fecha2_2.mes * 100) + fecha2_2.dia;
-	
-	if(fecha1>fecha2){
+	fecha1 = (fecha1_1.anio * 10000) + (fecha1_1.mes * 100) + fecha1_1.dia;
+	printf("FUNC\n");
+	fecha2 = (fecha2_2.anio * 10000) + (fecha2_2.mes * 100) + fecha2_2.dia;
+	printf("FUNC 2\n");
+	if(fecha1 > fecha2){
+		printf("FUNC 3.1\n");
 		mayor=fecha1;
 		menor=fecha2;
 	}else{
-		if(fecha2>fecha1){
+		printf("FUNC 3.2\n");
+		if(fecha2 > fecha1){
 			mayor=fecha2;
 			menor=fecha1;
 		}else{
+			printf("FUNC 3.3\n");
 			mayor=fecha1;
 			menor=fecha1;
 		}
 	}
+	printf("OUT\n");
 	fflush(stdin);
 	
-	ini=salida; //Guarda el inicio de la cola de trabajos
-	DesencolarTrabajos(&aux,&entrada,&salida);
+	//ini=salida; //Guarda el inicio de la cola de trabajos
+	//DesencolarTrabajos(&aux,&entrada,&salida);
 	
 	/*struct trabajos{ //Cola.
     int id_trabajo, id_opcion, opcion, cuatromtrs;
@@ -2068,12 +2065,21 @@ void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcio
     
     ------------------------------------------------------------------------------------------------------------------
 */
-	while(salida->id_trabajo!=ini->id_trabajo){
-		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia; 
+	printf("SECURITY\n");
+	struct trabajos *entAux = NULL, *salAux = NULL;
+	while(!ColaVacia(salida)){
+		printf("FUNC WHILE \n");
+		DesencolarTrabajos(&aux,&entrada,&salida);
+		printf("FUNC DESENCOLAR\n");
+		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia;
 		if(fecha_trabajo<=mayor && fecha_trabajo>=menor){
+			printf("IF WHILE\n");
 			materiales = OperacionCosto(raiz,aux->id_opcion, &inimat);
 			printf("\nEl costo de materiales es: %f",materiales);
-			manodeobra = (OperacionTiempo(aux->id_opcion, initar) * BuscarPrecioManodeObra(aux->id_opcion,iniopc)) + (BuscarPrecioManodeObra(aux->id_opcion,iniopc)*aux->cuatromtrs*0.80);
+			double aux3=0;
+			aux3 = BuscarPrecioManodeObra (aux->id_opcion, iniopc)*(aux->cuatromtrs*0.20);
+			printf("aux3: %.0f", aux3);
+			manodeobra = (OperacionTiempo(aux->id_opcion, initar) * BuscarPrecioManodeObra(aux->id_opcion,iniopc)) + aux3;
 			printf("\nEl costo de mano de obra es: %f",manodeobra);
 			totalparcial = materiales + manodeobra;
 			printf("\nEl total parcial del trabajo es: %f",totalparcial);
@@ -2081,20 +2087,40 @@ void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcio
 			printf("\nID opcion: %i",aux->id_opcion);
 			fflush(stdin);
 		}
-		EncolarTrabajos(&aux,&entrada,&salida);
+		EncolarTrabajos(&aux,&entAux,&salAux);
 		aux=NULL;
-		DesencolarTrabajos(&aux,&entrada,&salida);
+
 	}
+	printf("FUERA WHILE \n");
+	while(!ColaVacia(salAux)){
+		printf("FUNC X WHILE\n");
+		DesencolarTrabajos(&aux,&entAux, &salAux);
+		EncolarTrabajos(&aux, &entrada, &salida);
+	}
+	printf("FUERA FUNCION");
 }
 
-double BuscarPrecioManodeObra(float id,struct opcion *ini){
-	struct opcion *aux=NULL;
-	while(aux->id!=id){
-		aux=aux->sgte;
+double BuscarPrecioManodeObra(int id, struct opcion *ini){
+	struct opcion *aux=ini;
+	int band=0;
+	printf("FUNC\n");
+	if(ini!=NULL){
+		while((aux->id!=id)&&(band==0)){
+			if(aux->sgte==NULL){
+				band=1;
+			}else{
+				aux=aux->sgte;
+			}
+		}
+		if(band==0){
+			printf("\nNombre de la opcion: ");
+			puts(aux->Nombre);
+			printf("FUNC por si acaso\n");
+			fflush(stdin);
+		}else{
+			printf("Casi rompes todo, bruto\n");
+		}
 	}
-	printf("\nNombre de la opcion: ");
-	puts(aux->Nombre);
-	fflush(stdin);
 	return(aux->cHoraMObra);
 	
 }
@@ -2102,111 +2128,109 @@ double BuscarPrecioManodeObra(float id,struct opcion *ini){
 void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc){
 	struct trabajos *ini=NULL,*aux=NULL;
 	struct opcionesfav *L=NULL,*auxL=NULL,*Lord=NULL;
-	int band=0,i;
-	struct fecha fecha1_1,fecha2_2;
+	int band=0,i=0;
 	long fecha1,fecha2,mayor,menor,fecha_trabajo;
 	
-	printf("\n\nIngrese el dia de la primer fecha: ");
-	fflush(stdin);
+	printf("Ingrese el dia de la primer fecha: ");
 	scanf("%i",&fecha1_1.dia);
-	while ((fecha1_1.dia < 0) && (fecha1_1.dia > 31)){
-		printf("\n\nDia invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha1_1.dia);
-	}
-	printf("\nIngrese el mes de la primer fecha: ");
 	fflush(stdin);
+	printf("Ingrese el mes de la primer fecha: ");
 	scanf("%i",&fecha1_1.mes);
-	while ((fecha1_1.mes < 0) && (fecha1_1.mes > 12)){
-		printf("\nMes invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha1_1.mes);
-	}
-	printf("\nIngrese el año de la primer fecha: ");
 	fflush(stdin);
+	printf("Ingrese el anio de la primer fecha: ");
 	scanf("%i",&fecha1_1.anio);
-	while ((fecha1_1.anio < 2000) && (fecha1_1.anio >= 2030)){
-		printf("\nAño invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha1_1.anio);
-	}
-	
-	//comento porque me mareé
-	
-	printf("\n\nIngrese el dia de la segunda fecha: ");
 	fflush(stdin);
+	
+	printf("Ingrese el dia de la segunda fecha: ");
 	scanf("%i",&fecha2_2.dia);
-	while ((fecha2_2.dia < 0) && (fecha2_2.dia > 31)){
-		printf("\n\nDia invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha2_2.dia);
-	}
-	printf("\nIngrese el mes de la segunda fecha: ");
 	fflush(stdin);
+	printf("Ingrese el mes de la segunda fecha: ");
 	scanf("%i",&fecha2_2.mes);
-	while ((fecha2_2.mes < 0) && (fecha2_2.mes > 12)){
-		printf("\nMes invalido, ingrese de nuevo: ");
-		fflush(stdin);
-		scanf("%i",&fecha2_2.mes);
-	}
-	printf("\nIngrese el anio de la segunda fecha: ");
 	fflush(stdin);
+	printf("Ingrese el anio de la segunda fecha: ");
 	scanf("%i",&fecha2_2.anio);
-	while ((fecha2_2.anio < 2000) && (fecha2_2.anio > 2030)){
-		printf("\nIngrese el anio de la segunda fecha: ");
-		fflush(stdin);
-		scanf("%i",&fecha2_2.anio);
-	}
+	fflush(stdin);
 	
 	fecha1=(fecha1_1.anio * 10000) + (fecha1_1.mes * 100) + fecha1_1.dia;
+	printf("FUNC 1\n");
 	fecha2=(fecha2_2.anio * 10000) + (fecha2_2.mes * 100) + fecha2_2.dia;
-	
+	printf("FUNC 2\n");
 	if(fecha1>fecha2){
+		printf("PUTIN 1\n");
 		mayor=fecha1;
 		menor=fecha2;
 	}else{
+		printf("PUTIN 2\n");
 		if(fecha2>fecha1){
 			mayor=fecha2;
 			menor=fecha1;
 		}else{
+			printf("PUTIN 3\n");
 			mayor=fecha1;
 			menor=fecha1;
 		}
 	}
 	fflush(stdin);
+	printf("PUTOUT\n");
 
-
-	ini=salida; //Guarda el inicio de la cola de trabajos
+	//ini=salida; //Guarda el inicio de la cola de trabajos
+	struct trabajos *entAux = NULL, *salAux = NULL;
+	printf("ENTRO FUNC\n");
 	completarlista(&L,iniopc);//Ahora tenemos una lista donde cada nodo tiene un id op y un int acumulativo
+	printf("SALIO FUNC\n");
 	auxL=L;
-	DesencolarTrabajos(&aux,&entrada,&salida);
-	while(salida->id_trabajo!=ini->id_trabajo){//El while se va a detener cuando recorra toda la cola de trabajos
+	while(!ColaVacia(salida)){//El while se va a detener cuando recorra toda la cola de trabajos
+		printf("ENTRO WHILE 1 Y FUNC\n");
+		DesencolarTrabajos(&aux,&entrada,&salida);
+		printf("SALIO FUNC\n");
 		while(band=!1){//Se va a detener cuando auxL este en la posicion donde debe incrementarse la cantidad de ventas
+			printf("ENTRO WHILE 2\n");
 			if(aux->id_opcion!=auxL->id_op){
+				printf("MI IFEEEEEEEEEE\n");
 				auxL=auxL->sgte;
 			}else{
+				printf("ELSE B\n");
 				band=1;
 			}
+			printf("RESET\n");
 		}
+		printf("SALIO WHILE 2\n");
 
 		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia; 
 
+		printf("ASIGNO A LA CHINA\n");
+		auxL->ventas=0;
 		if(fecha_trabajo<=mayor && fecha_trabajo>=menor){
+			printf("IFE DOS\n");
 			auxL->ventas++;//Se incrementa la cantidad de ventas en esa opcion
+			printf("IFE tres\n");
 		}
 					
 		band=0;
 		auxL=L;
-		EncolarTrabajos(&aux,&entrada,&salida);
+		aux->sgte = NULL;
+		printf("ENTRO FUNC 2\n");
+		EncolarTrabajos(&aux,&entAux,&salAux);
+		printf("SALIO\n");
 		aux=NULL;
-		DesencolarTrabajos(&aux,&entrada,&salida);
 	}
-
+	printf("SALIO WHILE 1\n");
+	
+	while(!ColaVacia(salAux)){
+		printf("POR DIOS VALE\n");
+		DesencolarTrabajos(&aux,&entAux,&salAux);
+		printf("888 kilometros de ida\n");
+		aux->sgte = NULL;
+		printf("tururu\n");
+		EncolarTrabajos(&aux,&entrada,&salida);
+		printf("888 kilometros de vuelta\n");
+	}
+	printf("SALIO WHILE 8\n");
 	/*auxL=L;
 	while(auxL!=NULL){
 		printf("\nLa cantidad de ventas de la opcion %i es: %i",auxL->id_op,auxL->ventas);
 	}*/
-	auxL=NULL;
+	auxL = NULL;
 	while(L!=NULL){
 		auxL=L;
 		L=L->sgte;
@@ -2214,9 +2238,14 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 		insertaropcionordenada(&auxL,&Lord);
 	}
 
-	printf("\nTOP 4 opciones mas vendidas: ");
-	for(i=1;i<=4;i++){
-		printf("\n%i) Opcion %i, con %i ventas",i,Lord->id_op,Lord->ventas);
-		Lord=Lord->sgte;
+	if(Lord!=NULL){
+		printf("\nTOP 4 opciones mas vendidas: ");
+		for(i=1; i<=4; i++){
+			printf("for FUNC\n");
+			printf("\n%i) Opcion %i, con %i ventas",i,Lord->id_op,Lord->ventas);
+			Lord=Lord->sgte;
+		}
+	}else{
+		printf("No se encontro ni a tu madre. \n");
 	}
 }
