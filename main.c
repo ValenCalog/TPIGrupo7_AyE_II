@@ -153,7 +153,7 @@ int main(int argc, char *argv[]){
 	struct trabajos *nd=NULL, *e=NULL, *s=NULL;
 	struct opcion *iniopc=NULL;
     struct pendientes *nodo=NULL, *tope=NULL;	
-	int opc=-1;
+	int opc=-1,id_trabajo;
 	FILE *p=NULL;
 	
 	srand(time(NULL));
@@ -213,6 +213,12 @@ int main(int argc, char *argv[]){
 			case 10:
 				ListadoDeTrabajosDeTecnicos (&e, &s, &et, &st, &iniopc, &inicli);
 				opc=-1;
+				break;
+			case 11:
+				printf("Digite el ID de trabajo a consultar: ");
+				scanf("%i",&id_trabajo);
+				fflush(stdin);
+				ListadoPendientes(id_trabajo,&tope);
 				break;
 		}
 	}
@@ -489,13 +495,13 @@ int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materi
 
 int Menu (int o){
 	int contgency = 0;
-	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) && (o!=7) && (o!=8) && (o!=9) && (o!=10)){
+	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) && (o!=7) && (o!=8) && (o!=9) && (o!=10) && (o!=11)){
 		if (contgency >= 1){
 			printf ("El valor que ingreso no es valido, vuelva a ingresar una opcion. \n" );
 			fflush (stdin);
 			scanf ("%d", &o );
 		}else{
-			printf ("-------------------Bienvenido al menu :D-------------------\n---Ingrese 0 para salir.\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para ver las opciones mas vendidas.\n---Ingrese 6 para dar de alta un material.\n---Ingrese 7 para dar de alta un tecnico.\n---Ingrese 8 para dar de alta un cliente.\n---Ingrese 9 para listar materiales.\n---Ingrese 10 para listar trabajos de un tecnico.\n" );
+			printf ("-------------------Bienvenido al menu :D-------------------\n---Ingrese 0 para salir.\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para ver las opciones mas vendidas.\n---Ingrese 6 para dar de alta un material.\n---Ingrese 7 para dar de alta un tecnico.\n---Ingrese 8 para dar de alta un cliente.\n---Ingrese 9 para listar materiales.\n---Ingrese 10 para listar trabajos de un tecnico.\n---Ingrese 11 para listar las tareas pendietes de un trabajo.\n" );
 			fflush (stdin);
 			scanf ("%d", &o);
 			contgency++;
@@ -1822,9 +1828,6 @@ void ListadoPendientes(int id_trabajo,struct pendientes **tope){
 		Apilar(&nodoaux,tope);
 	}
 }
-
-
-
 
 void ListadoDeTrabajosDeTecnicos(struct trabajos **e, struct trabajos **s, struct tecnico **et, struct tecnico **st, struct opcion **l, struct cliente **r) {
     int id, tec = 0;
