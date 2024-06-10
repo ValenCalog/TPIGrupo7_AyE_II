@@ -181,7 +181,10 @@ int main(int argc, char *argv[]){
 				opc=-1;
 				break;
 			case 4:
-				ListadoDePendientes(&nodo, &tope);
+				printf("Digite el ID de trabajo a consultar: ");
+				scanf("%i",&id_trabajo);
+				fflush(stdin);
+				ListadoPendientes(id_trabajo,&tope);
 				opc=-1;
 				break;
 			case 5:
@@ -213,13 +216,7 @@ int main(int argc, char *argv[]){
 			case 10:
 				ListadoDeTrabajosDeTecnicos (&e, &s, &et, &st, &iniopc, &inicli);
 				opc=-1;
-				break;
-			case 11:
-				printf("Digite el ID de trabajo a consultar: ");
-				scanf("%i",&id_trabajo);
-				fflush(stdin);
-				ListadoPendientes(id_trabajo,&tope);
-				break;
+				break;	
 		}
 	}
 	DescargaSupremaDeEstructuras(p, inicli, raiz, inimat, initar, &et, &st, e, s, iniopc, &tope);
@@ -501,7 +498,7 @@ int Menu (int o){
 			fflush (stdin);
 			scanf ("%d", &o );
 		}else{
-			printf ("-------------------Bienvenido al menu :D-------------------\n---Ingrese 0 para salir.\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar trabajos y tareas pendientes.\n---Ingrese 5 para ver las opciones mas vendidas.\n---Ingrese 6 para dar de alta un material.\n---Ingrese 7 para dar de alta un tecnico.\n---Ingrese 8 para dar de alta un cliente.\n---Ingrese 9 para listar materiales.\n---Ingrese 10 para listar trabajos de un tecnico.\n---Ingrese 11 para listar las tareas pendietes de un trabajo.\n" );
+			printf ("-------------------Bienvenido al menu :D-------------------\n---Ingrese 0 para salir.\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar las tareas pendietes de un trabajo.\n---Ingrese 5 para ver las opciones mas vendidas.\n---Ingrese 6 para dar de alta un material.\n---Ingrese 7 para dar de alta un tecnico.\n---Ingrese 8 para dar de alta un cliente.\n---Ingrese 9 para listar materiales.\n---Ingrese 10 para listar trabajos de un tecnico.\n" );
 			fflush (stdin);
 			scanf ("%d", &o);
 			contgency++;
