@@ -354,7 +354,7 @@ int BuscarMayorIdTarea (struct tarea *ini){
 }
 
 int BuscarMayorIdTrab (struct trabajos **nodo, struct trabajos **e, struct trabajos **s){
-	int mayor=1;
+	int mayor=0;
 	struct trabajos *eAux = NULL, *sAux= NULL;
 	
 	if (ColaVacia(*s) == 1){
@@ -1839,33 +1839,39 @@ void ListadoDeTrabajosDeTecnicos(struct trabajos **e, struct trabajos **s, struc
     char nombre_op[30], nombre_cli[30];
     struct tecnico *nodo = NULL;
     struct trabajos *aux = NULL;
+    struct trabajos *eAux = NULL, *sAux = NULL;
 
-    printf("Ingrese el ID del técnico para ver sus trabajos: \n");
+    printf("Ingrese el ID del tÃ©cnico para ver sus trabajos: \n");
     scanf("%d", &id);
     tec = BuscarIDTecnico(id, &nodo, et, st);
     if (tec == 0) {
-        printf("El técnico no existe.\n");
-        // hacer que vaya al menú
+        printf("El tÃ©cnico no existe.\n");
+        // hacer que vaya al menÃº
     } else {
         while (!ColaVacia(*s)) {
             DesencolarTrabajos(&aux, e, s);
             if (aux->id_tecnico == id) {
                 printf("ID del trabajo: %d \n", aux->id_trabajo);
-                strcpy(nombre_op, BuscarNombreOpcion(aux->id_opcion, *l)); // Copia el nombre de la opción a nombre_op
-                printf("El nombre de la opción es: %s \n", nombre_op);
+                strcpy(nombre_op, BuscarNombreOpcion(aux->id_opcion, *l)); // Copia el nombre de la opciÃ³n a nombre_op
+                printf("El nombre de la opciÃ³n es: %s \n", nombre_op);
                 strcpy(nombre_cli, BuscarNombreCliente(aux->id_cliente, *r)); // Copia el nombre del cliente a nombre_cli
                 printf("El nombre del cliente es: %s \n", nombre_cli);
-                printf("La ubicación es: %s \n", aux->direccion);
+                printf("La ubicaciÃ³n es: %s \n", aux->direccion);
                 if (aux->cuatromtrs == 1) {
                     printf("Requiere trabajo en altura.\n");
                 } else {
                     printf("No requiere trabajo en altura.\n");
                 }
-                EncolarTrabajos(&aux, e, s);
+                EncolarTrabajos(&aux, &eAux, &sAux);
             } else {
-                EncolarTrabajos(&aux, e, s);
+                EncolarTrabajos(&aux, &eAux, &sAux);
             }
         }
+        
+        while(!ColaVacia(sAux)){
+        	DesencolarTrabajos(&aux, &eAux, &sAux);
+        	EncolarTrabajos(&aux, e, s);
+		}
     }
 }
 
