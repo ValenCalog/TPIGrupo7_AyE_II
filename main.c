@@ -2016,8 +2016,6 @@ void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcio
 	printf("\nIngrese el mes de la primer fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha1_1.mes);
-	printf("Ingrese el anio de la primer fecha: ");
-	scanf("%i",&fecha1_1.anio);
 	while ((fecha1_1.mes < 0) && (fecha1_1.mes > 12)){
 		printf("\nMes invalido, ingrese de nuevo: ");
 		fflush(stdin);
@@ -2032,13 +2030,11 @@ void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcio
 		scanf("%i",&fecha1_1.anio);
 	}
 
-	printf("Ingrese el dia de la segunda fecha: ");
 	//comento porque me mareé
 
 	printf("\n\nIngrese el dia de la segunda fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha2_2.dia);
-	printf("Ingrese el mes de la segunda fecha: ");
 	while ((fecha2_2.dia < 0) && (fecha2_2.dia > 31)){
 		printf("\n\nDia invalido, ingrese de nuevo: ");
 		fflush(stdin);
@@ -2047,8 +2043,6 @@ void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcio
 	printf("\nIngrese el mes de la segunda fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha2_2.mes);
-	printf("Ingrese el anio de la segunda fecha: ");
-	scanf("%i",&fecha2_2.anio);
 	while ((fecha2_2.mes < 0) && (fecha2_2.mes > 12)){
 		printf("\nMes invalido, ingrese de nuevo: ");
 		fflush(stdin);
@@ -2164,7 +2158,6 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	int band=0,i=0;
 	long fecha1,fecha2,mayor,menor,fecha_trabajo;
 	
-	printf("Ingrese el dia de la primer fecha: ");
 	printf("\n\nIngrese el dia de la primer fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha1_1.dia);
@@ -2177,8 +2170,6 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	printf("\nIngrese el mes de la primer fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha1_1.mes);
-	printf("Ingrese el anio de la primer fecha: ");
-	scanf("%i",&fecha1_1.anio);
 	while ((fecha1_1.mes < 0) && (fecha1_1.mes > 12)){
 		printf("\nMes invalido, ingrese de nuevo: ");
 		fflush(stdin);
@@ -2193,13 +2184,11 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 		scanf("%i",&fecha1_1.anio);
 	}
 
-	printf("Ingrese el dia de la segunda fecha: ");
 	//comento porque me mareé
 
 	printf("\n\nIngrese el dia de la segunda fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha2_2.dia);
-	printf("Ingrese el mes de la segunda fecha: ");
 	while ((fecha2_2.dia < 0) && (fecha2_2.dia > 31)){
 		printf("\n\nDia invalido, ingrese de nuevo: ");
 		fflush(stdin);
@@ -2208,8 +2197,6 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	printf("\nIngrese el mes de la segunda fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha2_2.mes);
-	printf("Ingrese el anio de la segunda fecha: ");
-	scanf("%i",&fecha2_2.anio);
 	while ((fecha2_2.mes < 0) && (fecha2_2.mes > 12)){
 		printf("\nMes invalido, ingrese de nuevo: ");
 		fflush(stdin);
