@@ -1818,6 +1818,11 @@ void ListadoPendientes(int id_trabajo,struct pendientes **tope){
 			printf("\nDe ID: %i",nodoaux->id_tarea);
 			if(nodoaux->completado == 0){
 				printf("No ha sido completada");
+				printf("\nDesea completar la tarea?");
+				printf("\n1) Si");
+				printf("\n0) No");
+				printf("\n---> ");
+				scanf("%i",&nodoaux->completado);
 			}else{
 				printf("Ha sido completada");
 			}
