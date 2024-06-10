@@ -1841,22 +1841,22 @@ void ListadoDeTrabajosDeTecnicos(struct trabajos **e, struct trabajos **s, struc
     struct trabajos *aux = NULL;
     struct trabajos *eAux = NULL, *sAux = NULL;
 
-    printf("Ingrese el ID del tÃ©cnico para ver sus trabajos: \n");
+    printf("Ingrese el ID del tecnico para ver sus trabajos: \n");
     scanf("%d", &id);
     tec = BuscarIDTecnico(id, &nodo, et, st);
     if (tec == 0) {
-        printf("El tÃ©cnico no existe.\n");
-        // hacer que vaya al menÃº
+        printf("El tecnico no existe.\n");
+        // hacer que vaya al menu
     } else {
         while (!ColaVacia(*s)) {
             DesencolarTrabajos(&aux, e, s);
             if (aux->id_tecnico == id) {
                 printf("ID del trabajo: %d \n", aux->id_trabajo);
-                strcpy(nombre_op, BuscarNombreOpcion(aux->id_opcion, *l)); // Copia el nombre de la opciÃ³n a nombre_op
-                printf("El nombre de la opciÃ³n es: %s \n", nombre_op);
+                strcpy(nombre_op, BuscarNombreOpcion(aux->id_opcion, *l)); // Copia el nombre de la opcion a nombre_op
+                printf("El nombre de la opcion es: %s \n", nombre_op);
                 strcpy(nombre_cli, BuscarNombreCliente(aux->id_cliente, *r)); // Copia el nombre del cliente a nombre_cli
                 printf("El nombre del cliente es: %s \n", nombre_cli);
-                printf("La ubicaciÃ³n es: %s \n", aux->direccion);
+                printf("La ubicacion es: %s \n", aux->direccion);
                 if (aux->cuatromtrs == 1) {
                     printf("Requiere trabajo en altura.\n");
                 } else {
@@ -1867,13 +1867,13 @@ void ListadoDeTrabajosDeTecnicos(struct trabajos **e, struct trabajos **s, struc
                 EncolarTrabajos(&aux, &eAux, &sAux);
             }
         }
-        
         while(!ColaVacia(sAux)){
         	DesencolarTrabajos(&aux, &eAux, &sAux);
         	EncolarTrabajos(&aux, e, s);
 		}
     }
 }
+
 
 void recorrerIRD(struct materiales *r){
 	if(r!=NULL){
