@@ -1997,21 +1997,51 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	
 	printf("Ingrese el dia de la primer fecha: ");
 	scanf("%i",&fecha1_1.dia);
+	while ((fecha1_1.dia < 0) || (fecha1_1.dia > 31)){
+		printf("\n\nDia invalido, ingrese de nuevo: ");
+		fflush(stdin);
+		scanf("%i",&fecha1_1.dia);
+	}
 	fflush(stdin);
 	printf("Ingrese el mes de la primer fecha: ");
 	scanf("%i",&fecha1_1.mes);
+	while ((fecha1_1.mes < 0) || (fecha1_1.mes > 12)){
+		printf("\nMes invalido, ingrese de nuevo: ");
+		fflush(stdin);
+		scanf("%i",&fecha1_1.mes);
+	}
 	fflush(stdin);
 	printf("Ingrese el anio de la primer fecha: ");
 	scanf("%i",&fecha1_1.anio);
+	while ((fecha1_1.anio < 2000) || (fecha1_1.anio >= 2030)){
+		printf("\nAño invalido, ingrese de nuevo: ");
+		fflush(stdin);
+		scanf("%i",&fecha1_1.anio);
+	}
 	fflush(stdin);
 	printf("Ingrese el dia de la segunda fecha: ");
 	scanf("%i",&fecha2_2.dia);
+	while ((fecha2_2.dia < 0) || (fecha2_2.dia > 31)){
+		printf("\n\nDia invalido, ingrese de nuevo: ");
+		fflush(stdin);
+		scanf("%i",&fecha2_2.dia);
+	}
 	fflush(stdin);
 	printf("Ingrese el mes de la segunda fecha: ");
 	scanf("%i",&fecha2_2.mes);
+	while ((fecha2_2.mes < 0) || (fecha2_2.mes > 12)){
+		printf("\nMes invalido, ingrese de nuevo: ");
+		fflush(stdin);
+		scanf("%i",&fecha2_2.mes);
+	}
 	fflush(stdin);
 	printf("Ingrese el anio de la segunda fecha: ");
 	scanf("%i",&fecha2_2.anio);
+	while ((fecha2_2.anio < 2000) || (fecha2_2.anio > 2030)){
+		printf("\nIngrese el anio de la segunda fecha: ");
+		fflush(stdin);
+		scanf("%i",&fecha2_2.anio);
+	}
 	fflush(stdin);
 	fecha1=(fecha1_1.anio * 10000) + (fecha1_1.mes * 100) + fecha1_1.dia;
 	fecha2=(fecha2_2.anio * 10000) + (fecha2_2.mes * 100) + fecha2_2.dia;
