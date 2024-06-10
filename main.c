@@ -144,6 +144,8 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcion *iniopc,struct materiales *raiz,struct materialesop *inimat,struct tarea *initar);
 double BuscarPrecioManodeObra(float id,struct opcion *ini);
 
+//void ListadoPendientes(int id_trabajo,struct pendietes **tope)
+
 int main(int argc, char *argv[]){
 	struct cliente *inicli=NULL;
 	struct materiales *raiz=NULL;
@@ -1783,6 +1785,31 @@ void ListadoDeOpciones (struct opcion **iniopcion, struct materiales **raiz, str
 		aux = aux->sgte;
 	}
 }
+
+/*
+void ListadoPendientes(int id_trabajo,struct pendietes **tope){
+	struct pendientes *tpaux=NULL,*nodoaux=NULL;
+	while((*tope)!=NULL){
+		Desapilar(nodoaux,tope);
+		if(nodoaux->id_trabajo=id_trabajo){
+			printf("\nLa Tarea: ");
+			puts(nodoaux->descripcion);
+			printf("\nDe ID: %i",nodoaux->id_tarea);
+			if(nodoaux->completado == 0){
+				printf("No ha sido completada");
+			}else{
+				printf("Ha sido completada");
+			}
+		}
+		Apilar(nodoaux,tpaux);
+	}
+	nodoaux=NULL;
+	while(tpaux!=NULL){
+		Desapilar(nodoaux,tpaux);
+		Apilar(nodoaux,tope);
+	}
+}
+*/
 
 void ListadoDePendientes (struct pendientes **nodo, struct pendientes **tope){
 	int pila;
