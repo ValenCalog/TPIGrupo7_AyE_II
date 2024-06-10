@@ -855,7 +855,7 @@ void AltaDeTareas (struct tarea **initar, int id){
 				}else{
 					newtar->id_tarea = BuscarMayorIdTarea ((*initar)) + 1;
 				}
-				printf("El ID de la tarea es: %d", newtar->id);
+				printf("El ID de la tarea es: %d", newtar->id_tarea);
 				printf("\n--- Ingrese el orden: ");
 				fflush(stdin);
 				scanf("%d", &newtar->orden);
