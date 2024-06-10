@@ -216,7 +216,13 @@ int main(int argc, char *argv[]){
 			case 10:
 				ListadoDeTrabajosDeTecnicos (&e, &s, &et, &st, &iniopc, &inicli);
 				opc=-1;
-				break;	
+				break;
+			case 11:
+				trabajosentre(e,s,iniopc,raiz,inimat,initar);
+				break;
+			case 12:
+				OpcionesMasVendidas(e,s,iniopc);
+				break;
 		}
 	}
 	DescargaSupremaDeEstructuras(p, inicli, raiz, inimat, initar, &et, &st, e, s, iniopc, &tope);
@@ -492,13 +498,13 @@ int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materi
 
 int Menu (int o){
 	int contgency = 0;
-	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) && (o!=7) && (o!=8) && (o!=9) && (o!=10) && (o!=11)){
+	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) && (o!=7) && (o!=8) && (o!=9) && (o!=10) && (o!=11) && (o!=12)){
 		if (contgency >= 1){
 			printf ("El valor que ingreso no es valido, vuelva a ingresar una opcion. \n" );
 			fflush (stdin);
 			scanf ("%d", &o );
 		}else{
-			printf ("-------------------Bienvenido al menu :D-------------------\n---Ingrese 0 para salir.\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar las tareas pendietes de un trabajo.\n---Ingrese 5 para ver las opciones mas vendidas.\n---Ingrese 6 para dar de alta un material.\n---Ingrese 7 para dar de alta un tecnico.\n---Ingrese 8 para dar de alta un cliente.\n---Ingrese 9 para listar materiales.\n---Ingrese 10 para listar trabajos de un tecnico.\n" );
+			printf ("-------------------Bienvenido al menu :D-------------------\n---Ingrese 0 para salir.\n---Ingrese 1 para listar opciones.\n---Ingrese 2 para dar de alta un opcion.\n---Ingrese 3 para dar de alta un trabajo.\n---Ingrese 4 para listar las tareas pendietes de un trabajo.\n---Ingrese 5 para ver las opciones mas vendidas.\n---Ingrese 6 para dar de alta un material.\n---Ingrese 7 para dar de alta un tecnico.\n---Ingrese 8 para dar de alta un cliente.\n---Ingrese 9 para listar materiales.\n---Ingrese 10 para listar trabajos de un tecnico.\n---Ingrese 11 para consultar los trabajos finalizados entre 2 fechas.\n---Ingrese 12 consultar sobre las 4 opciones mas vendidas entre 2 fechas.\n" );
 			fflush (stdin);
 			scanf ("%d", &o);
 			contgency++;
