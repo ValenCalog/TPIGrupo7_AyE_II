@@ -2004,7 +2004,6 @@ void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcio
 	double totalfinal=0,materiales=0,manodeobra=0,totalparcial=0;
 	long fecha1,fecha2,mayor,menor,fecha_trabajo;
 	
-	printf("Ingrese el dia de la primer fecha: ");
 	printf("\n\nIngrese el dia de la primer fecha: ");
 	fflush(stdin);
 	scanf("%i",&fecha1_1.dia);
