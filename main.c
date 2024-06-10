@@ -134,7 +134,7 @@ void EncolarTecnico(struct tecnico **nv, struct tecnico **e, struct tecnico **s)
 void EncolarTrabajos(struct trabajos **nv, struct trabajos **e, struct trabajos **s);
 void insertaropcionordenada(struct opcionesfav **auxL,struct opcionesfav **Lord);
 void insertaropfav(struct opcionesfav **nv, struct opcionesfav **ini);
-void ListadoPendientes(int id_trabajo,struct pendientes **tope);
+void ListadoPendientes(int id_trabajo,struct pendientes **tope, struct trabajos **e, struct trabajos **s);
 void ListadoDeOpciones (struct opcion **iniop, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar); //este solo muestra las opciones que hay
 void ListadoDeTrabajosDeTecnicos (struct trabajos **entrada, struct trabajos **salida, struct tecnico **et, struct tecnico **st, struct opcion **iniopc, struct cliente **inicli);
 void recorrerIRD(struct materiales *r);
@@ -184,7 +184,7 @@ int main(int argc, char *argv[]){
 				printf("Digite el ID de trabajo a consultar: ");
 				scanf("%i",&id_trabajo);
 				fflush(stdin);
-				ListadoPendientes(id_trabajo,&tope);
+				ListadoPendientes(id_trabajo,&tope, &e, &s);
 				opc=-1;
 				break;
 			case 5:
@@ -1806,8 +1806,10 @@ void ListadoDeOpciones (struct opcion **iniopcion, struct materiales **raiz, str
 	}
 }
 
-void ListadoPendientes(int id_trabajo,struct pendientes **tope){
+void ListadoPendientes(int id_trabajo,struct pendientes **tope, struct trabajos **e, struct trabajos **s){
+	int band = 1;
 	struct pendientes *tpaux=NULL,*nodoaux=NULL;
+	struct trabajos *trabAux = NULL, *eAux = NULL, *sAux = NULL;
 	while((*tope)!=NULL){
 		Desapilar(&nodoaux,tope);
 		if(nodoaux->id_trabajo=id_trabajo){
@@ -1830,7 +1832,36 @@ void ListadoPendientes(int id_trabajo,struct pendientes **tope){
 	nodoaux=NULL;
 	while(tpaux!=NULL){
 		Desapilar(&nodoaux,&tpaux);
+		if(nodoaux->id_trabajo == id_trabajo){
+			if(nodoaux->completado == 0){
+				printf("\nEntre aca");
+				band = 0;
+			}
+		}
 		Apilar(&nodoaux,tope);
+	}
+	if(band==1){
+		while(!ColaVacia(*s)){
+			printf("\nHOLA GENTE");
+			DesencolarTrabajos(&trabAux, e, s);
+			if(trabAux->id_trabajo == id_trabajo){
+				printf("\nIngrese la fecha de finalizacion");
+				printf("\nDia: ");
+				scanf("%d", &trabAux->fc_fin.dia);
+				printf("\nMes: ");
+				scanf("%d", &trabAux->fc_fin.mes);
+				printf("\nAnio: ");
+				scanf("%d", &trabAux->fc_fin.anio);
+			}
+			trabAux->sgte = NULL;
+			EncolarTrabajos(&trabAux, &eAux, &sAux);
+		}
+		
+		while(!ColaVacia(sAux)){
+			DesencolarTrabajos(&trabAux, &eAux, &sAux);
+			trabAux->sgte = NULL;
+			EncolarTrabajos(&trabAux, e, s);
+		}
 	}
 }
 
