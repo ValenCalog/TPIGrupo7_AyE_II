@@ -454,13 +454,13 @@ int GenerarIdMaterial (struct materiales *r){
 
 int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materiales **raiz, struct materialesop **inimat, int _cuatrometros, struct tarea *initar_){
 	int o, cont=0;
-	double auxc=0, auxtiempo=0, auxcosto=0, total=0;
+	double auxtiempo=0, auxcosto=0, total=0;
 	struct opcion *aux = (*iniopcion);
 	
 	printf("Las opciones disponibles son: \n");
 	while (aux != NULL){
 		cont = cont + 1;
-		printf("--------------------------\n");
+		printf("\n--------------------------\n");
 		printf("Opcion %d: %s. \n", cont, aux->Nombre);
 		printf("ID de la opcion: %d. \n", aux->id);
 		auxcosto = OperacionCosto ((*raiz), aux->id, inimat);
@@ -474,12 +474,12 @@ int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materi
 			printf("El precio de mano de obra es: %.2f.\n", aux->cHoraMObra);
 			printf("El precio de los materiales es: %.2f. \n", auxcosto);
 			printf("El tiempo total de las tareas es de: %.2f.\n", auxtiempo);
-			printf("Se añadira un 20% extra por la mano de obra en altura mayor a 4 metros.\n");
+			printf("Se agregara un 20 porciento extra por la mano de obra en altura mayor a 4 metros.\n");
 			total = auxcosto + aux->cHoraMObra;
 			total = ((total * 20)/100) + total;
 			printf("---> El precio total de la opcion es: %.2f", total);
 		}
-		printf("--------------------------\n");
+		printf("\n--------------------------\n");
 		auxcosto=0;
 		auxtiempo=0;
 		total = 0;       //se reincia todo para que no se vayan acumulando a lo largo del recorrido
@@ -495,7 +495,6 @@ int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materi
 	}
 	return(o);
 }
-
 int Menu (int o){
 	int contgency = 0;
 	while ((o!=0) && (o!=1) && (o!=2) && (o!=3) && (o!=4) && (o!=5) && (o!=6) && (o!=7) && (o!=8) && (o!=9) && (o!=10) && (o!=11) && (o!=12)){
@@ -1789,18 +1788,17 @@ void ListadoDeOpciones (struct opcion **iniopcion, struct materiales **raiz, str
 	printf("Las opciones disponibles son: \n");
 	while (aux != NULL){
 		cont = cont + 1;
-		printf("--------------------------\n");
+		printf("\n--------------------------\n");
 		printf("Opcion %d: %s. \n", cont, aux->Nombre);
 		printf("ID de la opcion: %d. \n", aux->id);
 		auxcosto = OperacionCosto ((*raiz), aux->id, inimat);
 		auxtiempo = OperacionTiempo(aux->id, *initar_);
 		printf("El precio de mano de obra es: %.2f.\n", aux->cHoraMObra);
 		printf("El precio de los materiales es: %.2f. \n", auxcosto);
-		printf("El tiempo total de las tareas es de: %.2f.\n", auxtiempo);
 		total = auxcosto + aux->cHoraMObra;
-		total = ((total * 20)/100) + total;
+		printf("El tiempo total de las tareas es de: %.2f.\n", total);
 		printf("---> El precio total de la opcion es: %.2f", total);
-		printf("--------------------------\n");
+		printf("\n--------------------------\n");
 		auxcosto=0;
 		auxtiempo=0;
 		total = 0;       //se reincia todo para que no se vayan acumulando a lo largo del recorrido
