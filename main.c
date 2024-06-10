@@ -170,16 +170,25 @@ int main(int argc, char *argv[]){
 			case 1:
 				system("cls");
 				ListadoDeOpciones(&iniopc, &raiz, &inimat, &initar);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 			case 2:
 				system("cls");
 				AltaDeOpciones(&iniopc, &initar, raiz, &inimat);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 			case 3:
 				system("cls");
 				AltaDeTrabajos (&inicli, &iniopc, &et, &st, &e, &s, &inimat, &raiz, initar, &tope);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 			case 4:
@@ -193,26 +202,41 @@ int main(int argc, char *argv[]){
 					scanf("%i",&id_trabajo);
 				}
 				ListadoPendientes(id_trabajo, &tope, &e, &s);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 			case 5:
 				system("cls");
 				OpcionesMasVendidas(e,s,&iniopc);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1; 
 				break;
 			case 6:
 				system("cls");
 				AltaDeMateriales(&raiz);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 			case 7:
 				system("cls");
 				AltaDeTecnicos(&et, &st);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 			case 8:
 				system("cls");
 				AltaDeClientes(&inicli);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 			case 9:
@@ -224,16 +248,25 @@ int main(int argc, char *argv[]){
 				}else{
 					printf("\n\t|||| No hay materiales cargados en el stock de la empresa ||||");
 				}
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 			case 10:
 				system("cls");
 				ListadoDeTrabajosDeTecnicos (&e, &s, &et, &st, &iniopc, &inicli);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 			case 11:
 				system("cls");
 				trabajosentre(e,s,iniopc,raiz,inimat,initar);
+				printf("\n--- Pulse cualquier enter para continuar: ");
+				getch();
+				fflush(stdin);
 				opc=-1;
 				break;
 		}
@@ -509,7 +542,7 @@ int Menu (int o){
 			fflush (stdin);
 			scanf ("%d", &o );
 		}else{
-			printf ("\t-------------------Bienvenido al menu :D-------------------\n\t---Ingrese 0 para salir.\n\t---Ingrese 1 para listar opciones.\n\n\t---Ingrese 5 para consultar sobre las 4 opciones mas vendidas entre 2 fechas.\n\t---Ingrese 6 para dar de alta un material.\n\t---Ingrese 7 para dar de alta un tecnico.\n\t---Ingrese 8 para dar de alta un cliente.\n\t---Ingrese 9 para listar materiales.\n\t---Ingrese 10 para listar trabajos de un tecnico.\n\t---Ingrese 11 para consultar los trabajos finalizados entre 2 fechas.\n" );
+			printf ("\t-------------------Bienvenido al menu :D-------------------\n\t---Ingrese 0 para salir.\n\t---Ingrese 1 para listar opciones.\n\t---Ingrese 2 para dar de alta opciones.\n\t---Ingrese 3 para dar de alta trabajos.\n\t---Ingrese 4 para dar de listar pendientes.\n\t---Ingrese 5 para consultar sobre las 4 opciones mas vendidas entre 2 fechas.\n\t---Ingrese 6 para dar de alta un material.\n\t---Ingrese 7 para dar de alta un tecnico.\n\t---Ingrese 8 para dar de alta un cliente.\n\t---Ingrese 9 para listar materiales.\n\t---Ingrese 10 para listar trabajos de un tecnico.\n\t---Ingrese 11 para consultar los trabajos finalizados entre 2 fechas.\n" );
 			fflush (stdin);
 			scanf ("%d", &o);
 			contgency++;
@@ -758,36 +791,96 @@ void AltaDeMaterialesOP (struct materiales *raiz, struct materialesop **inimat, 
 		fflush(stdin);
 		scanf("%d", &opc);
 		while(opc!=0){
+			newmat = (struct materialesop *) malloc (sizeof (struct materialesop));
 			printf("\n--- Ingrese el id de material: ");
 			fflush(stdin);
 			scanf("%d", &idaux);
-			while (idaux < 0){
-				printf("\n--- ID invalido, ingrese de nuevo: ");
-				fflush(stdin);
-				scanf("%d", &idaux);
-			}
 			band = BuscarIdMaterialesOP (raiz, idaux, band);
 			if(band==0){
 				printf("\n|||| El material no se encuentra en el almacen ||||");
 			}else{
-				newmat->idmat=idaux;
-				newmat->id_opcion=id;
-				printf("\n--- Ingrese la cantidad del material a utilizar: ");
-				fflush(stdin);
-				scanf("%d", &newmat->cantidad);
-				while (newmat->cantidad <0){
-					printf("\n--- Cantidad invalida, ingrese de nuevo: ");
+				if(newmat !=NULL){
+					newmat->idmat=idaux;
+					newmat->id_opcion=id;
+					printf("\n--- Ingrese la cantidad del material a utilizar: ");
 					fflush(stdin);
 					scanf("%d", &newmat->cantidad);
+					newmat->sgte=NULL;
+					(*inimat) = InsertarMaterialesOp (newmat, (*inimat));
 				}
-				newmat->sgte=NULL;
-				(*inimat) = InsertarMaterialesOp (newmat, (*inimat));
 			}
 			printf("--- Ingrese (1) para cargar un material o (0) para terminar: ");
 			fflush(stdin);
 			scanf("%d", &opc);
 		}
 	}
+	
+	/*
+	void AltaDeTareas (struct tarea **initar, int id){
+	struct tarea *newtar=NULL, *antt=NULL , *auxt=NULL;
+	int band=0, opc=1;
+	printf("--- Ingrese (1) para cargar una tarea o (0) para terminar: ");
+		fflush(stdin);
+		scanf("%d", &opc);
+		while(opc!=0){
+			newtar = (struct tarea *) malloc (sizeof (struct tarea));
+			if(newtar!=NULL){
+				newtar->id_op=id;
+				if ((*initar) == NULL){
+					newtar->id_tarea = 1;
+				}else{
+					newtar->id_tarea = BuscarMayorIdTarea ((*initar)) + 1;
+				}
+				printf("El ID de la tarea es: %d", newtar->id_tarea);
+				printf("\n--- Ingrese el orden: ");
+				fflush(stdin);
+				scanf("%d", &newtar->orden);
+				while (newtar->orden < 0){
+					printf("\n--- Orden incorrecto, ingrese de nuevo: ");
+					fflush(stdin);
+					scanf("%d", &newtar->orden);
+				}
+				printf("\n--- Ingrese el tiempo estimado: ");
+				fflush(stdin);
+				scanf("%lf", &newtar->tiempo);
+				while (newtar->tiempo < 0){
+					printf("\n--- Tiempo invalido, ingrese de nuevo: ");
+					fflush(stdin);
+					scanf("%lf", &newtar->tiempo);
+				}
+				printf("\n--- Ingrese una descripcion: ");
+				fflush(stdin);
+				gets(newtar->descripcion);
+				newtar->ant=NULL;
+				newtar->sgte=NULL;
+				        antt = BuscarAnterior (newtar->id_op, (*initar));
+						if( *initar == NULL ){
+							(*initar) = newtar;
+							(*initar)->sgte = NULL;
+							(*initar)->ant = NULL;
+						}else{
+							if( antt == NULL ){
+								(*initar) = newtar;
+							}else{
+								auxt = antt->sgte;
+								newtar->ant = antt;
+								antt->sgte = newtar;
+								if( auxt != NULL ){
+									newtar->sgte = auxt;
+									auxt->ant = newtar;
+								}
+							}
+						}
+			}else{
+				//
+			}
+			printf("--- Ingrese (1) para cargar una tarea o (0) para terminar: ");
+			fflush(stdin);
+			scanf("%d", &opc);
+			fflush(stdin);
+		}
+}
+	*/
 }
 
 void AltaDeOpciones (struct opcion ** iniop, struct tarea **initar, struct materiales *raiz, struct materialesop **inimat){
@@ -1474,44 +1567,66 @@ void completarlista(struct opcionesfav **Inicio, struct opcion **ini_opciones){
 	struct opcionesfav *nuevo=NULL,*aux=NULL;
 	int encontro=0;
 	iniopaux=(*ini_opciones);
+
 	aux=(*Inicio);
 	while(iniopaux!=NULL){ //recorre toda la lista de opciones
+	
 		while(encontro!=1 || aux!=NULL){ //recorre las opciones fav buscando la que coincide con el id opc que esta leyendo
+	
+			printf("ini_opciones: %d\n",iniopaux->id);
+
 			fflush(stdin);
 			if(aux==NULL){
 				nuevo=(struct opcionesfav *) malloc(sizeof(struct opcionesfav));
 				if(nuevo!=NULL){
+		
 					nuevo->id_op=iniopaux->id;
 					nuevo->ventas=0;
 					nuevo->sgte=NULL;
+		
 					insertaropfav(&nuevo,Inicio);
+	
 					encontro=1;
 				}else{
 					printf("No hay espacio en memoria");
 				}
 			}else{
 				if(iniopaux->id == aux->id_op){
+		
 					encontro=1;
 				}else{
+		
 					aux=aux->sgte;
 				}
 			}
+	
 		}
+	
 		if(encontro==0){
+	
 			nuevo=(struct opcionesfav *) malloc(sizeof(struct opcionesfav));
 			if(nuevo!=NULL){
+	
 				nuevo->id_op=iniopaux->id;
 				nuevo->ventas=0;
 				nuevo->sgte=NULL;
+		
 				insertaropfav(&nuevo,&(*Inicio));
+		
 			}else{
 				printf("No hay espacio en memoria");
 			}
+		
 		}
+	
 		encontro=0;
+
 		iniopaux=iniopaux->sgte;
+	
 		aux=(*Inicio);
+	
 	}
+
 }
 
 void Desapilar (struct pendientes **nodo, struct pendientes **tp){
@@ -1712,13 +1827,18 @@ void insertaropcionordenada(struct opcionesfav **auxL,struct opcionesfav **Lord)
 void insertaropfav(struct opcionesfav **nv, struct opcionesfav **ini){
 	struct opcionesfav *auxi=NULL;
 	auxi = (*ini);
-	while(auxi->sgte!=NULL){
-		auxi=auxi->sgte;
+	if(auxi==NULL){
+		(*ini)=(*nv);
+	}else{	
+		while(auxi->sgte!=NULL){
+			auxi=auxi->sgte;
+		}
+		auxi->sgte=(*nv);
+		auxi=NULL;
 	}
-	auxi->sgte=(*nv);
-	auxi=NULL;
-
+	
 }
+
 
 void ListadoDeOpciones (struct opcion **iniopcion, struct materiales **raiz, struct materialesop **inimat, struct tarea **initar_){
 	int o, cont=0;
@@ -1995,97 +2115,126 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	int band=0,i=0;
 	long fecha1,fecha2,mayor,menor,fecha_trabajo;
 	
-	printf("Ingrese el dia de la primer fecha: ");
+	printf("\n\nIngrese el dia de la primer fecha: ");
+	fflush(stdin);
 	scanf("%i",&fecha1_1.dia);
 	while ((fecha1_1.dia < 0) || (fecha1_1.dia > 31)){
 		printf("\n\nDia invalido, ingrese de nuevo: ");
 		fflush(stdin);
 		scanf("%i",&fecha1_1.dia);
 	}
+	printf("\nIngrese el mes de la primer fecha: ");
 	fflush(stdin);
-	printf("Ingrese el mes de la primer fecha: ");
 	scanf("%i",&fecha1_1.mes);
 	while ((fecha1_1.mes < 0) || (fecha1_1.mes > 12)){
 		printf("\nMes invalido, ingrese de nuevo: ");
 		fflush(stdin);
 		scanf("%i",&fecha1_1.mes);
 	}
+	printf("\nIngrese el anio de la primer fecha: ");
 	fflush(stdin);
-	printf("Ingrese el anio de la primer fecha: ");
 	scanf("%i",&fecha1_1.anio);
 	while ((fecha1_1.anio < 2000) || (fecha1_1.anio >= 2030)){
-		printf("\nAño invalido, ingrese de nuevo: ");
+		printf("\nAnio es invalido, ingrese de nuevo: ");
 		fflush(stdin);
 		scanf("%i",&fecha1_1.anio);
 	}
+
+	printf("\n\nIngrese el dia de la segunda fecha: ");
 	fflush(stdin);
-	printf("Ingrese el dia de la segunda fecha: ");
 	scanf("%i",&fecha2_2.dia);
 	while ((fecha2_2.dia < 0) || (fecha2_2.dia > 31)){
 		printf("\n\nDia invalido, ingrese de nuevo: ");
 		fflush(stdin);
 		scanf("%i",&fecha2_2.dia);
 	}
+	printf("\nIngrese el mes de la segunda fecha: ");
 	fflush(stdin);
-	printf("Ingrese el mes de la segunda fecha: ");
 	scanf("%i",&fecha2_2.mes);
 	while ((fecha2_2.mes < 0) || (fecha2_2.mes > 12)){
 		printf("\nMes invalido, ingrese de nuevo: ");
 		fflush(stdin);
 		scanf("%i",&fecha2_2.mes);
 	}
+	printf("\nIngrese el anio de la segunda fecha: ");
 	fflush(stdin);
-	printf("Ingrese el anio de la segunda fecha: ");
 	scanf("%i",&fecha2_2.anio);
 	while ((fecha2_2.anio < 2000) || (fecha2_2.anio > 2030)){
 		printf("\nIngrese el anio de la segunda fecha: ");
 		fflush(stdin);
 		scanf("%i",&fecha2_2.anio);
 	}
-	fflush(stdin);
+	
 	fecha1=(fecha1_1.anio * 10000) + (fecha1_1.mes * 100) + fecha1_1.dia;
+
 	fecha2=(fecha2_2.anio * 10000) + (fecha2_2.mes * 100) + fecha2_2.dia;
+
 	if(fecha1>fecha2){
+	
 		mayor=fecha1;
 		menor=fecha2;
 	}else{
+	
 		if(fecha2>fecha1){
 			mayor=fecha2;
 			menor=fecha1;
 		}else{
+		
 			mayor=fecha1;
 			menor=fecha1;
 		}
 	}
 	fflush(stdin);
+
+
 	//ini=salida; //Guarda el inicio de la cola de trabajos
 	struct trabajos *entAux = NULL, *salAux = NULL;
+	
 	completarlista(&L,iniopc);//Ahora tenemos una lista donde cada nodo tiene un id op y un int acumulativo
+	
 	auxL=L;
 	while(!ColaVacia(salida)){//El while se va a detener cuando recorra toda la cola de trabajos
+	
 		DesencolarTrabajos(&aux,&entrada,&salida);
+	
 		while(band=!1){//Se va a detener cuando auxL este en la posicion donde debe incrementarse la cantidad de ventas
+	
 			if(aux->id_opcion!=auxL->id_op){
+		
 				auxL=auxL->sgte;
 			}else{
+		
 				band=1;
 			}
+		
 		}
-		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia;
+
+
+		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia; 
+
+
 		if(fecha_trabajo<=mayor && fecha_trabajo>=menor){
+
 			auxL->ventas=auxL->ventas+1;//Se incrementa la cantidad de ventas en esa opcion
+
 		}
 					
 		band=0;
 		auxL=L;
 		aux->sgte = NULL;
+
 		EncolarTrabajos(&aux,&entAux,&salAux);
+
 		aux=NULL;
 	}
+
 	
 	while(!ColaVacia(salAux)){
+
 		DesencolarTrabajos(&aux,&entAux,&salAux);
+
 		aux->sgte = NULL;
+
 		EncolarTrabajos(&aux,&entrada,&salida);
 	}
 	/*auxL=L;
@@ -2102,11 +2251,27 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 
 	if(Lord!=NULL){
 		printf("\nTOP 4 opciones mas vendidas: ");
-		for(i=1; i<=4; i++){
+		i=1;
+		while(i<=4 && band==0){
+			printf("\n%i) Opcion %i, con %i ventas",i,Lord->id_op,Lord->ventas);
+			if(Lord->sgte==NULL){
+				band=1;
+			}else{
+				Lord=Lord->sgte;
+			}
+			i++;
+		}
+		printf("\n--- Pulse cualquier enter para continuar: ");
+		getch();
+		fflush(stdin);
+		/*for(i=1; i<=4; i++){
+			printf("for FUNC\n");
 			printf("\n%i) Opcion %i, con %i ventas",i,Lord->id_op,Lord->ventas);
 			Lord=Lord->sgte;
-		}
+		}*/
 	}else{
-		printf("\n----No se encontro ninguna opcion.\n");
+		printf("No se encontro ni a tu madre. \n");
 	}
 }
+
+
