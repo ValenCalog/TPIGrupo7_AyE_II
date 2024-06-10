@@ -1791,7 +1791,6 @@ void ListadoDeOpciones (struct opcion **iniopcion, struct materiales **raiz, str
 		printf("El precio de mano de obra es: %.2f.\n", aux->cHoraMObra);
 		printf("El precio de los materiales es: %.2f. \n", auxcosto);
 		printf("El tiempo total de las tareas es de: %.2f.\n", auxtiempo);
-		printf("Se añadira un 20% extra por la mano de obra en altura mayor a 4 metros.\n");
 		total = auxcosto + aux->cHoraMObra;
 		total = ((total * 20)/100) + total;
 		printf("---> El precio total de la opcion es: %.2f", total);
