@@ -831,6 +831,7 @@ void AltaDeTareas (struct tarea **initar, int id){
 			printf("\n--- Ingrese una descripcion: ");
 			fflush(stdin);
 			gets(newtar->descripcion);
+			fflush(stdin);
 			newtar->ant=NULL;
 			newtar->sgte=NULL;
 			antt = BuscarAnterior (newtar->id_op, (*initar));
@@ -1943,11 +1944,14 @@ void trabajosentre(struct trabajos *entrada,struct trabajos *salida,struct opcio
 	while(salida->id_trabajo!=ini->id_trabajo){
 		fecha_trabajo=(aux->fc_fin.anio * 10000) + (aux->fc_fin.mes * 100) + aux->fc_fin.dia; 
 		if(fecha_trabajo<=mayor && fecha_trabajo>=menor){
+			fflush(stdin);
 			materiales = OperacionCosto(raiz,aux->id_opcion, &inimat);
 			printf("\nEl costo de materiales es: %f",materiales);
 			manodeobra = (OperacionTiempo(aux->id_opcion, &initar) * BuscarPrecioManodeObra(aux->id_opcion,iniopc)) + (BuscarPrecioManodeObra(aux->id_opcion,iniopc)*aux->cuatromtrs*0.80);
+			fflush(stdin);
 			printf("\nEl costo de mano de obra es: %f",manodeobra);
 			totalparcial = materiales + manodeobra;
+			fflush(stdin);
 			printf("\nEl total parcial del trabajo es: %f",totalparcial);
 			printf("\nID trabajo: %i",aux->id_trabajo);
 			printf("\nID opcion: %i",aux->id_opcion);
@@ -1980,16 +1984,20 @@ void OpcionesMasVendidas(struct trabajos *entrada,struct trabajos *salida,struct
 	
 	printf("Ingrese el dia de la primer fecha: ");
 	scanf("%i",&fecha1_1.dia);
+	fflush(stdin);
 	printf("Ingrese el mes de la primer fecha: ");
 	scanf("%i",&fecha1_1.mes);
+	fflush(stdin);
 	printf("Ingrese el anio de la primer fecha: ");
 	scanf("%i",&fecha1_1.anio);
 	fflush(stdin);
 	
 	printf("Ingrese el dia de la segunda fecha: ");
 	scanf("%i",&fecha2_2.dia);
+	fflush(stdin);
 	printf("Ingrese el mes de la segunda fecha: ");
 	scanf("%i",&fecha2_2.mes);
+	fflush(stdin);
 	printf("Ingrese el anio de la segunda fecha: ");
 	scanf("%i",&fecha2_2.anio);
 	fflush(stdin);
