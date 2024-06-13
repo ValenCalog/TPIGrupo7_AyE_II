@@ -1,4 +1,5 @@
-1;1;Relevamiento;1;3.000000
-2;1;Nivelacion;2;10.000000
-3;1;Colocacion de postes;3;10.000000
-4;1;Instalacion;4;10.000000
+1;1;Tarea 1;1;5.000000
+2;1;Tarea 2;2;5.000000
+3;2;Tarea 1;1;10.000000
+4;2;Tarea 2;2;20.000000
+5;2;Tarea 3;2;20.000000

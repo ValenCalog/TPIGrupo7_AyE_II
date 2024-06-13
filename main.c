@@ -310,19 +310,22 @@ double OperacionTiempo (int id, struct tarea *initar){
 	return (tiempo);
 }
 
-double OperacionCosto (struct materiales *raiz, int codop, struct materialesop **inimat){
+double OperacionCosto (struct materiales *raiz, int codop, struct materialesop **inimat ){
 	double costomat=0, auxc=0;
 	struct materialesop *aux=NULL;
 	aux = (*inimat);
 	while(aux!=NULL){
-		if(aux->id_opcion=codop){
+		if(aux->id_opcion==codop){
+			printf("aux %d\n",aux->idmat);
 			BuscarPrecioMaterial(&auxc, raiz, aux->idmat);
+			printf("%f\n", auxc);
 			if(auxc==0){
 				printf("\n\t|||| El material no se encontro en en arbol ||||\n");
 			}else{
 				costomat = costomat + (aux->cantidad * auxc);			
 			}
 		}
+		auxc=0;
 		aux=aux->sgte;
 	}
 	return (costomat);
@@ -496,28 +499,20 @@ int ListadoDeOpcionesParaAltaDeTrabajo (struct opcion **iniopcion, struct materi
 	double auxtiempo=0, auxcosto=0, total=0;
 	struct opcion *aux = (*iniopcion);
 	
-	printf("\n--- Las opciones disponibles son: \n");
+	printf("Las opciones disponibles son: \n");
 	while (aux != NULL){
 		cont = cont + 1;
 		printf("\n--------------------------\n");
 		printf("Opcion %d: %s. \n", cont, aux->Nombre);
 		printf("ID de la opcion: %d. \n", aux->id);
 		auxcosto = OperacionCosto ((*raiz), aux->id, inimat);
-		auxtiempo = OperacionTiempo(aux->id, initar_);		
-		if (_cuatrometros == 0){
-			printf("El precio de mano de obra es: %.2f.\n", aux->cHoraMObra);
-			printf("El precio de los materiales es: %.2f. \n", auxcosto);
-			printf("El tiempo total de las tareas es de: %.2f.\n", auxtiempo);
-			printf("---> El precio total de la opcion es: %.2f", auxcosto + aux->cHoraMObra);
-		} else {
-			printf("El precio de mano de obra es: %.2f.\n", aux->cHoraMObra);
-			printf("El precio de los materiales es: %.2f. \n", auxcosto);
-			printf("El tiempo total de las tareas es de: %.2f.\n", auxtiempo);
-			printf("Se agregara un 20 porciento extra por la mano de obra en altura mayor a 4 metros.\n");
-			total = auxcosto + aux->cHoraMObra;
-			total = ((total * 20)/100) + total;
-			printf("---> El precio total de la opcion es: %.2f", total);
-		}
+		auxtiempo = OperacionTiempo(aux->id, initar_);
+		printf("El precio de mano de obra por hora es: %.2f.\n", aux->cHoraMObra);
+		printf("El precio de mano de obra total es: %.2f.\n", aux->cHoraMObra* auxtiempo);
+		printf("El precio de los materiales es: %.2f. \n", auxcosto);
+		total = auxcosto + (aux->cHoraMObra * auxtiempo);
+		printf("El tiempo total de las tareas es de: %.2f.\n", auxtiempo);
+		printf("---> El precio total de la opcion es: %.2f", total);
 		printf("\n--------------------------\n");
 		auxcosto=0;
 		auxtiempo=0;
@@ -1853,10 +1848,11 @@ void ListadoDeOpciones (struct opcion **iniopcion, struct materiales **raiz, str
 		printf("ID de la opcion: %d. \n", aux->id);
 		auxcosto = OperacionCosto ((*raiz), aux->id, inimat);
 		auxtiempo = OperacionTiempo(aux->id, *initar_);
-		printf("El precio de mano de obra es: %.2f.\n", aux->cHoraMObra);
+		printf("El precio de mano de obra por hora es: %.2f.\n", aux->cHoraMObra);
+		printf("El precio de mano de obra total es: %.2f.\n", aux->cHoraMObra* auxtiempo);
 		printf("El precio de los materiales es: %.2f. \n", auxcosto);
-		total = auxcosto + aux->cHoraMObra;
-		printf("El tiempo total de las tareas es de: %.2f.\n", total);
+		total = auxcosto + (aux->cHoraMObra * auxtiempo);
+		printf("El tiempo total de las tareas es de: %.2f.\n", auxtiempo);
 		printf("---> El precio total de la opcion es: %.2f", total);
 		printf("\n--------------------------\n");
 		auxcosto=0;
